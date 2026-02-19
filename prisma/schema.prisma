@@ -1,0 +1,178 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  role          UserRole  @default(ATHLETE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  athleteProfile AthleteProfile?
+  recruiterProfile RecruiterProfile?
+  applications   Application[]
+}
+
+enum UserRole {
+  ATHLETE
+  RECRUITER
+  ADMIN
+}
+
+model AthleteProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  firstName       String
+  lastName        String
+  dateOfBirth     DateTime
+  gender          Gender
+  phone           String?
+  location        String?
+  bio             String?
+  
+  height          Float?    // in cm
+  weight          Float?    // in kg
+  profileImage    String?
+  resumeUrl       String?
+  
+  primarySport    String
+  secondarySports String[]
+  position        String?
+  experience      String?   // Beginner, Intermediate, Advanced, Professional
+  achievements    String[]
+  
+  gpa             Float?
+  graduationYear  Int?
+  currentSchool   String?
+  
+  videoHighlights String[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  applications    Application[]
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model RecruiterProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  organization    String
+  title           String
+  phone           String?
+  bio             String?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  opportunities   Opportunity[]
+}
+
+model Opportunity {
+  id              String    @id @default(cuid())
+  recruiterId     String
+  recruiter       RecruiterProfile @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  
+  title           String
+  sport           String
+  category        String    // Sector (e.g., "Professional", "College", "Club")
+  location        String
+  city            String?
+  state           String?
+  
+  type            String    // Full Time, Part Time, Contract, Scholarship
+  salaryMin       Int?
+  salaryMax       Int?
+  
+  description     String
+  requirements    String[]
+  benefits        String[]
+  
+  status          OpportunityStatus @default(ACTIVE)
+  postedDate      DateTime  @default(now())
+  deadline        DateTime?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  applications    Application[]
+}
+
+enum OpportunityStatus {
+  ACTIVE
+  CLOSED
+  DRAFT
+}
+
+model Application {
+  id              String    @id @default(cuid())
+  athleteId       String
+  athlete         AthleteProfile @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  
+  opportunityId   String
+  opportunity     Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  status          ApplicationStatus @default(PENDING)
+  coverLetter     String?
+  notes           String?
+  
+  appliedAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([athleteId, opportunityId])
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWING
+  SHORTLISTED
+  INTERVIEWED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+model Sport {
+  id              String    @id @default(cuid())
+  name            String    @unique
+  description     String?
+  icon            String?
+  
+  createdAt       DateTime  @default(now())
+}
+
+model Category {
+  id              String    @id @default(cuid())
+  name            String    @unique
+  description     String?
+  icon            String?
+  imageUrl        String?
+  
+  createdAt       DateTime  @default(now())
+}
