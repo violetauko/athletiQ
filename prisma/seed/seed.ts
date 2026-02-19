@@ -18,7 +18,7 @@ async function main() {
     { name: 'Tennis', description: 'Racket sport' },
     { name: 'Baseball', description: 'Bat and ball game' },
     { name: 'Volleyball', description: 'Team sport with net' },
-    { name: 'American Football', description: 'Contact team sport.' },
+    { name: 'American Football', description: 'Contact team sport' },
   ]
 
   for (const sport of sports) {
