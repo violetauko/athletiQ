@@ -12,38 +12,49 @@ export function HeroSection() {
 
   return (
     <section className="relative w-full min-h-150 flex flex-col items-center justify-center overflow-hidden">
-      <div className='container w-full flex items-center justify-between my-7'>
-        <div className="space-y-4 w-2/3">
-          <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-            Take the Next Step in Your Career with Us
-          </h1>
+      <div className="w-full flex lg:flex-row 
+                items-start lg:items-center 
+                justify-between gap-6 my-7">
+
+          {/* Left Section */}
+          <div className="space-y-4 w-full sm:w-2/3">
+            <h1 className="text-3xl sm:text-3xl md:text-5xl lg:text-6xl 
+                          font-bold leading-tight">
+              Take the Next Step in Your Career with Us
+            </h1>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex items-center 
+                          justify-start lg:justify-end 
+                          flex-wrap md:flex-nowrap gap-3">
+            <RoundedImage
+              image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80"
+              alt="Profile"
+              size={10}
+            />
+            <RoundedImage
+              image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80"
+              alt="Profile"
+              size={10}
+            />
+            <RoundedImage
+              image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80"
+              alt="Profile"
+              size={10}
+            />
+            <RoundedImage
+              image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80"
+              alt="Profile"
+              size={10}
+            />
+          </div>
+
         </div>
-        <div className='flex items-start justify-evenly space-x-3'>
-          <RoundedImage 
-              image='https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80'
-              alt='Profile'
-              size={16}
-            />
-          <RoundedImage 
-              image='https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80'
-              alt='Profile'
-              size={16}
-            />
-          <RoundedImage 
-              image='https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80'
-              alt='Profile'
-              size={16}
-            />
-          <RoundedImage 
-              image='https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80'
-              alt='Profile'
-              size={16}
-            />
-        </div>
-      </div>
+
 
       {/* Content */}
-      <div className="container relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pb-20 mt-10">
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pb-20 mt-10">
         <div className="space-y-8 text-white h-full">
 
           {/* Search Box */}

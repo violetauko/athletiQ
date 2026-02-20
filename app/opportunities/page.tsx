@@ -1,9 +1,13 @@
+'use client'
 import { OpportunityCard } from '@/components/opportunities/opportunity-card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Search, Filter } from 'lucide-react'
+import TitleCard from '@/components/shared/title-card'
+import { useRouter } from 'next/navigation'
 
 export default function OpportunitiesPage() {
+  const router = useRouter();
   // Mock data - in production, this would come from API/database with pagination
   const opportunities = [
     {
@@ -114,20 +118,22 @@ export default function OpportunitiesPage() {
     },
   ]
 
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       {/* Page Header */}
-      <section className="bg-gradient-to-br from-stone-900 to-black text-white py-16">
-        <div className="container space-y-6">
-          <h1 className="text-5xl font-bold">Find Your Perfect Opportunity</h1>
-          <p className="text-xl text-white/80 max-w-3xl">
-            Browse through thousands of verified sports opportunities across the globe
-          </p>
-        </div>
-      </section>
+      <div className="my-12">
+        <TitleCard 
+          image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80" 
+          title="Find Your Perfect Opportunity" 
+          description="Browse through thousands of verified sports opportunities across the globe"
+          action="Let's talk"
+          onClick={()=>router.push("/contact")}
+        />
+      </div>
 
       {/* Search and Filter Section */}
-      <section className="bg-white border-b sticky top-16 z-40">
+      <section className="bg-white border-b sticky top-16 z-40 rounded-2xl px-3">
         <div className="container py-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 flex gap-2">
@@ -163,7 +169,7 @@ export default function OpportunitiesPage() {
       </section>
 
       {/* Opportunities Grid */}
-      <section className="py-12 bg-gradient-to-br from-stone-50 to-white flex-1">
+      <section className="py-12 flex-1">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <p className="text-muted-foreground">

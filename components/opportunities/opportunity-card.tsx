@@ -51,14 +51,14 @@ export function OpportunityCard({
 
         {/* Title */}
         <div>
-          <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
+          <h3 className="text-xl sm:text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
             {title}
           </h3>
           <p className="text-sm text-muted-foreground">{category}</p>
         </div>
 
         {/* Location and Details */}
-        <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="space-y-1 sm:space-y-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4" />
             <span>{city || location}</span>

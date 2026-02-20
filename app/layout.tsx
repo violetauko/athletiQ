@@ -23,9 +23,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ReactQueryProvider>
-          <div className="flex min-h-screen flex-col">
+          <div className="min-h-screen">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="container mx-auto">{children}</main>
             <Footer />
           </div>
         </ReactQueryProvider>

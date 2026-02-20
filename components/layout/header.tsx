@@ -7,13 +7,13 @@ import { Heart } from 'lucide-react'
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-band-20 backdrop-blur supports-backdrop-filter:bg-band-10">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container mx-auto px-2 sm:px-0 lg:px-0 flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2">
             <div className="flex items-center justify-center w-10 h-10 bg-black rounded-full">
               <Heart className="w-5 h-5 text-white fill-white" />
             </div>
-            <span className="font-bold text-xl">AthletiQ</span>
+            <span className="font-bold text-xl text-black">AthletiQ</span>
           </Link>
         </div>
 

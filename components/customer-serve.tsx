@@ -48,43 +48,7 @@ const rugbyLogos: LogoItem[] = [
     alt: "New Zealand All Blacks",
     width: 120,
     height: 60,
-  },
-  {
-    src: "https://1000logos.net/wp-content/uploads/2020/09/England-Rugby-Logo-500x281.png",
-    alt: "England Rugby",
-    width: 120,
-    height: 60,
-  },
-  {
-    src: "https://1000logos.net/wp-content/uploads/2020/09/Ireland-Rugby-Logo-500x281.png",
-    alt: "Ireland Rugby",
-    width: 120,
-    height: 60,
-  },
-  {
-    src: "https://1000logos.net/wp-content/uploads/2020/09/France-Rugby-Logo-500x281.png",
-    alt: "France Rugby",
-    width: 120,
-    height: 60,
-  },
-  {
-    src: "https://1000logos.net/wp-content/uploads/2020/09/South-Africa-Rugby-Logo-500x281.png",
-    alt: "South Africa Rugby",
-    width: 120,
-    height: 60,
-  },
-  {
-    src: "https://1000logos.net/wp-content/uploads/2020/09/Wales-Rugby-Logo-500x281.png",
-    alt: "Wales Rugby",
-    width: 120,
-    height: 60,
-  },
-  {
-    src: "https://1000logos.net/wp-content/uploads/2020/09/Scotland-Rugby-Logo-500x281.png",
-    alt: "Scotland Rugby",
-    width: 120,
-    height: 60,
-  },
+  }
 ];
 
 // Duplicate the array to create a seamless infinite scroll effect
@@ -92,12 +56,11 @@ const marqueeLogos = [...rugbyLogos, ...rugbyLogos];
 
 const CustomersWeServe: React.FC = () => {
   return (
-    <section className="w-full bg-white py-2 md:py-16 lg:py-20 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          
+    <section className="w-full py-2 md:py-4 lg:py-6 overflow-hidden">
+      <div className="mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
           {/* LEFT SIDE - STATIC CONTENT */}
-          <div className="text-center lg:text-left">
+          <div className="text-start">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
               Customers we serve
             </h2>
@@ -105,21 +68,20 @@ const CustomersWeServe: React.FC = () => {
               Trusted by rugby clubs and organizations worldwide.
             </p>
             {/* Brand name from your image */}
-            
           </div>
 
           {/* RIGHT SIDE - SCROLLING MARQUEE (RTL) */}
-          <div className="relative w-full overflow-hidden">
+          <div className="relative col-span-2 w-full overflow-hidden">
             {/* Gradient fade edges for a smooth effect */}
-            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-linear-to-r from-white to-transparent z-10 pointer-events-none rounded-2xl"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-16 bg-linear-to-l from-white to-transparent z-10 pointer-events-none rounded-2xl"></div>
 
             {/* Scrolling container */}
-            <div className="flex animate-marquee-rtl whitespace-nowrap">
+            <div className="flex w-max animate-marquee whitespace-nowrap">
               {marqueeLogos.map((logo, index) => (
                 <div
                   key={`${logo.alt}-${index}`}
-                  className="inline-flex mx-4 flex-shrink-0 items-center justify-center"
+                  className="inline-flex mx-4 shrink-0 items-center justify-center"
                 >
                   <Image
                     src={logo.src}
@@ -137,16 +99,16 @@ const CustomersWeServe: React.FC = () => {
 
       {/* Tailwind custom animation for right-to-left marquee */}
       <style jsx>{`
-        @keyframes marquee-rtl {
-          0% {
-            transform: translateX(0%);
+        @keyframes marquee {
+          from {
+            transform: translateX(0);
           }
-          100% {
+          to {
             transform: translateX(-50%);
           }
         }
-        .animate-marquee-rtl {
-          animation: marquee-rtl 30s linear infinite;
+        .animate-marquee {
+          animation: marquee 15s linear infinite;
         }
       `}</style>
     </section>

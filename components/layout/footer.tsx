@@ -7,9 +7,9 @@ export function Footer() {
 
   return (
     <footer className="w-full border-t bg-band-100 pb-10">
-      <div className="container">
+      <div className="container mx-auto px-4 sm:px-0">
         <div className="border-t border-gray-800 mt-5 mb-16"></div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-8">
           {/* Logo and Brand */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-2">

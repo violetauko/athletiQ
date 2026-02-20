@@ -1,10 +1,14 @@
+'use client'
+import TitleCard from '@/components/shared/title-card'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Trophy, Users, Target, Heart } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function AboutPage() {
+  const router = useRouter()
   const values = [
     {
       icon: <Trophy className="w-8 h-8" />,
@@ -36,27 +40,24 @@ export default function AboutPage() {
   ]
 
   return (
-    <div className="flex flex-col">
+    <>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-stone-900 to-black text-white py-24">
-        <div className="container">
-          <div className="max-w-3xl">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              About AthletiQ
-            </h1>
-            <p className="text-xl text-white/80 leading-relaxed">
-              We're on a mission to connect talented athletes with world-class sports organizations, 
-              creating opportunities that transform careers and lives.
-            </p>
-          </div>
-        </div>
-      </section>
+      <div className="my-12">
+        <TitleCard 
+          image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80" 
+          title="About AthletiQ" 
+          description="We're on a mission to connect talented athletes with world-class sports organizations, 
+            creating opportunities that transform careers and lives."
+          action="Let's talk"
+          onClick={()=>router.push("/contact")}
+        />
+      </div>
 
       {/* Story Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative h-96 lg:h-[500px] rounded-2xl overflow-hidden">
+            <div className="relative h-60 lg:h-90 rounded-2xl overflow-hidden">
               <Image
                 src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
                 alt="Athletes training"
@@ -90,7 +91,7 @@ export default function AboutPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-gradient-to-br from-amber-50 to-stone-100">
+      <section className="py-16 bg-linear-to-br from-amber-50 to-stone-100 rounded-2xl">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -108,7 +109,7 @@ export default function AboutPage() {
       </section>
 
       {/* Values Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Our Values</h2>
@@ -120,7 +121,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value, index) => (
               <Card key={index} className="p-8 text-center space-y-4 hover:shadow-lg transition-shadow">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-200 to-amber-100 rounded-2xl">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-amber-200 to-amber-100 rounded-2xl">
                   {value.icon}
                 </div>
                 <h3 className="text-xl font-bold">{value.title}</h3>
@@ -134,26 +135,28 @@ export default function AboutPage() {
       </section>
 
       {/* Mission Section */}
-      <section className="py-20 bg-gradient-to-br from-stone-50 to-white">
-        <div className="container">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
+      <section className="py-4">
+        <div className="border-t border-gray-500 mb-20"></div>
+        <div className="w-full">
+          <div className="grid grid-cols-3 mx-auto">
+            <div className="text-start mb-12">
               <h2 className="text-4xl font-bold mb-4">Our Mission</h2>
             </div>
 
-            <Card className="p-12 bg-gradient-to-br from-amber-50 to-white border-amber-200">
-              <p className="text-xl text-center leading-relaxed text-muted-foreground">
+            {/* <Card className="p-12 w-full col-span-2"> */}
+              <p className="text-xl text-start col-span-2">
                 To democratize access to sports opportunities by creating a transparent, efficient, 
                 and inclusive platform that empowers athletes to achieve their dreams and helps 
                 organizations discover exceptional talent from around the world.
               </p>
-            </Card>
+            {/* </Card> */}
           </div>
         </div>
+        <div className="border-t border-gray-500 my-12"></div>
       </section>
 
       {/* Team Section */}
-      <section className="py-20 bg-white">
+      <section className="py-12">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Meet Our Team</h2>
@@ -198,7 +201,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-stone-900 to-black text-white">
+      <section className="py-20 bg-linear-to-br from-stone-900 to-black text-white rounded-2xl mb-20">
         <div className="container text-center">
           <h2 className="text-4xl font-bold mb-6">
             Ready to Join AthletiQ?
@@ -211,12 +214,12 @@ export default function AboutPage() {
             <Button size="lg" className="bg-white text-black hover:bg-white/90 rounded-full px-8" asChild>
               <Link href="/register">Get Started</Link>
             </Button>
-            <Button size="lg" variant="outline" className="rounded-full px-8 text-white border-white hover:bg-white/10" asChild>
+            <Button size="lg" variant="outline" className="rounded-full px-8 text-black border-white hover:bg-white/10" asChild>
               <Link href="/contact">Contact Us</Link>
             </Button>
           </div>
         </div>
       </section>
-    </div>
+    </>
   )
 }

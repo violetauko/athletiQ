@@ -1,28 +1,27 @@
+'use client';
+import TitleCard from '@/components/shared/title-card'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Mail, Phone, MapPin, Clock } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export default function ContactPage() {
+  const router = useRouter()
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-stone-900 to-black text-white py-20">
-        <div className="container">
-          <div className="max-w-3xl">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Get In Touch
-            </h1>
-            <p className="text-xl text-white/80">
-              Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
-            </p>
-          </div>
-        </div>
-      </section>
+      <div className="my-12">
+        <TitleCard 
+          image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80" 
+          title="Get In Touch" 
+          description="Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible."
+        />
+      </div>
 
       {/* Contact Section */}
-      <section className="py-20 bg-gradient-to-br from-white to-stone-50">
+      <section className="py-20">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
@@ -73,7 +72,7 @@ export default function ContactPage() {
 
             {/* Contact Information */}
             <div className="space-y-8">
-              <div>
+              <div className='text-center sm:text-start'>
                 <h2 className="text-3xl font-bold mb-6">Contact Information</h2>
                 <p className="text-muted-foreground mb-8">
                   Fill up the form and our team will get back to you within 24 hours.
@@ -82,7 +81,7 @@ export default function ContactPage() {
 
               <div className="space-y-6">
                 <Card className="p-6 flex items-start gap-4 hover:shadow-lg transition-shadow">
-                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-linear-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
                     <Mail className="w-6 h-6" />
                   </div>
                   <div>
@@ -93,7 +92,7 @@ export default function ContactPage() {
                 </Card>
 
                 <Card className="p-6 flex items-start gap-4 hover:shadow-lg transition-shadow">
-                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-linear-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
                     <Phone className="w-6 h-6" />
                   </div>
                   <div>
@@ -104,7 +103,7 @@ export default function ContactPage() {
                 </Card>
 
                 <Card className="p-6 flex items-start gap-4 hover:shadow-lg transition-shadow">
-                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-linear-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
                     <MapPin className="w-6 h-6" />
                   </div>
                   <div>
@@ -115,7 +114,7 @@ export default function ContactPage() {
                 </Card>
 
                 <Card className="p-6 flex items-start gap-4 hover:shadow-lg transition-shadow">
-                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 bg-linear-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
                     <Clock className="w-6 h-6" />
                   </div>
                   <div>
@@ -143,16 +142,16 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white">
-        <div className="container max-w-4xl">
+      <section className="py-20">
+        <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Frequently Asked Questions</h2>
-            <p className="text-xl text-muted-foreground">
+            <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">Frequently Asked Questions</h2>
+            <p className="text-xl md:text-xl text-muted-foreground">
               Quick answers to common questions
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-2 md:space-y-4">
             {[
               {
                 question: 'How do I create an athlete profile?',

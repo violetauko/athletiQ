@@ -1,3 +1,4 @@
+'use client';
 import { HeroSection } from '@/components/shared/hero-section'
 import { OpportunityCard } from '@/components/opportunities/opportunity-card'
 import { CategoryCard } from '@/components/shared/category-card'
@@ -5,8 +6,11 @@ import { AthleteCard } from '@/components/athletes/athlete-card'
 import { Button } from '@/components/ui/button'
 import { Dumbbell, Users, GraduationCap, TrendingUp, Briefcase, Trophy } from 'lucide-react'
 import Link from 'next/link'
+import TitleCard from '@/components/shared/title-card'
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
+  const router = useRouter()
   // Mock data - in production, this would come from API/database
   const latestOpportunities = [
     {
@@ -145,16 +149,15 @@ export default function HomePage() {
       <HeroSection />
 
       {/* Benefits Section */}
-      <section className="py-16 bg-linear-to-br from-white to-stone-50">
+      <section className="py-12 md:py-16">
         <div className="container">
-
           <div className="border-t border-gray-500 mb-20"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            <div className="space-y-6">
-              <h2 className="text-4xl font-bold">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-start">
+            <div className="space-y-3 md:space-y-6">
+              <h2 className="text-2xl md:text-4xl font-bold">
                 Recruitment Benefits With Us
               </h2>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-muted-foreground text-base md:text-lg">
                 Join the leading platform connecting athletes with opportunities worldwide. 
                 We've been the trusted partner for sports recruitment since our founding.
               </p>
@@ -196,16 +199,16 @@ export default function HomePage() {
       </section>
 
       {/* Team Section */}
-      <section className="bg-white">
+      <section >
         <div className="container space-y-8">
-          <div className="text-start space-y-2">
-            <p className="text-sm font-semibold text-muted-foreground tracking-wider uppercase mb-4">
+          <div className="text-start space-y-1 md:space-y-2">
+            <p className="text-sm font-semibold text-muted-foreground tracking-wider uppercase mb2 md:mb-4">
               The Team
             </p>
-            <h2 className="text-4xl font-bold">Our Dedicated Team</h2>
+            <h2 className="text-2xl md:text-4xl font-bold">Our Dedicated Team</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {featuredAthletes.map((athlete, index) => (
               <div key={index} className="animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
                 <AthleteCard {...athlete} />
@@ -216,16 +219,16 @@ export default function HomePage() {
       </section>
 
       {/* Categories/Sectors Section */}
-      <section className="py-16 bg-linear-to-br from-stone-50 to-amber-50/30">
-        <div className="container space-y-8">
-          <div className="space-y-2 flex justify-evenly">
-            <h2 className="text-4xl text-start font-bold w-full">Our Sectors</h2>
-            <p className="text-muted-foreground text-lg max-w-3xl w-full text-start">
+      <section className="py-16">
+        <div className="container space-y-4 md:space-y-8">
+          <div className="space-y-2 flex flex-col md:flex-row justify-evenly">
+            <h2 className="text-2xl md:text-4xl text-start font-bold w-full">Our Sectors</h2>
+            <p className="text-muted-foreground text-base md:text-lg max-w-3xl w-full text-start">
               Explore opportunities across various sports sectors and find the perfect match for your skills and ambitions.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 md:mt-12">
             {categories.map((category, index) => (
               <div key={index} className="animate-slide-up" style={{ animationDelay: `${index * 100}ms` }}>
                 <CategoryCard {...category} />
@@ -236,10 +239,10 @@ export default function HomePage() {
       </section>
 
       {/* Latest Opportunities */}
-      <section className="py-7 bg-white">
+      <section className="py-7">
         <div className="container space-y-8">
-          <div className="flex items-center justify-between mb-12">
-            <h2 className="text-4xl font-bold">Our Latest Opportunities</h2>
+          <div className="flex items-center justify-between mb-6 md:mb-12">
+            <h2 className="text-2xl md:text-4xl font-bold">Our Latest Opportunities</h2>
             <Button variant="outline" className="rounded-full" asChild>
               <Link href="/opportunities">View All</Link>
             </Button>
@@ -256,13 +259,13 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 bg-linear-to-br from-stone-50 to-white">
+      <section className="py-10 md:py-16">
         <div className="container">
           <div className="border-t border-gray-500 mb-20"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-4xl font-bold">Testimonials</h2>
-              <p className="text-muted-foreground text-lg">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-center">
+            <div className="space-y-3 md:space-y-6">
+              <h2 className="text-2xl md:text-4xl font-bold">Testimonials</h2>
+              <p className="text-muted-foreground text-base md:text-lg">
                 Hear what athletes and organizations say about their experience with AthletiQ
               </p>
               <Button className="bg-black hover:bg-black/90 rounded-full">
@@ -297,35 +300,14 @@ export default function HomePage() {
       </section>
 
       {/* Contact CTA Section */}
-      <section className="min-h-80 py-20 flex items-center">
-        <div className="container relative rounded-2xl overflow-hidden h-full">
-
-          {/* Background */}
-          <div className="absolute inset-0 z-0">
-            <img
-              src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80"
-              alt="Contact us"
-              className="w-full h-full object-cover brightness-75"
-            />
-            <div className="absolute inset-0 bg-linear-to-r from-black/70 to-black/50" />
-          </div>
-
-          {/* Content */}
-          <div className="relative z-10 text-white text-center md:text-left space-y-6 py-12">
-            <h2 className="text-4xl md:text-5xl font-bold max-w-2xl">
-              Contact Us
-            </h2>
-
-            <p className="text-lg text-white/90 max-w-xl">
-              Ready to take the next step? Get in touch with our team today.
-            </p>
-
-            <Button className="bg-white text-black hover:bg-white/90 rounded-full px-8">
-              Let's Talk
-            </Button>
-          </div>
-
-        </div>
+      <section className="min-h-80 pt-12 pb-20">
+        <TitleCard
+          image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80"
+          title='Contact Us'
+          description='Ready to take the next step? Get in touch with our team today.'
+          action="Let's Talk"
+          onClick={()=>router.push("/contact")}
+          />
       </section>
 
     </div>
