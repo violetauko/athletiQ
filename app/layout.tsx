@@ -4,6 +4,7 @@ import './globals.css'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { ReactQueryProvider } from '@/lib/react-query-provider'
+import { AuthProvider } from '@/components/layout/auth-provider'
 
 
 export const metadata: Metadata = {
@@ -22,13 +23,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ReactQueryProvider>
-          <div className="min-h-screen">
-            <Header />
-            <main className="container mx-auto">{children}</main>
-            <Footer />
-          </div>
-        </ReactQueryProvider>
+        <AuthProvider>
+          <ReactQueryProvider>
+            <div className="min-h-screen">
+              <Header />
+              <main className="container mx-auto px-2 sm:px-0 lg:px-0">{children}</main>
+              <Footer />
+            </div>
+          </ReactQueryProvider>
+        </AuthProvider>
       </body>
     </html>
   )

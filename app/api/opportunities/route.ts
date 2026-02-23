@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/auth'
 
 // GET /api/opportunities - List all opportunities
 export async function GET(request: Request) {
@@ -37,7 +38,7 @@ export async function GET(request: Request) {
       prisma.opportunity.findMany({
         where,
         include: {
-          recruiter: {
+          client: {
             include: {
               user: {
                 select: {
@@ -80,19 +81,33 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
-    // TODO: Add authentication check here
-    // const session = await getServerSession()
-    // if (!session || session.user.role !== 'RECRUITER') {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
+    const session = await auth()
+    
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (session.user.role !== 'CLIENT') {
+      return NextResponse.json({ error: 'Unauthorized - Only clients can create opportunities' }, { status: 403 })
+    }
+
+    // Get the client profile ID for this user
+    const userWithClient = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { clientProfile: { select: { id: true } } }
+    })
+
+    if (!userWithClient?.clientProfile) {
+      return NextResponse.json({ error: 'Client profile not found' }, { status: 404 })
+    }
 
     const opportunity = await prisma.opportunity.create({
       data: {
         ...body,
-        recruiterId: body.recruiterId, // Should come from session
+        clientId: userWithClient.clientProfile.id,
       },
       include: {
-        recruiter: true,
+        client: true,
       },
     })
 

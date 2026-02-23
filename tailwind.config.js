@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+
 module.exports = {
   darkMode: ["class"],
   content: [
@@ -6,7 +6,7 @@ module.exports = {
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
+  ],
   theme: {
     // container: {
     //   center: true,
@@ -18,9 +18,9 @@ module.exports = {
     extend: {
       colors: {
         band: {
-            10: "#f0eae4",
-            20: "#f2d6bb",
-            100: "#b5814e"
+          10: "#f0eae4",
+          20: "#f2d6bb",
+          100: "#b5814e"
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

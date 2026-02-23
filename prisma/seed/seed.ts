@@ -77,8 +77,8 @@ async function main() {
     create: {
       email: 'recruiter@athletiq.com',
       name: 'John Recruiter',
-      password: 'hashed_password_here', // In production, use proper password hashing
-      role: 'RECRUITER',
+      password: '$2b$12$oJPBFp/WRH6Q0EUtEd/9hOJfyCmwCic4FTmn/zEo4KbZU1zCJY.Ha', // In production, use proper password hashing
+      role: 'CLIENT',
     },
   })
 
@@ -88,15 +88,15 @@ async function main() {
     create: {
       email: 'athlete@athletiq.com',
       name: 'Jane Athlete',
-      password: 'hashed_password_here',
+      password: '$2b$12$oJPBFp/WRH6Q0EUtEd/9hOJfyCmwCic4FTmn/zEo4KbZU1zCJY.Ha',
       role: 'ATHLETE',
     },
   })
 
   console.log('✅ Users created')
 
-  // Create recruiter profile
-  const recruiterProfile = await prisma.recruiterProfile.upsert({
+  // Create client profile
+  const clientProfile = await prisma.clientProfile.upsert({
     where: { userId: recruiterUser.id },
     update: {},
     create: {
@@ -145,7 +145,7 @@ async function main() {
   // Create sample opportunities
   const opportunities = [
     {
-      recruiterId: recruiterProfile.id,
+      clientId: clientProfile.id,
       title: 'Professional Basketball Player',
       sport: 'Basketball',
       category: 'Professional Sports',
@@ -171,7 +171,7 @@ async function main() {
       deadline: new Date('2026-06-01'),
     },
     {
-      recruiterId: recruiterProfile.id,
+      clientId: clientProfile.id,
       title: 'Swimming Coach',
       sport: 'Swimming',
       category: 'Coaching & Training',

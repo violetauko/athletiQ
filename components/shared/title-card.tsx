@@ -1,6 +1,6 @@
 import { Button } from '../ui/button'
 
-const TitleCard = ({ image, title, description, action, onClick }: { image: string, title: string, description: string, action?: string, onClick?: () => void }) => {
+const TitleCard = ({ image, title, description, action, onClick }: { image: string, title: string, description?: string, action?: string, onClick?: () => void }) => {
     return (
         <div className="px-5 relative rounded-2xl hover:shadow-xl transition-all duration-300 
                  overflow-hidden h-full">

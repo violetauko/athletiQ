@@ -1,21 +1,18 @@
-'use client';
 import TitleCard from '@/components/shared/title-card'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Mail, Phone, MapPin, Clock } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 
 export default function ContactPage() {
-  const router = useRouter()
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
       <div className="my-12">
-        <TitleCard 
-          image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80" 
-          title="Get In Touch" 
+        <TitleCard
+          image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
+          title="Get In Touch"
           description="Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible."
         />
       </div>
