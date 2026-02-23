@@ -34,6 +34,10 @@ export interface Opportunity {
   benefits: string[];
   deadline?: string;
   client: ClientProfile;
+  responsibilities: string[];
+  imageUrl?: string;
+  createdAt?: string;
+  count?: number;
 }
 
 export interface Application {

@@ -11,6 +11,7 @@ async function main() {
 
   // Create sports
   const sports = [
+    { name: 'Rugby', description: 'Team sport'},
     { name: 'Basketball', description: 'Team sport played on a court' },
     { name: 'Soccer', description: 'Football played with feet' },
     { name: 'Track & Field', description: 'Athletics and running events' },

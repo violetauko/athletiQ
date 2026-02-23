@@ -17,6 +17,8 @@ const opportunitySchema = z.object({
   requirements: z.array(z.string()).min(1),
   benefits: z.array(z.string()).default([]),
   deadline: z.string().optional(),
+  responsibilities:z.array(z.string()).min(1),
+  imageUrl: z.string().optional(),
 });
 
 export async function GET() {
@@ -32,23 +34,23 @@ export async function GET() {
     const userWithClient = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
-        clientProfile: {
+        ClientProfile: {
           select: { id: true }
         }
       }
     });
 
-    if (!userWithClient?.clientProfile) {
+    if (!userWithClient?.ClientProfile) {
       // Possible that the user is marked CLIENT but hasn't finished profile setup
       return NextResponse.json([]);
     }
 
     const opportunities = await prisma.opportunity.findMany({
-      where: { clientId: userWithClient.clientProfile.id },
+      where: { clientId: userWithClient.ClientProfile.id },
       orderBy: { createdAt: 'desc' },
       include: {
         _count: {
-          select: { applications: true }
+          select: { Application: true }
         }
       }
     });
@@ -63,48 +65,70 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const session = await auth();
-    
+
     if (!session?.user || session.user.role !== "CLIENT") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const userWithClient = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { clientProfile: { select: { id: true } } }
+      select: {
+        ClientProfile: {
+          select: { id: true },
+        },
+      },
     });
 
-    if (!userWithClient?.clientProfile) {
+    if (!userWithClient?.ClientProfile) {
       return new NextResponse("Client Profile not found", { status: 404 });
     }
 
     const body = await req.json();
+    console.log("Request body:", body);
+
     const parsedData = opportunitySchema.parse(body);
 
     const newOpportunity = await prisma.opportunity.create({
       data: {
-        clientId: userWithClient.clientProfile.id,
-        // Enforce PENDING_APPROVAL status for new opportunities
+        clientId: userWithClient.ClientProfile.id,
+
+        // force status
         status: "PENDING_APPROVAL",
+
         title: parsedData.title,
         sport: parsedData.sport,
         category: parsedData.category,
-        location: parsedData.location,
-        city: parsedData.city,
-        state: parsedData.state,
+
+        // ensure location is never empty
+        location: parsedData.location || "N/A",
+
+        city: parsedData.city || null,
+        state: parsedData.state || null,
+
         type: parsedData.type,
-        salaryMin: parsedData.salaryMin,
-        salaryMax: parsedData.salaryMax,
+
+        salaryMin: parsedData.salaryMin ?? null,
+        salaryMax: parsedData.salaryMax ?? null,
+
         description: parsedData.description,
-        requirements: parsedData.requirements,
-        benefits: parsedData.benefits,
-        deadline: parsedData.deadline ? new Date(parsedData.deadline) : null,
-      }
+
+        requirements: parsedData.requirements || [],
+        benefits: parsedData.benefits || [],
+        responsibilities: parsedData?.responsibilities || [], // ✅ FIXED
+
+        imageUrl: parsedData.imageUrl || null, // ✅ FIXED
+
+        deadline: parsedData.deadline
+          ? new Date(parsedData.deadline)
+          : null,
+      },
     });
 
     return NextResponse.json(newOpportunity);
   } catch (error) {
+    console.log("Creation error",error)
     if (error instanceof z.ZodError) {
-      return new NextResponse("Invalid request data", { status: 400 });
+      return new NextResponse(error.message, { status: 400 });
     }
     console.error("[CLIENT_OPPORTUNITIES_POST]", error);
     return new NextResponse("Internal Error", { status: 500 });

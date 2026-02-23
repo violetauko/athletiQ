@@ -14,25 +14,26 @@ import {
     Loader2,
     Calendar,
     Pencil,
-    Settings,
-    CheckCircle2
+    // Settings,
+    // CheckCircle2
 } from 'lucide-react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { OpportunityModal } from './client/opportunity-modal'
 import { ApplicationModal } from './client/application-modal'
+import { Opportunity } from '@/app/types/athlete'
 
-type Tab = 'overview' | 'opportunities' | 'applications' | 'messages'
+type Tab = 'opportunities' | 'applications' | 'messages'
 
 export function ClientDashboard() {
     const queryClient = useQueryClient()
-    const [activeTab, setActiveTab] = useState<Tab>('overview')
+    const [activeTab, setActiveTab] = useState<Tab>('opportunities')
 
     const [isOppModalOpen, setOppModalOpen] = useState(false)
     const [editingOpp, setEditingOpp] = useState<any>(null)
 
     const [selectedApp, setSelectedApp] = useState<any>(null)
+    const router = useRouter()
 
     // Data Fetching
     const { data: opportunities = [], isLoading: oppsLoading } = useQuery({
@@ -41,7 +42,8 @@ export function ClientDashboard() {
             const res = await fetch('/api/client/opportunities')
             if (!res.ok) throw new Error('Failed to fetch opportunities')
             return res.json()
-        }
+        },
+        staleTime: 1000*60*10
     })
 
     const { data: applications = [], isLoading: appsLoading } = useQuery({
@@ -50,7 +52,8 @@ export function ClientDashboard() {
             const res = await fetch('/api/client/applications')
             if (!res.ok) throw new Error('Failed to fetch applications')
             return res.json()
-        }
+        },
+        staleTime: 1000*60*10
     })
 
     const { data: messages = [], isLoading: msgsLoading } = useQuery({
@@ -109,16 +112,17 @@ export function ClientDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-stone-50">
+        <div className="min-h-screen">
             {/* Header */}
-            <section className="bg-gradient-to-br from-stone-900 to-black text-white py-12">
-                <div className="container">
+            <section className="bg-linear-to-br from-stone-900 to-black text-white py-12 mt-12 rounded-2xl px-12">
+                <div className="">
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-4xl font-bold mb-2">Recruiter Dashboard</h1>
                             <p className="text-white/80">Manage your postings and review top talent.</p>
                         </div>
-                        <Button className="bg-white text-black hover:bg-white/90" onClick={() => { setEditingOpp(null); setOppModalOpen(true) }}>
+                        <Button className="bg-white text-black hover:bg-white/90" 
+                            onClick={() => router.push('/opportunities/new')}>
                             <Plus className="w-4 h-4 mr-2" />
                             Post Opportunity
                         </Button>
@@ -126,16 +130,16 @@ export function ClientDashboard() {
                 </div>
             </section>
 
-            <div className="container py-12">
+            <div className="py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     {/* Sidebar Nav */}
                     <div className="lg:col-span-1">
                         <Card>
                             <CardContent className="p-6">
                                 <nav className="space-y-2">
-                                    <Button variant={activeTab === 'overview' ? 'default' : 'ghost'} className={`w-full justify-start ${activeTab === 'overview' ? 'bg-black' : ''}`} onClick={() => setActiveTab('overview')}>
+                                    {/* <Button variant={activeTab === 'overview' ? 'default' : 'ghost'} className={`w-full justify-start ${activeTab === 'overview' ? 'bg-black' : ''}`} onClick={() => setActiveTab('overview')}>
                                         <TrendingUp className="w-4 h-4 mr-2" /> Overview
-                                    </Button>
+                                    </Button> */}
                                     <Button variant={activeTab === 'opportunities' ? 'default' : 'ghost'} className={`w-full justify-start ${activeTab === 'opportunities' ? 'bg-black' : ''}`} onClick={() => setActiveTab('opportunities')}>
                                         <Briefcase className="w-4 h-4 mr-2" /> My Opportunities
                                     </Button>
@@ -156,7 +160,7 @@ export function ClientDashboard() {
                             <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-stone-400" /></div>
                         ) : (
                             <>
-                                {activeTab === 'overview' && (
+                                {/* {activeTab === 'overview' && ( */}
                                     <div className="space-y-6">
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                             <Card>
@@ -189,7 +193,7 @@ export function ClientDashboard() {
                                             </Card>
                                         </div>
                                     </div>
-                                )}
+                                {/* )}*/}
 
                                 {activeTab === 'opportunities' && (
                                     <Card>
@@ -201,16 +205,16 @@ export function ClientDashboard() {
                                                 <p className="text-center text-muted-foreground py-10">You have not posted any opportunities yet.</p>
                                             ) : (
                                                 <div className="space-y-4">
-                                                    {opportunities.map((opp: any) => (
+                                                    {opportunities.map((opp:Opportunity) => (
                                                         <div key={opp.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg hover:bg-white transition-colors gap-4 bg-stone-50">
                                                             <div className="flex-1">
                                                                 <h3 className="font-semibold text-lg">{opp.title}</h3>
                                                                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-1">
-                                                                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(opp.createdAt).toLocaleDateString()}</span>
+                                                                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {opp.createdAt? new Date(opp.createdAt).toLocaleDateString(): Date.now()}</span>
                                                                     <span>•</span>
                                                                     <span>{opp.location}</span>
                                                                     <span>•</span>
-                                                                    <span className="font-medium text-black">{opp._count?.applications || 0} Apps</span>
+                                                                    <span className="font-medium text-black">{opp.count || 0} Apps</span>
                                                                 </div>
                                                             </div>
                                                             <div className="flex items-center gap-3">
@@ -221,7 +225,7 @@ export function ClientDashboard() {
                                                                 `}>
                                                                     {opp.status.replace('_', ' ')}
                                                                 </Badge>
-                                                                <Button variant="outline" size="sm" onClick={() => { setEditingOpp(opp); setOppModalOpen(true); }}>
+                                                                <Button variant="outline" size="sm" onClick={() => router.push(`/opportunities/${opp.id}/edit`)}>
                                                                     <Pencil className="w-3 h-3 mr-2" /> Edit
                                                                 </Button>
                                                             </div>
@@ -296,14 +300,6 @@ export function ClientDashboard() {
                     </div>
                 </div>
             </div>
-
-            {/* Modals */}
-            <OpportunityModal
-                isOpen={isOppModalOpen}
-                onClose={() => { setOppModalOpen(false); setEditingOpp(null); }}
-                onSubmit={handleOppSubmit}
-                initialData={editingOpp}
-            />
 
             <ApplicationModal
                 isOpen={!!selectedApp}

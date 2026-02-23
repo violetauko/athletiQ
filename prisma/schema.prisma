@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Account {
-  id                String  @id
+  id                String  @id  @default(cuid())
   userId            String
   type              String
   provider          String
@@ -26,7 +26,7 @@ model Account {
 }
 
 model Application {
-  id             String            @id
+  id             String            @id  @default(cuid())
   athleteId      String
   opportunityId  String
   userId         String
@@ -34,7 +34,7 @@ model Application {
   coverLetter    String?
   notes          String?
   appliedAt      DateTime          @default(now())
-  updatedAt      DateTime
+  updatedAt      DateTime          @updatedAt
   AthleteProfile AthleteProfile    @relation(fields: [athleteId], references: [id], onDelete: Cascade)
   Opportunity    Opportunity       @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
   User           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -43,7 +43,7 @@ model Application {
 }
 
 model AthleteProfile {
-  id              String        @id
+  id              String        @id  @default(cuid())
   userId          String        @unique
   firstName       String
   lastName        String
@@ -66,7 +66,7 @@ model AthleteProfile {
   currentSchool   String?
   videoHighlights String[]
   createdAt       DateTime      @default(now())
-  updatedAt       DateTime
+  updatedAt       DateTime      @updatedAt
   profileViews    Int           @default(0)
   Application     Application[]
   User            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -74,7 +74,7 @@ model AthleteProfile {
 }
 
 model Category {
-  id          String   @id
+  id          String   @id  @default(cuid())
   name        String   @unique
   description String?
   icon        String?
@@ -83,20 +83,20 @@ model Category {
 }
 
 model ClientProfile {
-  id           String        @id
+  id           String        @id  @default(cuid())
   userId       String        @unique
   organization String
   title        String
   phone        String?
   bio          String?
   createdAt    DateTime      @default(now())
-  updatedAt    DateTime
+  updatedAt    DateTime      @updatedAt
   User         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   Opportunity  Opportunity[]
 }
 
 model Message {
-  id                            String       @id
+  id                            String       @id  @default(cuid())
   senderId                      String
   receiverId                    String
   content                       String
@@ -109,7 +109,7 @@ model Message {
 }
 
 model Opportunity {
-  id             String            @id
+  id             String            @id @default(cuid())
   clientId       String
   title          String
   sport          String
@@ -120,14 +120,16 @@ model Opportunity {
   type           String
   salaryMin      Int?
   salaryMax      Int?
-  description    String
-  requirements   String[]
-  benefits       String[]
-  status         OpportunityStatus @default(ACTIVE)
-  postedDate     DateTime          @default(now())
-  deadline       DateTime?
+  description      String
+  requirements     String[]
+  benefits         String[]
+  responsibilities String[]
+  imageUrl         String?
+  status           OpportunityStatus @default(ACTIVE)
+  postedDate       DateTime          @default(now())
+  deadline         DateTime?
   createdAt      DateTime          @default(now())
-  updatedAt      DateTime
+  updatedAt      DateTime          @updatedAt
   Application    Application[]
   Message        Message[]
   ClientProfile  ClientProfile     @relation(fields: [clientId], references: [id], onDelete: Cascade)
@@ -143,7 +145,7 @@ model Session {
 }
 
 model Sport {
-  id          String   @id
+  id          String   @id @default(cuid())
   name        String   @unique
   description String?
   icon        String?
@@ -151,7 +153,7 @@ model Sport {
 }
 
 model User {
-  id                               String          @id
+  id                               String          @id  @default(cuid())
   email                            String          @unique
   emailVerified                    DateTime?
   name                             String?
@@ -159,7 +161,7 @@ model User {
   password                         String?
   role                             UserRole        @default(ATHLETE)
   createdAt                        DateTime        @default(now())
-  updatedAt                        DateTime
+  updatedAt                        DateTime        @updatedAt
   Account                          Account[]
   Application                      Application[]
   AthleteProfile                   AthleteProfile?

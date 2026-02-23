@@ -1,6 +1,6 @@
 import { Button } from '../ui/button'
 
-const TitleCard = ({ image, title, description, action, onClick }: { image: string, title: string, description?: string, action?: string, onClick?: () => void }) => {
+const TitleCard = ({ image, title, description, action, onClick, icon }: { image: string, title: string, description?: string, action?: string, onClick?: () => void , icon?:React.ReactNode}) => {
     return (
         <div className="px-5 relative rounded-2xl hover:shadow-xl transition-all duration-300 
                  overflow-hidden h-full">
@@ -19,9 +19,12 @@ const TitleCard = ({ image, title, description, action, onClick }: { image: stri
 
             {/* Content */}
             <div className="relative z-10 text-white text-center md:text-left space-y-6 py-12">
-                <h2 className="text-3xl md:text-5xl font-bold max-w-2xl">
-                    {title}
-                </h2>
+                <div className='flex'>
+                    {icon && <div className="mb-4 me-2">{icon}</div>}
+                    <h2 className="text-3xl md:text-5xl font-bold max-w-2xl">
+                        {title}
+                    </h2>
+                </div>
 
                 <p className="text-base md:text-lg text-white/90 max-w-xl">
                     {description}

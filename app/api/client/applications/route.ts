@@ -11,23 +11,23 @@ export async function GET() {
 
     const userWithClient = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { clientProfile: { select: { id: true } } }
+      select: { ClientProfile: { select: { id: true } } }
     });
 
-    if (!userWithClient?.clientProfile) {
+    if (!userWithClient?.ClientProfile) {
       return NextResponse.json([]);
     }
 
     // Get all applications that are attached to this client's opportunities
     const applications = await prisma.application.findMany({
       where: {
-        opportunity: {
-          clientId: userWithClient.clientProfile.id
+        Opportunity: {
+          clientId: userWithClient.ClientProfile.id
         }
       },
       include: {
-        athlete: true, // we need applicant details
-        opportunity: {
+        AthleteProfile: true, // we need applicant details
+        Opportunity: {
           select: {
             id: true,
             title: true,

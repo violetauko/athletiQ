@@ -3,6 +3,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Search, Filter, Trophy } from 'lucide-react'
+import TitleCard from '@/components/shared/title-card'
+import Link from 'next/link'
 
 export default function AthletesPage() {
   // Mock data - in production, this would come from API/database
@@ -93,24 +95,19 @@ export default function AthletesPage() {
   ]
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col ">
       {/* Page Header */}
-      <section className="bg-gradient-to-br from-stone-900 to-black text-white py-16">
-        <div className="container space-y-6">
-          <div className="flex items-center gap-3">
-            <Trophy className="w-12 h-12 text-amber-400" />
-            <div>
-              <h1 className="text-5xl font-bold">Discover Talented Athletes</h1>
-              <p className="text-xl text-white/80 mt-2">
-                Connect with exceptional athletes across all sports disciplines
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className="my-12">
+        <TitleCard
+          image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
+          title="Discover Talented Athletes"
+          icon={<Trophy className="w-12 h-12 text-amber-400" />}
+          description="Connect with exceptional athletes across all sports disciplines."
+        />
+      </div>
 
       {/* Search and Filter Section */}
-      <section className="bg-white border-b sticky top-16 z-40">
+      <section className="bg-white border-b sticky top-16 z-40 rounded-2xl">
         <div className="container py-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 flex gap-2">
@@ -146,7 +143,7 @@ export default function AthletesPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-8 bg-gradient-to-br from-amber-50 to-stone-100">
+      <section className="py-8 bg-linear-to-br from-amber-50 to-stone-100">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
@@ -169,8 +166,8 @@ export default function AthletesPage() {
       </section>
 
       {/* Athletes Grid */}
-      <section className="py-12 bg-gradient-to-br from-white to-stone-50 flex-1">
-        <div className="container">
+      <section className="py-12 flex-1">
+        <div className="">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-3xl font-bold mb-2">Featured Athletes</h2>
@@ -235,26 +232,30 @@ export default function AthletesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-stone-900 to-black text-white">
+      <section className="py-16 bg-linear-to-br from-stone-900 to-black text-white mb-12 rounded-2xl">
         <div className="container text-center">
           <h2 className="text-4xl font-bold mb-4">Are You an Athlete?</h2>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
             Create your profile and get discovered by top sports organizations worldwide
           </p>
           <div className="flex gap-4 justify-center">
-            <Button
-              size="lg"
-              className="bg-white text-black hover:bg-white/90 rounded-full px-8"
-            >
-              Create Profile
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="rounded-full px-8 text-white border-white hover:bg-white/10"
-            >
-              Learn More
-            </Button>
+            <Link href={'/register'}>
+              <Button
+                size="lg"
+                className="bg-white text-black hover:bg-white/90 rounded-full px-8"
+              >
+                Create Profile
+              </Button>
+            </Link>
+            <Link href={'/about'}>
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-full px-8 text-black border-white hover:bg-white/10"
+              >
+                Learn More
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

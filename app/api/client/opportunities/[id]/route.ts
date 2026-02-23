@@ -29,10 +29,10 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
 
     const userWithClient = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { clientProfile: { select: { id: true } } }
+      select: { ClientProfile: { select: { id: true } } }
     });
 
-    if (!userWithClient?.clientProfile) {
+    if (!userWithClient?.ClientProfile) {
       return new NextResponse("Client Profile not found", { status: 404 });
     }
 
@@ -41,7 +41,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
       where: { id: params.id }
     });
 
-    if (!opportunity || opportunity.clientId !== userWithClient.clientProfile.id) {
+    if (!opportunity || opportunity.clientId !== userWithClient.ClientProfile.id) {
       return new NextResponse("Not Found / Unauthorized", { status: 404 });
     }
 
@@ -76,10 +76,10 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
 
     const userWithClient = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { clientProfile: { select: { id: true } } }
+      select: { ClientProfile: { select: { id: true } } }
     });
 
-    if (!userWithClient?.clientProfile?.id) {
+    if (!userWithClient?.ClientProfile?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -88,7 +88,7 @@ export async function DELETE(req: Request, props: { params: Promise<{ id: string
       where: { id: params.id }
     });
 
-    if (!opportunity || opportunity.clientId !== userWithClient.clientProfile.id) {
+    if (!opportunity || opportunity.clientId !== userWithClient.ClientProfile.id) {
       return new NextResponse("Not Found / Unauthorized", { status: 404 });
     }
 

@@ -8,23 +8,27 @@ import { Badge } from '@/components/ui/badge'
 import { CheckCircle2, Upload, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import TitleCard from '@/components/shared/title-card'
 
 export default function ApplyPage({ params }: { params: { id: string } }) {
   const [step, setStep] = useState(1)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-white py-12">
-      <div className="container max-w-4xl">
+    <div className="">
+      <div className="mb-12">
         {/* Header */}
         <div className="mb-8">
           <Link href={`/opportunities/${params.id}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to Opportunity
           </Link>
-          <h1 className="text-4xl font-bold mb-2">Apply for Position</h1>
-          <p className="text-muted-foreground">
-            Professional Basketball Player at Elite Sports Management
-          </p>
+           <div className="my-12">
+          <TitleCard
+            image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
+            title="Apply for Position"
+            description="Professional Basketball Player at Elite Sports Management."
+          />
+        </div>
         </div>
 
         {/* Progress Indicator */}
@@ -330,15 +334,17 @@ export default function ApplyPage({ params }: { params: { id: string } }) {
         </Card>
 
         {/* Help Card */}
-        <Card className="mt-6 bg-gradient-to-br from-amber-50 to-white border-amber-200">
+        <Card className="mt-6 bg-linear-to-br from-amber-50 to-white border-amber-200">
           <CardContent className="p-6">
             <h3 className="font-semibold mb-2">Need Help?</h3>
             <p className="text-sm text-muted-foreground mb-4">
               If you have questions about the application process, contact our support team.
             </p>
-            <Button variant="outline" size="sm" className="rounded-full">
-              Contact Support
-            </Button>
+            <Link href={"/contact"}>
+              <Button variant="outline" size="sm" className="rounded-full">
+                Contact Support
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

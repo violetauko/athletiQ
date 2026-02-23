@@ -38,9 +38,9 @@ export async function GET(request: Request) {
       prisma.opportunity.findMany({
         where,
         include: {
-          client: {
+          ClientProfile: {
             include: {
-              user: {
+              User: {
                 select: {
                   name: true,
                   email: true,
@@ -94,20 +94,20 @@ export async function POST(request: Request) {
     // Get the client profile ID for this user
     const userWithClient = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { clientProfile: { select: { id: true } } }
+      select: { ClientProfile: { select: { id: true } } }
     })
 
-    if (!userWithClient?.clientProfile) {
+    if (!userWithClient?.ClientProfile) {
       return NextResponse.json({ error: 'Client profile not found' }, { status: 404 })
     }
 
     const opportunity = await prisma.opportunity.create({
       data: {
         ...body,
-        clientId: userWithClient.clientProfile.id,
+        clientId: userWithClient.ClientProfile.id,
       },
       include: {
-        client: true,
+        ClientProfile: true,
       },
     })
 
