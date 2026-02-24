@@ -29,39 +29,41 @@ export function Header() {
           </Link>
         </div>
 
-        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          <Link
-            href="/about"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
-            About Us
-          </Link>
-          <Link
-            href="/opportunities"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
-            Opportunities
-          </Link>
-          <Link
-            href="/athletes"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
-            Athletes
-          </Link>
-          <Link
-            href="/contact"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
-            Contact Us
-          </Link>
-          <Link
-            href="/donate"
-            className="inline-flex items-center gap-1 transition-colors hover:text-foreground/80 text-foreground/60"
-          >
-            Donate
-            <Heart className="w-4 h-4 text-red-500 fill-red-500" />
-          </Link>
-        </nav>
+        {!session?.user &&
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+            <Link
+              href="/about"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              About Us
+            </Link>
+            <Link
+              href="/opportunities"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Opportunities
+            </Link>
+            <Link
+              href="/athletes"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Athletes
+            </Link>
+            <Link
+              href="/contact"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Contact Us
+            </Link>
+            <Link
+              href="/donate"
+              className="inline-flex items-center gap-1 transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Donate
+              <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+            </Link>
+          </nav>
+        }
 
         <div className="flex items-center gap-2">
           {isLoading ? (

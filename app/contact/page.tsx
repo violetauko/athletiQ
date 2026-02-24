@@ -1,11 +1,57 @@
+'use client'
 import TitleCard from '@/components/shared/title-card'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Mail, Phone, MapPin, Clock } from 'lucide-react'
-
+import { useMutation } from '@tanstack/react-query'
+import { Mail, Phone, MapPin, Clock, CheckCircle2, AlertCircle } from 'lucide-react'
+import { useState } from 'react'
+              
 export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  })
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target
+    setFormData(prev => ({ ...prev, [id]: value }))
+  }
+
+  const { mutate: submitMessage, isPending, isSuccess, isError, error } = useMutation({
+    mutationFn: async () => {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error ?? 'Failed to send message')
+      }
+      return res.json()
+    },
+    onSuccess: () => {
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: ''
+      })
+    }
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    submitMessage()
+  }
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -24,48 +70,103 @@ export default function ContactPage() {
             {/* Contact Form */}
             <Card className="p-8 shadow-lg">
               <h2 className="text-3xl font-bold mb-6">Send Us a Message</h2>
-              <form className="space-y-6">
+              {isSuccess && (
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+                  <p className="text-green-700">Message sent successfully! We'll get back to you soon.</p>
+                </div>
+              )}
+
+              {isError && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+                  <p className="text-red-700">
+                    Error: {error instanceof Error ? error.message : 'Failed to send message'}
+                  </p>
+                </div>
+              )}
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" placeholder="John" />
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input 
+                      id="firstName" 
+                      placeholder="John" 
+                      required
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" placeholder="Doe" />
+                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Input 
+                      id="lastName" 
+                      placeholder="Doe" 
+                      required
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="john.doe@example.com" />
+                  <Label htmlFor="email">Email *</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="john.doe@example.com" 
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" />
+                  <Input 
+                    id="phone" 
+                    type="tel" 
+                    placeholder="+1 (555) 000-0000"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Subject</Label>
-                  <Input id="subject" placeholder="How can we help?" />
+                  <Label htmlFor="subject">Subject *</Label>
+                  <Input 
+                    id="subject" 
+                    placeholder="How can we help?" 
+                    required
+                    value={formData.subject}
+                    onChange={handleInputChange}
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
+                  <Label htmlFor="message">Message *</Label>
                   <textarea
                     id="message"
                     rows={5}
                     className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     placeholder="Tell us more about your inquiry..."
+                    required
+                    value={formData.message}
+                    onChange={handleInputChange}
                   />
                 </div>
 
-                <Button className="w-full bg-black hover:bg-black/90 rounded-full" size="lg">
-                  Send Message
+                <Button 
+                  type="submit" 
+                  className="w-full bg-black hover:bg-black/90 rounded-full" 
+                  size="lg"
+                  disabled={isPending}
+                >
+                  {isPending ? 'Sending...' : 'Send Message'}
                 </Button>
               </form>
             </Card>
+  
 
             {/* Contact Information */}
             <div className="space-y-8">

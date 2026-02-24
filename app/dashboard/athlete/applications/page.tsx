@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Clock, CheckCircle2, XCircle, Building, MapPin } from 'lucide-react'
 import Link from 'next/link'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function AthleteApplicationsPage() {
     const { data: applications = [], isLoading: loading } = useQuery<Application[]>({
@@ -15,7 +16,12 @@ export default function AthleteApplicationsPage() {
             const response = await fetch('/api/athlete/applications')
             if (!response.ok) throw new Error('Failed to fetch applications')
             return response.json()
-        }
+        },
+        staleTime: 10 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
     })
 
     const getStatusColor = (status: string) => {
@@ -45,7 +51,7 @@ export default function AthleteApplicationsPage() {
                 <h1 className="text-3xl font-bold mb-6">My Applications</h1>
 
                 {loading ? (
-                    <div className="text-center py-12">Loading applications...</div>
+                    <ApplicationsSkeleton/>
                 ) : applications.length === 0 ? (
                     <div className="text-center py-12 text-muted-foreground flex flex-col items-center gap-4">
                         <p>You haven&apos;t applied to any opportunities yet.</p>
@@ -69,7 +75,7 @@ export default function AthleteApplicationsPage() {
                                             <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {app.opportunity.location}</span>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-end gap-3 min-w-[200px]">
+                                    <div className="flex flex-col items-end gap-3 min-w-50">
                                         <Badge className={`${getStatusColor(app.status)} flex items-center gap-1.5 px-3 py-1 text-sm`}>
                                             {getStatusIcon(app.status)}
                                             {app.status}
@@ -90,3 +96,16 @@ export default function AthleteApplicationsPage() {
         </div>
     )
 }
+const ApplicationsSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[...Array(4)].map((_, i) => (
+            <Card key={i}>
+                <CardContent className="p-6">
+                    <Skeleton className="w-8 h-8 mb-2" />
+                    <Skeleton className="w-16 h-8 mb-1" />
+                    <Skeleton className="w-24 h-4" />
+                </CardContent>
+            </Card>
+        ))}
+    </div>
+)

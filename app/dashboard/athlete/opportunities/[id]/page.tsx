@@ -175,7 +175,7 @@ export default function AthleteOpportunityDetailsPage() {
                                     <label className="text-sm font-medium">Cover Letter / Message (Optional)</label>
                                     <Textarea
                                         placeholder="Briefly introduce yourself and why you're a good fit..."
-                                        className="min-h-[150px]"
+                                        className="min-h-37.5"
                                         value={coverLetter}
                                         onChange={(e) => setCoverLetter(e.target.value)}
                                     />

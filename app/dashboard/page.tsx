@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { AthleteDashboard } from '@/components/dashboard/athlete-dashboard'
 import { ClientDashboard } from '@/components/dashboard/client-dashboard'
 import { AdminDashboard } from '@/components/dashboard/admin-dashboard'
 
@@ -20,6 +19,6 @@ export default async function DashboardPage() {
       return <ClientDashboard />
     case 'ATHLETE':
     default:
-      return <AthleteDashboard />
+      redirect('/dashboard/athlete')
   }
 }

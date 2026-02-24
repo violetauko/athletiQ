@@ -23,7 +23,27 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     const body = await req.json();
-    const { coverLetter } = body;
+    const { 
+      coverLetter,
+      firstName,
+      lastName,
+      email,
+      phone,
+      dateOfBirth,
+      city,
+      state,
+      address,
+      height,
+      weight,
+      position,
+      experience,
+      currentTeam,
+      achievements,
+      stats,
+      resumeFileName,
+      portfolioFileNames,
+      additionalDocsFileNames
+    } = body;
 
     // Ensure opportunity exists and is active
     const opportunity = await prisma.opportunity.findUnique({
@@ -48,13 +68,32 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         return new NextResponse("Already applied to this opportunity", { status: 400 });
     }
 
+    // Create application with all the data
     const application = await prisma.application.create({
       data: {
         athleteId: athleteProfile.id,
         opportunityId: id,
         userId: session.user.id,
         coverLetter: coverLetter || null,
-        status: "PENDING"
+        status: "PENDING",
+        firstName,
+        lastName,
+        email,
+        phone,
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+        city,
+        state,
+        address,
+        height: height ? parseInt(height) : null,
+        weight: weight ? parseInt(weight) : null,
+        position,
+        experience: experience ? parseInt(experience) : null,
+        currentTeam,
+        achievements,
+        stats,
+        resumeFileName,
+        portfolioFileNames,
+        additionalDocsFileNames
       }
     });
 

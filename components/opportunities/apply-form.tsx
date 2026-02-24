@@ -122,7 +122,7 @@
 //               <p className="font-semibold truncate">{opportunity.title}</p>
 //               <p className="text-sm text-muted-foreground">{opportunity.organization}</p>
 //             </div>
-//             <div className="flex gap-2 flex-shrink-0">
+//             <div className="flex gap-2 shrink-0">
 //               <Badge className="bg-amber-600 hover:bg-amber-700 text-xs">{opportunity.sport}</Badge>
 //               <Badge variant="outline" className="text-xs">{opportunity.type}</Badge>
 //             </div>
@@ -580,7 +580,7 @@
 
 //                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
 //                   <div className="flex gap-3">
-//                     <div className="flex-shrink-0">
+//                     <div className="shrink-0">
 //                       <CheckCircle2 className="w-5 h-5 text-blue-600" />
 //                     </div>
 //                     <div className="text-sm">
@@ -664,146 +664,669 @@
 // }
 'use client'
 
-import { use, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useMutation } from '@tanstack/react-query'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+// import { Badge } from '@/components/ui/badge'
+import { CheckCircle2, Upload, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
+import { use, useState } from 'react'
 import TitleCard from '@/components/shared/title-card'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 
-export function ApplyForm({
-  params,
-}: {
-  params: { id: string }
-}) {
-  const { id } = params;
+interface OpportunitySummary {
+  id: string
+  title: string
+  organization: string
+  sport: string
+  type: string
+  city: string
+}
+
+interface FormData {
+  // Personal Info
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  dateOfBirth: string
+  city: string
+  state: string
+  address: string
+  
+  // Athletic Background
+  height: string
+  weight: string
+  position: string
+  experience: string
+  currentTeam: string
+  achievements: string
+  stats: string
+  
+  // Documents
+  coverLetter: string
+  // Note: File uploads would need a different approach (multipart/form-data)
+  // For now, we'll store file names/paths if you have file upload endpoints
+  resumeFileName: string
+  portfolioFileNames: string
+  additionalDocsFileNames: string
+  
+  // Terms
+  termsAccepted: boolean
+}
+
+export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: string, successRedirect: string }>}) {
+  const [step, setStep] = useState(1)
   const router = useRouter()
+  const { id, backHref, successRedirect } = use(params);
 
-  const [coverLetter, setCoverLetter] = useState('')
-  const [notes, setNotes] = useState('')
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  // Form state
+  const [formData, setFormData] = useState<FormData>({
+    // Personal Info
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    dateOfBirth: '',
+    city: '',
+    state: '',
+    address: '',
+    
+    // Athletic Background
+    height: '',
+    weight: '',
+    position: '',
+    experience: '',
+    currentTeam: '',
+    achievements: '',
+    stats: '',
+    
+    // Documents
+    coverLetter: '',
+    resumeFileName: '',
+    portfolioFileNames: '',
+    additionalDocsFileNames: '',
+    
+    // Terms
+    termsAccepted: false
+  })
 
-  const successRedirect = `/opportunities/${id}?applied=true`
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target
+    setFormData(prev => ({ ...prev, [id]: value }))
+  }
 
-  const { mutate: submitApplication, isPending } = useMutation({
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, checked } = e.target
+    setFormData(prev => ({ ...prev, [id]: checked }))
+  }
+
+  // Handle file upload (simplified - you'll need to implement actual file upload)
+  const handleFileUpload = (fieldName: string, fileName: string) => {
+    setFormData(prev => ({ ...prev, [fieldName]: fileName }))
+  }
+
+  // Fetch just the summary info for the header
+  const { data: opportunity, isLoading } = useQuery<OpportunitySummary>({
+    queryKey: ['opportunity-summary', id],
+    queryFn: async () => {
+      const res = await fetch(`/api/opportunities/${id}`)
+      if (!res.ok) throw new Error('Failed to load opportunity')
+      return res.json()
+    },
+  })
+
+  const { mutate: submitApplication, isPending, isError, error } = useMutation({
     mutationFn: async () => {
-      // Build payload dynamically
-      const payload: Record<string, string> = {}
-
-      if (coverLetter.trim()) {
-        payload.coverLetter = coverLetter.trim()
-      }
-
-      if (notes.trim()) {
-        payload.notes = notes.trim()
-      }
-
-      const res = await fetch(
-        `/api/athlete/opportunities/${id}/apply`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        }
-      )
-
+      const res = await fetch(`/api/athlete/opportunities/${id}/apply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          // Personal Info
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          dateOfBirth: formData.dateOfBirth,
+          city: formData.city,
+          state: formData.state,
+          address: formData.address,
+          
+          // Athletic Background
+          height: formData.height ? parseInt(formData.height) : null,
+          weight: formData.weight ? parseInt(formData.weight) : null,
+          position: formData.position,
+          experience: formData.experience ? parseInt(formData.experience) : null,
+          currentTeam: formData.currentTeam,
+          achievements: formData.achievements,
+          stats: formData.stats,
+          
+          // Documents
+          coverLetter: formData.coverLetter,
+          resumeFileName: formData.resumeFileName,
+          portfolioFileNames: formData.portfolioFileNames,
+          additionalDocsFileNames: formData.additionalDocsFileNames,
+        }),
+      })
       if (!res.ok) {
-        const text = await res.text()
-        throw new Error(text || 'Failed to submit application')
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error ?? 'Failed to submit application')
       }
-
       return res.json()
     },
     onSuccess: () => {
       router.push(successRedirect)
     },
-    onError: (error: any) => {
-      setErrorMessage(error.message)
-    },
   })
 
   const handleSubmit = () => {
-    // Require at least cover letter
-    if (!coverLetter.trim()) {
-      setErrorMessage('Cover letter is required.')
-      return
-    }
-
-    setErrorMessage(null)
     submitApplication()
   }
 
+  const isStepValid = (stepNum: number) => {
+    switch(stepNum) {
+      case 1:
+        return formData.firstName && formData.lastName && formData.email && formData.phone && formData.dateOfBirth && formData.city && formData.state
+      case 2:
+        return formData.height && formData.weight && formData.position && formData.experience
+      case 3:
+        return formData.coverLetter // Add file validation as needed
+      case 4:
+        return formData.termsAccepted
+      default:
+        return true
+    }
+  }
+
   return (
-    <div className="max-w-3xl mx-auto py-10">
-      {/* Back Link */}
-      <Link
-        href={`/opportunities/${id}`}
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Opportunity
-      </Link>
+    <div className="">
+      <div className="mb-12">
+        {/* Header */}
+        <div className="mb-8">
+          <Link href={`/opportunities/${id}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
+            <ArrowLeft className="w-4 h-4" />
+            Back to Opportunity
+          </Link>
+           <div className="my-12">
+          <TitleCard
+            image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
+            title="Apply for Position"
+            description="Professional Basketball Player at Elite Sports Management."
+          />
+        </div>
+        </div>
 
-      <TitleCard
-        image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
-        title="Submit Your Application"
-        description="Complete the form below to apply."
-      />
-
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Application Details</CardTitle>
-          <CardDescription>
-            Tell the recruiter why you're a great fit.
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="space-y-6">
-          {/* Cover Letter */}
-          <div className="space-y-2">
-            <Label htmlFor="coverLetter">Cover Letter *</Label>
-            <textarea
-              id="coverLetter"
-              rows={6}
-              value={coverLetter}
-              onChange={(e) => setCoverLetter(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              placeholder="Explain why you're a strong candidate..."
-            />
+        {/* Progress Indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            {[
+              { num: 1, label: 'Personal Info' },
+              { num: 2, label: 'Athletic Background' },
+              { num: 3, label: 'Documents' },
+              { num: 4, label: 'Review' },
+            ].map((s, index) => (
+              <div key={s.num} className="flex items-center flex-1">
+                <div className="flex flex-col items-center flex-1">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                      step >= s.num
+                        ? 'bg-black text-white'
+                        : 'bg-stone-200 text-muted-foreground'
+                    }`}
+                  >
+                    {step > s.num ? <CheckCircle2 className="w-5 h-5" /> : s.num}
+                  </div>
+                  <span className="text-xs mt-2 font-medium">{s.label}</span>
+                </div>
+                {index < 3 && (
+                  <div
+                    className={`h-1 flex-1 ${
+                      step > s.num ? 'bg-black' : 'bg-stone-200'
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
           </div>
+        </div>
 
-          {/* Optional Notes */}
-          <div className="space-y-2">
-            <Label htmlFor="notes">Additional Notes (Optional)</Label>
-            <textarea
-              id="notes"
-              rows={4}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              placeholder="Any additional information you'd like to share..."
-            />
-          </div>
+        {/* Application Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {step === 1 && 'Personal Information'}
+              {step === 2 && 'Athletic Background'}
+              {step === 3 && 'Upload Documents'}
+              {step === 4 && 'Review & Submit'}
+            </CardTitle>
+            <CardDescription>
+              {step === 1 && 'Tell us about yourself'}
+              {step === 2 && 'Share your athletic experience'}
+              {step === 3 && 'Upload required documents'}
+              {step === 4 && 'Review your application before submitting'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Step 1: Personal Info */}
+            {step === 1 && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input 
+                      id="firstName" 
+                      placeholder="John" 
+                      required 
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Input 
+                      id="lastName" 
+                      placeholder="Doe" 
+                      required 
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
 
-          {errorMessage && (
-            <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
-              {errorMessage}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email *</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      placeholder="john.doe@email.com" 
+                      required 
+                      value={formData.email}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Input 
+                      id="phone" 
+                      type="tel" 
+                      placeholder="+1 (555) 000-0000" 
+                      required 
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="dateOfBirth">Date of Birth *</Label>
+                  <Input 
+                    id="dateOfBirth" 
+                    type="date" 
+                    required 
+                    value={formData.dateOfBirth}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City *</Label>
+                    <Input 
+                      id="city" 
+                      placeholder="Los Angeles" 
+                      required 
+                      value={formData.city}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="state">State/Province *</Label>
+                    <Input 
+                      id="state" 
+                      placeholder="California" 
+                      required 
+                      value={formData.state}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address">Street Address</Label>
+                  <Input 
+                    id="address" 
+                    placeholder="123 Main Street" 
+                    value={formData.address}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Athletic Background */}
+            {step === 2 && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="height">Height (cm) *</Label>
+                    <Input 
+                      id="height" 
+                      type="number" 
+                      placeholder="180" 
+                      required 
+                      value={formData.height}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="weight">Weight (kg) *</Label>
+                    <Input 
+                      id="weight" 
+                      type="number" 
+                      placeholder="75" 
+                      required 
+                      value={formData.weight}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="position">Primary Position *</Label>
+                  <Input 
+                    id="position" 
+                    placeholder="Point Guard" 
+                    required 
+                    value={formData.position}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="experience">Years of Experience *</Label>
+                  <Input 
+                    id="experience" 
+                    type="number" 
+                    placeholder="5" 
+                    required 
+                    value={formData.experience}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="currentTeam">Current/Most Recent Team</Label>
+                  <Input 
+                    id="currentTeam" 
+                    placeholder="UCLA Bruins" 
+                    value={formData.currentTeam}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="achievements">Key Achievements</Label>
+                  <textarea
+                    id="achievements"
+                    rows={4}
+                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    placeholder="List your major achievements, awards, and recognitions..."
+                    value={formData.achievements}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="stats">Career Statistics (Optional)</Label>
+                  <textarea
+                    id="stats"
+                    rows={3}
+                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    placeholder="Points per game, assists, rebounds, etc."
+                    value={formData.stats}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Documents */}
+            {step === 3 && (
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-stone-300 rounded-lg p-8 text-center hover:border-amber-400 transition-colors cursor-pointer">
+                    <input
+                      type="file"
+                      id="resume"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) handleFileUpload('resumeFileName', file.name)
+                      }}
+                    />
+                    <label htmlFor="resume" className="cursor-pointer">
+                      <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="font-medium mb-2">Upload Resume/CV *</p>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        PDF or Word document, max 5MB
+                      </p>
+                      <Button variant="outline" size="sm" asChild>
+                        <span>Choose File</span>
+                      </Button>
+                      {formData.resumeFileName && (
+                        <p className="mt-2 text-sm text-green-600">Selected: {formData.resumeFileName}</p>
+                      )}
+                    </label>
+                  </div>
+
+                  <div className="border-2 border-dashed border-stone-300 rounded-lg p-8 text-center hover:border-amber-400 transition-colors cursor-pointer">
+                    <input
+                      type="file"
+                      id="portfolio"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = e.target.files
+                        if (files) {
+                          const fileNames = Array.from(files).map(f => f.name).join(', ')
+                          handleFileUpload('portfolioFileNames', fileNames)
+                        }
+                      }}
+                    />
+                    <label htmlFor="portfolio" className="cursor-pointer">
+                      <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="font-medium mb-2">Athletic Portfolio</p>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Photos, videos, or links to highlight reels
+                      </p>
+                      <Button variant="outline" size="sm" asChild>
+                        <span>Choose Files</span>
+                      </Button>
+                      {formData.portfolioFileNames && (
+                        <p className="mt-2 text-sm text-green-600">Selected: {formData.portfolioFileNames}</p>
+                      )}
+                    </label>
+                  </div>
+
+                  <div className="border-2 border-dashed border-stone-300 rounded-lg p-8 text-center hover:border-amber-400 transition-colors cursor-pointer">
+                    <input
+                      type="file"
+                      id="additionalDocs"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = e.target.files
+                        if (files) {
+                          const fileNames = Array.from(files).map(f => f.name).join(', ')
+                          handleFileUpload('additionalDocsFileNames', fileNames)
+                        }
+                      }}
+                    />
+                    <label htmlFor="additionalDocs" className="cursor-pointer">
+                      <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="font-medium mb-2">Additional Documents</p>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        References, certifications, transcripts (optional)
+                      </p>
+                      <Button variant="outline" size="sm" asChild>
+                        <span>Choose Files</span>
+                      </Button>
+                      {formData.additionalDocsFileNames && (
+                        <p className="mt-2 text-sm text-green-600">Selected: {formData.additionalDocsFileNames}</p>
+                      )}
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="coverLetter">Cover Letter *</Label>
+                  <textarea
+                    id="coverLetter"
+                    rows={8}
+                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    placeholder="Tell us why you're interested in this position and what makes you a great fit..."
+                    required
+                    value={formData.coverLetter}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Review */}
+            {step === 4 && (
+              <div className="space-y-6">
+                <Card className="bg-linear-to-br from-amber-50 to-stone-50">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      <CheckCircle2 className="w-5 h-5 text-green-600" />
+                      <h3 className="font-semibold">Application Summary</h3>
+                    </div>
+
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Name:</span>
+                        <span className="font-medium">{formData.firstName} {formData.lastName}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Email:</span>
+                        <span className="font-medium">{formData.email}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Position:</span>
+                        <span className="font-medium">{formData.position}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Experience:</span>
+                        <span className="font-medium">{formData.experience} years</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Documents:</span>
+                        <span className="font-medium">{formData.resumeFileName ? 'Resume uploaded' : 'No resume'}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex gap-3">
+                    <div className="shrink-0">
+                      <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div className="text-sm">
+                      <p className="font-medium text-blue-900 mb-1">Before you submit</p>
+                      <ul className="text-blue-800 space-y-1">
+                        <li>• All required fields are completed</li>
+                        <li>• Documents are uploaded correctly</li>
+                        <li>• Information is accurate and up-to-date</li>
+                        <li>• You've reviewed your cover letter</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-stone-100 rounded-lg">
+                  <input
+                    type="checkbox"
+                    id="termsAccepted"
+                    className="mt-1"
+                    checked={formData.termsAccepted}
+                    onChange={handleCheckboxChange}
+                  />
+                  <Label htmlFor="termsAccepted" className="text-sm cursor-pointer">
+                    I confirm that all information provided is accurate and I agree to the{' '}
+                    <Link href="/terms" className="text-amber-700 hover:underline">
+                      Terms and Conditions
+                    </Link>
+                    {' '}and{' '}
+                    <Link href="/privacy" className="text-amber-700 hover:underline">
+                      Privacy Policy
+                    </Link>
+                  </Label>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation Buttons */}
+            <div className="flex gap-4 pt-6 border-t">
+              {step > 1 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setStep(step - 1)}
+                  className="flex-1"
+                >
+                  Previous
+                </Button>
+              )}
+              {step < 4 ? (
+                <Button
+                  onClick={() => setStep(step + 1)}
+                  className="flex-1 bg-black hover:bg-black/90"
+                  disabled={!isStepValid(step)}
+                >
+                  Next Step
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSubmit}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  disabled={!isStepValid(4) || isPending}
+                >
+                  {isPending ? 'Submitting...' : 'Submit Application'}
+                </Button>
+              )}
             </div>
-          )}
 
-          <Button
-            onClick={handleSubmit}
-            disabled={isPending}
-            className="w-full bg-green-600 hover:bg-green-700"
-          >
-            {isPending ? 'Submitting...' : 'Submit Application'}
-          </Button>
-        </CardContent>
-      </Card>
+            {/* Error Message */}
+            {isError && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">
+                  Error: {error instanceof Error ? error.message : 'Failed to submit application'}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Help Card */}
+        <Card className="mt-6 bg-linear-to-br from-amber-50 to-white border-amber-200">
+          <CardContent className="p-6">
+            <h3 className="font-semibold mb-2">Need Help?</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              If you have questions about the application process, contact our support team.
+            </p>
+            <Link href={"/contact"}>
+              <Button variant="outline" size="sm" className="rounded-full">
+                Contact Support
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

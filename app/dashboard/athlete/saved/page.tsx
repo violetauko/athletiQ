@@ -17,7 +17,13 @@ export default function AthleteSavedOpportunitiesPage() {
             const response = await fetch('/api/athlete/saved')
             if (!response.ok) throw new Error('Failed to fetch saved opportunities')
             return response.json()
-        }
+        },
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+
     })
 
     const unsaveMutation = useMutation({
@@ -38,7 +44,7 @@ export default function AthleteSavedOpportunitiesPage() {
     }
 
     return (
-        <div className="min-h-screen bg-stone-50 py-8">
+        <div className="min-h-screen w-full py-8">
             <div className="container mx-auto">
                 <h1 className="text-3xl font-bold mb-6">Saved Opportunities</h1>
 

@@ -24,7 +24,12 @@ export default function AthleteMessagesPage() {
             const response = await fetch('/api/athlete/messages')
             if (!response.ok) throw new Error('Failed to fetch messages')
             return response.json()
-        }
+        },
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
     })
 
     const sendMutation = useMutation({

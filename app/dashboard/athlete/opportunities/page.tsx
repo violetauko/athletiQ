@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, Briefcase, MapPin, Building, Calendar } from 'lucide-react'
 import Link from 'next/link'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function AthleteOpportunitiesPage() {
     const [search, setSearch] = useState('')
@@ -28,7 +29,12 @@ export default function AthleteOpportunitiesPage() {
             const response = await fetch(`/api/athlete/opportunities?${queryParams.toString()}`)
             if (!response.ok) throw new Error('Failed to fetch opportunities')
             return response.json()
-        }
+        },
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
     })
 
     const handleSearch = (e: React.FormEvent) => {
@@ -75,7 +81,7 @@ export default function AthleteOpportunitiesPage() {
 
                 {/* Results */}
                 {loading ? (
-                    <div className="text-center py-12">Loading opportunities...</div>
+                    <OppotunitySkeleton/>
                 ) : opportunities.length === 0 ? (
                     <div className="text-center py-12 text-muted-foreground">No opportunities found matching your criteria.</div>
                 ) : (
@@ -116,3 +122,16 @@ export default function AthleteOpportunitiesPage() {
         </div>
     )
 }
+const OppotunitySkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[...Array(4)].map((_, i) => (
+            <Card key={i}>
+                <CardContent className="p-6">
+                    <Skeleton className="w-8 h-8 mb-2" />
+                    <Skeleton className="w-16 h-8 mb-1" />
+                    <Skeleton className="w-24 h-4" />
+                </CardContent>
+            </Card>
+        ))}
+    </div>
+)

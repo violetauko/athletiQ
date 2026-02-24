@@ -22,7 +22,7 @@ export async function GET() {
             email: true,
           }
         },
-        opportunity: {
+        Opportunity: {
           select: {
             id: true,
             title: true,
