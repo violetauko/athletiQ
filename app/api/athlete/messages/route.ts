@@ -19,7 +19,7 @@ export async function GET() {
       include: {
         sender: { select: { id: true, name: true, email: true, image: true, role: true } },
         receiver: { select: { id: true, name: true, email: true, image: true, role: true } },
-        opportunity: { select: { id: true, title: true } }
+        Opportunity: { select: { id: true, title: true } }
       },
       orderBy: { createdAt: "desc" }
     });

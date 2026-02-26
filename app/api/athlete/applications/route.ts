@@ -20,9 +20,9 @@ export async function GET() {
     const applications = await prisma.application.findMany({
       where: { athleteId: athleteProfile.id },
       include: {
-        opportunity: {
+        Opportunity: {
           include: { 
-            client: {
+            ClientProfile: {
               select: { organization: true }
             }
           }

@@ -17,8 +17,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const opportunity = await prisma.opportunity.findUnique({
       where: { id },
       include: {
-        client: {
-          include: { user: { select: { image: true } } }
+        ClientProfile: {
+          include: { User: { select: { image: true } } }
         }
       }
     });

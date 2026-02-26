@@ -14,7 +14,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const athleteProfile = await prisma.athleteProfile.findUnique({
       where: { userId: session.user.id },
       include: {
-        savedOpportunities: {
+        Opportunity: {
           where: { id }
         }
       }
@@ -24,14 +24,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         return new NextResponse("Athlete profile not found", { status: 404 });
     }
 
-    const isSaved = athleteProfile.savedOpportunities.length > 0;
+    const isSaved = athleteProfile.Opportunity.length > 0;
 
     if (isSaved) {
       // Unsave
       await prisma.athleteProfile.update({
         where: { id: athleteProfile.id },
         data: {
-          savedOpportunities: {
+          Opportunity: {
             disconnect: { id }
           }
         }
@@ -42,7 +42,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       await prisma.athleteProfile.update({
         where: { id: athleteProfile.id },
         data: {
-          savedOpportunities: {
+          Opportunity: {
             connect: { id }
           }
         }

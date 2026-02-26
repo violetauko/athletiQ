@@ -128,7 +128,7 @@ export default function NewOpportunityPage() {
       <div className="border-b bg-white sticky top-16 z-30">
         <div className="py-4 flex items-center justify-between">
           <Button asChild variant="ghost" className="gap-2 text-muted-foreground">
-            <Link href="/dashboard/client">
+            <Link href="/dashboard/recruiter">
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
             </Link>
@@ -262,7 +262,7 @@ export default function NewOpportunityPage() {
           <CardContent>
             <Textarea
               placeholder="Describe the opportunity in detail..."
-              className="min-h-[180px] resize-none"
+              className="min-h-45 resize-none"
               value={form.description}
               onChange={(e) => set('description', e.target.value)}
             />

@@ -210,7 +210,7 @@
 // }
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, Suspense } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { OpportunityCard } from '@/components/opportunities/opportunity-card'
@@ -253,7 +253,7 @@ async function fetchOpportunities(params: URLSearchParams): Promise<Opportunitie
   return await res.json()
 }
 
-export default function OpportunitiesPage() {
+function OpportunitiesPage() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -442,4 +442,12 @@ export default function OpportunitiesPage() {
       </section>
     </div>
   )
+}
+
+export default function OpportunitiesPageWrapper() {
+  return (
+    <Suspense fallback={<div className="text-center py-20">Loading…</div>}>
+      <OpportunitiesPage />
+    </Suspense>
+  );
 }

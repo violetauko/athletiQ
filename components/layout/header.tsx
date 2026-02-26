@@ -12,10 +12,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useEffect } from 'react'
+import { redirect, useRouter } from 'next/navigation'
 
 export function Header() {
   const { data: session, status } = useSession()
   const isLoading = status === 'loading'
+  const router = useRouter();
+
+  useEffect(() => {
+      if (!session?.user?.role) return; // wait for session
+
+      switch (session.user.role) {
+        case "ADMIN":
+          router.push("/dashboard/admin");
+          break;
+        case "CLIENT":
+          router.push("/dashboard/recruiter");
+          break;
+        case "ATHLETE":
+        default:
+          router.push("/dashboard/athlete");
+          break;
+      }
+    }, [session, router]); // dependency array includes session & router
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-band-20 backdrop-blur supports-backdrop-filter:bg-band-10">
@@ -90,6 +110,10 @@ export function Header() {
                     {session.user.role}
                   </p>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/donate">Donate<Heart className="w-4 h-4 text-red-500 fill-red-500" /></Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard">Dashboard</Link>

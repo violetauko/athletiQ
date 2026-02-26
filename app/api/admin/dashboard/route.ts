@@ -29,8 +29,8 @@ export async function GET() {
       prisma.opportunity.findMany({
         where: { status: "PENDING_APPROVAL" },
         include: {
-          client: {
-            include: { user: { select: { name: true, email: true } } }
+          ClientProfile: {
+            include: { User: { select: { name: true, email: true } } }
           }
         },
         orderBy: { createdAt: "asc" }

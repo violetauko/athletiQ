@@ -247,7 +247,7 @@ export default function EditOpportunityPage({ params }: { params: Promise<{ id: 
           <CardHeader><CardTitle>Description *</CardTitle></CardHeader>
           <CardContent>
             <Textarea
-              className="min-h-[180px] resize-none"
+              className="min-h-45 resize-none"
               value={form.description}
               onChange={(e) => set('description', e.target.value)}
             />
@@ -295,7 +295,7 @@ export default function EditOpportunityPage({ params }: { params: Promise<{ id: 
 
         <div className="flex justify-end gap-3 pb-8">
           <Button asChild variant="outline" className="rounded-full">
-            <Link href="/dashboard/client">Cancel</Link>
+            <Link href="/dashboard/recruiter">Cancel</Link>
           </Button>
           <Button
             className="bg-black hover:bg-black/90 rounded-full"

@@ -90,7 +90,7 @@ export default function AthleteMessagesPage() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Conversation List */}
-                        <Card className="md:col-span-1 h-[600px] overflow-y-auto">
+                        <Card className="md:col-span-1 h-150 overflow-y-auto">
                             <div className="flex flex-col">
                                 {conversations.map((conv) => (
                                     <div
@@ -113,7 +113,7 @@ export default function AthleteMessagesPage() {
                         </Card>
 
                         {/* Active Conversation */}
-                        <Card className="md:col-span-2 h-[600px] flex flex-col">
+                        <Card className="md:col-span-2 h-150 flex flex-col">
                             {selectedConversation ? (
                                 <>
                                     <CardHeader className="border-b">
@@ -128,7 +128,7 @@ export default function AthleteMessagesPage() {
                                                 <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                                                     <div className={`max-w-[75%] rounded-lg p-3 ${isMe ? 'bg-black text-white' : 'bg-stone-100 text-stone-900 border'}`}>
                                                         {msg.opportunity && (
-                                                            <div className={`text-xs mb-1 mb-2 pb-1 border-b ${isMe ? 'border-white/20' : 'border-stone-200'} opacity-80`}>
+                                                            <div className={`text-xs mb-1 pb-1 border-b ${isMe ? 'border-white/20' : 'border-stone-200'} opacity-80`}>
                                                                 Regarding: {msg.opportunity.title}
                                                             </div>
                                                         )}
@@ -145,7 +145,7 @@ export default function AthleteMessagesPage() {
                                         <div className="flex gap-2">
                                             <Textarea
                                                 placeholder="Type your message..."
-                                                className="min-h-[60px] resize-none"
+                                                className="min-h-15 resize-none"
                                                 value={replyContent}
                                                 onChange={(e) => setReplyContent(e.target.value)}
                                             />

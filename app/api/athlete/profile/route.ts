@@ -12,7 +12,7 @@ export async function GET() {
     const athleteProfile = await prisma.athleteProfile.findUnique({
       where: { userId: session.user.id },
       include: {
-        user: {
+        User: {
           select: { name: true, email: true, image: true }
         }
       }
@@ -60,7 +60,7 @@ export async function PATCH(req: Request) {
         where: { userId: session.user.id },
         data: profileData,
         include: {
-          user: { select: { name: true, email: true, image: true } }
+          User: { select: { name: true, email: true, image: true } }
         }
       });
     });

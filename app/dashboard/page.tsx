@@ -1,7 +1,5 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { ClientDashboard } from '@/components/dashboard/client-dashboard'
-import { AdminDashboard } from '@/components/dashboard/admin-dashboard'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -13,10 +11,9 @@ export default async function DashboardPage() {
   // Render different dashboards based on the user's role
   switch (session.user.role) {
     case 'ADMIN':
-      return <AdminDashboard />
+      redirect('/dashboard/admin')
     case 'CLIENT':
-      // Clients are also Recruiters in the domain context
-      return <ClientDashboard />
+      redirect('/dashboard/recruiter')
     case 'ATHLETE':
     default:
       redirect('/dashboard/athlete')

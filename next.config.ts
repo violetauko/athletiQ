@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "assets.stickpng.com",
       },
+      {
+        protocol: "https",
+        hostname: "www.panamsports.org"
+      }
 
     ],
   },

@@ -9,7 +9,7 @@ const NAV_ITEMS = [
     { href: '/dashboard/athlete/profile', label: 'My Profile', icon: User, default: false },
     { href: '/dashboard/athlete/applications', label: 'Applications', icon: Briefcase, default: false },
     { href: '/dashboard/athlete/saved', label: 'Saved Opportunities', icon: FileText, default: false },
-    { href: '/dashboard/athlete/settings', label: 'Settings', icon: Settings, default: false },
+    // { href: '/dashboard/athlete/settings', label: 'Settings', icon: Settings, default: false },
 ] as const
 
 export default function AthleteDashboardLayout({
@@ -56,7 +56,7 @@ export default function AthleteDashboardLayout({
                             </CardContent>
                         </Card>
                     </div>
-                    <div className='lg:col-span-3 space-y-8'>{children}</div>
+                    <div className='lg:col-span-3 space-y-8 p-2'>{children}</div>
                 </div>
             </div>
         </div>

@@ -12,9 +12,9 @@ export async function GET() {
     const athleteProfile = await prisma.athleteProfile.findUnique({
       where: { userId: session.user.id },
       include: {
-        savedOpportunities: {
+        Opportunity: {
           include: {
-            client: {
+            ClientProfile: {
               select: { organization: true }
             }
           },
@@ -27,7 +27,7 @@ export async function GET() {
         return new NextResponse("Athlete profile not found", { status: 404 });
     }
 
-    return NextResponse.json(athleteProfile.savedOpportunities);
+    return NextResponse.json(athleteProfile.Opportunity);
   } catch (error) {
     console.error("[ATHLETE_SAVED_GET]", error);
     return new NextResponse("Internal Error", { status: 500 });

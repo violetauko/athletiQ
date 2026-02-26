@@ -28,12 +28,12 @@ export async function GET() {
       recommendedOpportunitiesData
     ] = await Promise.all([
       prisma.application.count({ where: { athleteId: athleteProfile.id, status: { notIn: ["REJECTED", "WITHDRAWN"] } } }),
-      prisma.opportunity.count({ where: { savedBy: { some: { id: athleteProfile.id } } } }),
+      prisma.opportunity.count({ where: { AthleteProfile: { some: { id: athleteProfile.id } } } }),
       prisma.application.findMany({
         where: { athleteId: athleteProfile.id },
         include: {
-          opportunity: {
-            include: { client: true }
+          Opportunity: {
+            include: { ClientProfile: { select: { organization: true } } }
           }
         },
         orderBy: { appliedAt: "desc" },
@@ -41,7 +41,7 @@ export async function GET() {
       }),
       prisma.opportunity.findMany({
         where: { sport: athleteProfile.primarySport, status: "ACTIVE" },
-        include: { client: true },
+        include: { ClientProfile: true },
         orderBy: { postedDate: "desc" },
         take: 3
       })
@@ -64,17 +64,17 @@ export async function GET() {
 
     const recentApplications = recentApplicationsData.map(app => ({
       id: app.id,
-      title: app.opportunity.title,
-      organization: app.opportunity.client.organization,
+      title: app.Opportunity.title,
+      organization: app.Opportunity.ClientProfile.organization,
       status: app.status,
       appliedDate: app.appliedAt.toISOString().split('T')[0],
-      location: app.opportunity.location,
+      location: app.Opportunity.location,
     }));
 
     const recommendedOpportunities = recommendedOpportunitiesData.map(opp => ({
       id: opp.id,
       title: opp.title,
-      organization: opp.client.organization,
+      organization: opp.ClientProfile.organization,
       location: opp.location,
       type: opp.type,
       postedDate: opp.postedDate.toISOString().split('T')[0]

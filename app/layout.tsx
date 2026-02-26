@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { ReactQueryProvider } from '@/lib/react-query-provider'
 import { AuthProvider } from '@/components/layout/auth-provider'
+import { Toaster } from '@/components/ui/sonner'
 
 
 export const metadata: Metadata = {
@@ -27,7 +28,15 @@ export default function RootLayout({
           <ReactQueryProvider>
             <div className="min-h-screen">
               <Header />
-              <main className="container mx-auto px-2 sm:px-0 lg:px-0">{children}</main>
+              <main className="container mx-auto px-2 sm:px-0 lg:px-0">
+                {children}
+                <Toaster 
+                  position="top-right"
+                  richColors
+                  closeButton
+                  theme="light"
+                />
+              </main>
               <Footer />
             </div>
           </ReactQueryProvider>

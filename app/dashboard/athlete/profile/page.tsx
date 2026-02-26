@@ -111,9 +111,9 @@ export default function AthleteProfilePage() {
     if (!profile) return <div className="text-center py-12">Profile not found.</div>
 
     return (
-        <div className="min-h-screen bg-stone-50 py-8">
-            <div className="container max-w-3xl mx-auto space-y-8">
-                <h1 className="text-3xl font-bold">My Profile</h1>
+        <div className="min-h-screen">
+            <div className="container mx-auto space-y-8">
+                {/* <h1 className="text-3xl font-bold">My Profile</h1> */}
 
                 <Card>
                     <CardHeader>
@@ -175,7 +175,7 @@ export default function AthleteProfilePage() {
                                 value={formData.bio}
                                 onChange={handleChange}
                                 placeholder="Tell us a bit about yourself..."
-                                className="min-h-[100px]"
+                                className="min-h-25"
                             />
                         </div>
                     </CardContent>
@@ -195,6 +195,7 @@ export default function AthleteProfilePage() {
                                         <SelectValue placeholder="Select sport" />
                                     </SelectTrigger>
                                     <SelectContent>
+                                        <SelectItem value='Rugby'>Rugby</SelectItem>
                                         <SelectItem value="Basketball">Basketball</SelectItem>
                                         <SelectItem value="Football">Football</SelectItem>
                                         <SelectItem value="Soccer">Soccer</SelectItem>

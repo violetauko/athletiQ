@@ -212,6 +212,7 @@ model User {
   Message_Message_senderIdToUser   Message[]       @relation("Message_senderIdToUser")
   Session                          Session[]
   contactSubmissions               ContactSubmission[]
+  donations                        Donation[]
 }
 
 model VerificationToken {
@@ -222,6 +223,47 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model Donation {
+  id              String        @id @default(cuid())
+  stripeSessionId String        @unique
+  stripePaymentId String?       @unique
+
+  // Amount
+  amount          Int           // stored in cents (e.g. 2500 = $25.00)
+  currency        String        @default("usd")
+
+  // Tier
+  tierId          String        // "champion" | "supporter" | "mvp" | "legend" | "custom"
+  isCustom        Boolean       @default(false)
+
+  // Donor info
+  donorName       String?
+  donorEmail      String?
+  message         String?
+
+  // Linked user (nullable — anonymous donations allowed)
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Status
+  status          DonationStatus @default(PENDING)
+
+  // Timestamps
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum DonationStatus {
+  PENDING    
+  PAID       
+  FAILED     
+  REFUNDED   
+}
 enum ApplicationStatus {
   PENDING
   REVIEWING
@@ -243,6 +285,8 @@ enum OpportunityStatus {
   CLOSED
   DRAFT
   PENDING_APPROVAL
+  REJECTED
+  EXPIRED
 }
 
 enum UserRole {

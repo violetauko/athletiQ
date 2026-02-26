@@ -33,11 +33,11 @@ export async function GET(req: Request) {
     const opportunities = await prisma.opportunity.findMany({
       where: whereClause,
       include: {
-        client: {
+        ClientProfile: {
           select: { organization: true }
         },
         _count: {
-          select: { applications: true }
+          select: { Application: true }
         }
       },
       orderBy: { postedDate: "desc" }
