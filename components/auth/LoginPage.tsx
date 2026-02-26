@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 import TitleCard from "@/components/shared/title-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -23,6 +24,15 @@ export function LoginPage() {
     );
     const [loading, setLoading] = useState(false);
 
+    // Show toast for initial error if present
+    useState(() => {
+        if (errorParam === "CredentialsSignin") {
+            toast.error("Invalid email or password. Please try again.");
+        } else if (errorParam) {
+            toast.error(errorParam);
+        }
+    });
+
     async function handleCredentials(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setLoading(true);
@@ -38,7 +48,11 @@ export function LoginPage() {
 
         if (result?.error) {
             setError("Invalid email or password.");
+            toast.error("Invalid email or password. Please check your credentials and try again.");
         } else {
+            toast.success("Successfully signed in!", {
+                description: "Welcome back to AthletiQ.",
+            });
             router.push(callbackUrl);
             router.refresh();
         }
@@ -46,6 +60,9 @@ export function LoginPage() {
 
     async function handleGoogle() {
         setLoading(true);
+        toast.info("Redirecting to Google...", {
+            description: "You'll be redirected to Google to complete sign in.",
+        });
         await signIn("google", { callbackUrl });
     }
 
@@ -92,7 +109,15 @@ export function LoginPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="password">Password</Label>
+                                    <div className="flex items-center justify-between">
+                                        <Label htmlFor="password">Password</Label>
+                                        <Link
+                                            href="/forgot-password"
+                                            className="text-xs text-muted-foreground hover:text-black hover:underline"
+                                        >
+                                            Forgot password?
+                                        </Link>
+                                    </div>
                                     <Input
                                         id="password"
                                         type="password"
