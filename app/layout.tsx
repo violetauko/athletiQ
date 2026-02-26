@@ -11,6 +11,12 @@ import { Toaster } from '@/components/ui/sonner'
 export const metadata: Metadata = {
   title: 'AthletiQ - Athlete Recruitment Platform',
   description: 'Connect talented athletes with sports organizations worldwide',
+  icons: {
+    icon: [
+      { url: "/favicon.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-1.png", sizes: "48x48", type: "image/png" },
+    ]  
+  },
 }
 const inter = Inter({
   subsets: ["latin"],

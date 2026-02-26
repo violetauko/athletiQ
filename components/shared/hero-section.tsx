@@ -109,7 +109,7 @@ export function HeroSection() {
             <p className="text-white/80 text-sm mb-6">
               Connect with top talent across all sports disciplines
             </p>
-            <Link href="/apply">
+            <Link href="/dashboard/athlete/opportunities">
               <Button className="bg-white text-black hover:bg-white/90 rounded-full">
                 Apply Now
               </Button>

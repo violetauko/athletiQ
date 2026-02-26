@@ -217,7 +217,7 @@ export function OpportunityCard({
             size="sm"
             className="flex-1 bg-black hover:bg-black/90 rounded-full text-xs"
           >
-            <Link href={`/opportunities/${id}/apply`}>Apply Now</Link>
+            <Link href={`/dashboard/athlete/opportunities/${id}/apply`}>Apply Now</Link>
           </Button>
         </div>
       </CardContent>

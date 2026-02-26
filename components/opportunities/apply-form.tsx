@@ -845,7 +845,7 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
     <div className="">
       <div className="mb-12">
         {/* Header */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <Link href={`/opportunities/${id}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to Opportunity
@@ -857,7 +857,7 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
             description="Professional Basketball Player at Elite Sports Management."
           />
         </div>
-        </div>
+        </div> */}
 
         {/* Progress Indicator */}
         <div className="mb-8">

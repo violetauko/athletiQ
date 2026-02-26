@@ -359,7 +359,7 @@ function OpportunitiesPage() {
       <section className="py-12 flex-1">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
-            <p className="text-muted-foreground">
+            <div className="text-muted-foreground">
               {isLoading ? (
                 <Skeleton className="h-5 w-40 inline-block" />
               ) : (
@@ -369,7 +369,7 @@ function OpportunitiesPage() {
                   opportunities
                 </>
               )}
-            </p>
+            </div>
             <div className="flex gap-2 items-center">
               <span className="text-sm text-muted-foreground">Sort by:</span>
               <Button variant="outline" size="sm">

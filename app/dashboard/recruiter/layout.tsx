@@ -5,7 +5,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Briefcase, FileText, TrendingUp, User, Settings, MessageSquare } from 'lucide-react'
 import React from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { redirect, usePathname } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 const NAV_ITEMS = [
     { href: '/dashboard/recruiter', label: 'Dashboard', icon: TrendingUp },
@@ -31,6 +32,11 @@ export default function RecruiterDashboardLayout({
         // Check if path starts with the href for nested routes
         return pathname.startsWith(href)
     }
+    const{ data: session } = useSession()
+    if (!session || session.user.role !== 'CLIENT') {
+        redirect('/login')
+    }
+    
 
     return (
         <div className="min-h-screen">

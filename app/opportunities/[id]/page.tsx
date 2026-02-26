@@ -336,7 +336,7 @@ export default function OpportunityDetailPage({ params }: Props) {
     <OpportunityDetails
       id={id}
       backHref="/opportunities"
-      applyHref={`/opportunities/${id}/apply`}
+      applyHref={`/dashboard/athlete/opportunities/${id}/apply`}
     />
   )
 }

@@ -44,7 +44,7 @@ export default function AthleteSavedOpportunitiesPage() {
     }
 
     return (
-        <div className="min-h-screen w-full py-8">
+        <div className="min-h-screen w-full ps-3 pt-4 pb-8">
             <div className="container mx-auto">
                 <h1 className="text-3xl font-bold mb-6">Saved Opportunities</h1>
 

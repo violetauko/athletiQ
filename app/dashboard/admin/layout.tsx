@@ -5,7 +5,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { FileText, TrendingUp, User, MessageSquare, ShieldCheck, Users } from 'lucide-react'
 import React from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { redirect, usePathname } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 const NAV_ITEMS = [
     { href: '/dashboard/admin', label: 'Dashboard', icon: TrendingUp },
@@ -31,6 +32,11 @@ export default function AdminDashboardLayout({
         }
         // Check if path starts with the href for nested routes
         return pathname.startsWith(href)
+    }
+    
+    const{ data: session } = useSession()
+    if (!session || session.user.role !== 'ADMIN') {
+        redirect('/login')
     }
 
     return (

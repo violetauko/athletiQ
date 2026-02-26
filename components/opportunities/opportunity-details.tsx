@@ -204,7 +204,7 @@ export function OpportunityDetails({ id, backHref, applyHref }: OpportunityDetai
                     <ul className="space-y-3">
                       {opportunity.responsibilities.map((item, index) => (
                         <li key={index} className="flex gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
                           <span className="text-muted-foreground">{item}</span>
                         </li>
                       ))}
@@ -226,7 +226,7 @@ export function OpportunityDetails({ id, backHref, applyHref }: OpportunityDetai
                     <ul className="space-y-3">
                       {opportunity.requirements.map((item, index) => (
                         <li key={index} className="flex gap-3">
-                          <div className="w-2 h-2 bg-amber-600 rounded-full flex-shrink-0 mt-2" />
+                          <div className="w-2 h-2 bg-amber-600 rounded-full shrink-0 mt-2" />
                           <span className="text-muted-foreground">{item}</span>
                         </li>
                       ))}
@@ -249,9 +249,9 @@ export function OpportunityDetails({ id, backHref, applyHref }: OpportunityDetai
                       {opportunity.benefits.map((benefit, index) => (
                         <div
                           key={index}
-                          className="flex gap-3 p-4 bg-gradient-to-br from-amber-50 to-stone-50 rounded-lg border border-amber-200"
+                          className="flex gap-3 p-4 bg-linear-to-br from-amber-50 to-stone-50 rounded-lg border border-amber-200"
                         >
-                          <CheckCircle2 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                          <CheckCircle2 className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                           <span className="text-sm font-medium">{benefit}</span>
                         </div>
                       ))}
@@ -264,7 +264,7 @@ export function OpportunityDetails({ id, backHref, applyHref }: OpportunityDetai
             {/* Right Column - Application Card */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-6">
-                <Card className="border-2 border-amber-200 bg-gradient-to-br from-white to-amber-50">
+                <Card className="border-2 border-amber-200 bg-linear-to-br from-white to-amber-50">
                   <CardHeader>
                     <CardTitle className="text-xl">Ready to Apply?</CardTitle>
                   </CardHeader>

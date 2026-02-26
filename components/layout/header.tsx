@@ -20,22 +20,22 @@ export function Header() {
   const isLoading = status === 'loading'
   const router = useRouter();
 
-  useEffect(() => {
-      if (!session?.user?.role) return; // wait for session
+  // useEffect(() => {
+  //     if (!session?.user?.role) return; // wait for session
 
-      switch (session.user.role) {
-        case "ADMIN":
-          router.push("/dashboard/admin");
-          break;
-        case "CLIENT":
-          router.push("/dashboard/recruiter");
-          break;
-        case "ATHLETE":
-        default:
-          router.push("/dashboard/athlete");
-          break;
-      }
-    }, [session, router]); // dependency array includes session & router
+  //     switch (session.user.role) {
+  //       case "ADMIN":
+  //         router.push("/dashboard/admin");
+  //         break;
+  //       case "CLIENT":
+  //         router.push("/dashboard/recruiter");
+  //         break;
+  //       case "ATHLETE":
+  //       default:
+  //         router.push("/dashboard/athlete");
+  //         break;
+  //     }
+  //   }, [session, router]); // dependency array includes session & router
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-band-20 backdrop-blur supports-backdrop-filter:bg-band-10">
