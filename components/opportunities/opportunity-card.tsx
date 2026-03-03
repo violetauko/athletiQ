@@ -107,21 +107,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { MapPin, DollarSign, Clock } from 'lucide-react'
+import { OpportunityCardProps } from '@/app/types/athlete'
 
-interface OpportunityCardProps {
-  id: string
-  title: string
-  sport: string
-  category: string
-  location: string
-  city: string
-  type: string
-  salaryMin?: number | null
-  salaryMax?: number | null
-  description: string
-  postedDate: Date
-  isNew?: boolean
-}
+
 
 function formatSalary(min?: number | null, max?: number | null): string | null {
   if (!min && !max) return null

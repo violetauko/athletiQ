@@ -1,14 +1,11 @@
-'use client'
 import TitleCard from '@/components/shared/title-card'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Trophy, Users, Target, Heart } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 export default function AboutPage() {
-  const router = useRouter()
   const values = [
     {
       icon: <Trophy className="w-8 h-8" />,
@@ -49,7 +46,7 @@ export default function AboutPage() {
           description="We're on a mission to connect talented athletes with world-class sports organizations, 
             creating opportunities that transform careers and lives."
           action="Let's talk"
-          onClick={()=>router.push("/contact")}
+          href="/contact"
         />
       </div>
 

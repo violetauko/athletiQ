@@ -6,11 +6,14 @@ import { auth } from '@/auth'
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
+
     const sport = searchParams.get('sport')
     const category = searchParams.get('category')
     const location = searchParams.get('location')
+    const latest = searchParams.get('latest') === 'true'
+
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const limit = parseInt(searchParams.get('limit') || (latest ? '6' : '10'))
     const skip = (page - 1) * limit
 
     // Build query filters
@@ -33,39 +36,47 @@ export async function GET(request: Request) {
       }
     }
 
-    // Fetch opportunities with pagination
-    const [opportunities, total] = await Promise.all([
-      prisma.opportunity.findMany({
-        where,
-        include: {
-          ClientProfile: {
-            include: {
-              User: {
-                select: {
-                  name: true,
-                  email: true,
-                },
+    // If latest=true → ignore pagination skip
+    const opportunitiesQuery = prisma.opportunity.findMany({
+      where,
+      include: {
+        ClientProfile: {
+          include: {
+            User: {
+              select: {
+                name: true,
+                email: true,
               },
             },
           },
         },
-        orderBy: {
-          postedDate: 'desc',
-        },
-        skip,
-        take: limit,
-      }),
-      prisma.opportunity.count({ where }),
+      },
+      orderBy: {
+        postedDate: 'desc', // newest first
+      },
+      take: latest ? limit : limit,
+      skip: latest ? 0 : skip,
+    })
+
+    const totalQuery = latest
+      ? prisma.opportunity.count({ where })
+      : prisma.opportunity.count({ where })
+
+    const [opportunities, total] = await Promise.all([
+      opportunitiesQuery,
+      totalQuery,
     ])
 
     return NextResponse.json({
       opportunities,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
+      pagination: latest
+        ? null
+        : {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+          },
     })
   } catch (error) {
     console.error('Error fetching opportunities:', error)
@@ -75,7 +86,6 @@ export async function GET(request: Request) {
     )
   }
 }
-
 // POST /api/opportunities - Create new opportunity (Recruiter only)
 export async function POST(request: Request) {
   try {

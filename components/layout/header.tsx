@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useEffect } from 'react'
 import { redirect, useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 export function Header() {
   const { data: session, status } = useSession()
@@ -42,10 +43,8 @@ export function Header() {
       <div className="container mx-auto px-2 sm:px-0 lg:px-0 flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="flex items-center justify-center w-10 h-10 bg-black rounded-full">
-              <Heart className="w-5 h-5 text-white fill-white" />
-            </div>
-            <span className="font-bold text-xl text-black">AthletiQ</span>
+            
+            <Image src="/logo1.png" alt="Athletiq Logo" width={120} height={30} className="hidden sm:block" />
           </Link>
         </div>
 

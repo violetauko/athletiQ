@@ -309,7 +309,7 @@ function OpportunitiesPage() {
           title="Find Your Perfect Opportunity"
           description="Browse through thousands of verified sports opportunities across the globe"
           action="Let's talk"
-          onClick={() => router.push('/contact')}
+          href='/contact'
         />
       </div>
 

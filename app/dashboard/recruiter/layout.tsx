@@ -10,10 +10,10 @@ import { useSession } from 'next-auth/react'
 
 const NAV_ITEMS = [
     { href: '/dashboard/recruiter', label: 'Dashboard', icon: TrendingUp },
-    { href: '/dashboard/recruiter/profile', label: 'My Profile', icon: User },
     { href: '/dashboard/recruiter/applications', label: 'Applications', icon: Briefcase },
     { href: '/dashboard/recruiter/opportunities', label: 'My Opportunities', icon: FileText },
     { href: '/dashboard/recruiter/messages', label: 'Messages', icon: MessageSquare },
+    { href: '/dashboard/recruiter/profile', label: 'My Profile', icon: User },
     // { href: '/dashboard/recruiter/settings', label: 'Settings', icon: Settings },
 ] as const
 

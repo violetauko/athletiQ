@@ -111,3 +111,23 @@ export interface AthleteDashboardData {
     postedDate: string;
   }[];
 }
+export interface Sport {
+  id: string
+  name: string
+  icon?: string
+  category?: string
+}
+export interface OpportunityCardProps {
+  id: string
+  title: string
+  sport: string
+  category: string
+  location: string
+  city: string
+  type: string
+  salaryMin?: number | null
+  salaryMax?: number | null
+  description: string
+  postedDate: Date
+  isNew?: boolean
+}

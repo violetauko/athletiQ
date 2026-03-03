@@ -1,6 +1,7 @@
+import Link from 'next/link'
 import { Button } from '../ui/button'
 
-const TitleCard = ({ image, title, description, action, onClick, icon }: { image: string, title: string, description?: string, action?: string, onClick?: () => void , icon?:React.ReactNode}) => {
+const TitleCard = ({ image, title, description, action, href, icon }: { image: string, title: string, description?: string, action?: string, href?: string, icon?: React.ReactNode }) => {
     return (
         <div className="px-5 relative rounded-2xl hover:shadow-xl transition-all duration-300 
                  overflow-hidden h-full">
@@ -31,9 +32,11 @@ const TitleCard = ({ image, title, description, action, onClick, icon }: { image
                 </p>
 
                 {action &&
-                    <Button className="bg-white text-black hover:bg-white/90 rounded-full px-8" onClick={onClick}>
-                        {action}
-                    </Button>
+                    <Link href={href || '#'} className="inline-block">
+                        <Button className="bg-white text-black hover:bg-white/90 rounded-full px-8" >
+                            {action}
+                        </Button>
+                    </Link>
                 }
             </div>
 

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
+import { getClientDashboardData } from "@/lib/dashboard";
 
 const opportunitySchema = z.object({
   title: z.string().min(3),
@@ -123,6 +125,8 @@ export async function POST(req: Request) {
           : null,
       },
     });
+
+      await getClientDashboardData(userWithClient.ClientProfile.id)
 
     return NextResponse.json(newOpportunity);
   } catch (error) {
