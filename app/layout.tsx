@@ -34,7 +34,7 @@ export default function RootLayout({
           <ReactQueryProvider>
             <div className="min-h-screen">
               <Header />
-              <main className="container mx-auto px-2 sm:px-0 lg:px-0">
+              <main className="container mx-auto px-2 sm:px-0 lg:px-0 min-h-screen">
                 {children}
                 <Toaster 
                   position="top-right"

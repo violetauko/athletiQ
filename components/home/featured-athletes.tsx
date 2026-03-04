@@ -1,10 +1,9 @@
-// components/athletes/featured-athletes.tsx (Server Component with ISR)
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { AthleteCard } from '../athletes/athlete-card'
 import { getFeaturedAthletes } from '@/lib/athletes'
 
-export default async function FeaturedAthletes() {
+export async function FeaturedAthletes() {
   const athletes = await getFeaturedAthletes()
 
   if (!athletes.length) {

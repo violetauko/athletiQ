@@ -91,7 +91,7 @@ export function OpportunityDetails({ id, backHref, applyHref }: OpportunityDetai
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-96 bg-gradient-to-br from-stone-900 to-black rounded-2xl px-16 mt-4 overflow-hidden mx-4 lg:mx-0">
+      <section className="relative h-96 bg-linear-to-br from-stone-900 to-black rounded-2xl px-16 mt-4 overflow-hidden mx-4 lg:mx-0">
         <div className="absolute inset-0">
           {opportunity.imageUrl && (
             <Image

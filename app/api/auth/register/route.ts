@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import type { UserRole } from "@prisma/client";
+import { sendEmail } from "@/lib/email/email-service";
 
 interface RegisterBody {
   name: string;
@@ -66,6 +67,26 @@ export async function POST(request: Request): Promise<NextResponse> {
       email: true,
       role: true,
       createdAt: true,
+    },
+  });
+  const verificationToken = Buffer.from(`${user.id}:${Date.now()}`).toString("base64");
+
+  await prisma.verificationToken.create({
+    data: {
+      identifier: verificationToken,
+      token: verificationToken,
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+    }
+  });
+  await sendEmail({
+    to: user.email,
+    subject: 'Welcome to Athletic Performance Agency! 🎉',
+    template: 'registration-confirmation',
+    data: {
+      name: user.name,
+      email: user.email,
+      userType: user.role,
+      verificationLink: `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${verificationToken}`,
     },
   });
 

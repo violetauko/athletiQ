@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { X, Calendar, MapPin, User, Mail, GraduationCap, Award } from "lucide-react"
+import { X, MapPin, User, Mail, GraduationCap, Award } from "lucide-react"
 
 interface ApplicationModalProps {
     isOpen: boolean;

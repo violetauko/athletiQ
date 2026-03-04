@@ -770,14 +770,14 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
   }
 
   // Fetch just the summary info for the header
-  const { data: opportunity, isLoading } = useQuery<OpportunitySummary>({
-    queryKey: ['opportunity-summary', id],
-    queryFn: async () => {
-      const res = await fetch(`/api/opportunities/${id}`)
-      if (!res.ok) throw new Error('Failed to load opportunity')
-      return res.json()
-    },
-  })
+  // const { data: opportunity, isLoading } = useQuery<OpportunitySummary>({
+  //   queryKey: ['opportunity-summary', id],
+  //   queryFn: async () => {
+  //     const res = await fetch(`/api/opportunities/${id}`)
+  //     if (!res.ok) throw new Error('Failed to load opportunity')
+  //     return res.json()
+  //   },
+  // })
 
   const { mutate: submitApplication, isPending, isError, error } = useMutation({
     mutationFn: async () => {

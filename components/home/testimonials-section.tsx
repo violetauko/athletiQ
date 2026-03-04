@@ -1,4 +1,3 @@
-// components/home/testimonials-section.tsx (Static Component)
 import { Button } from '@/components/ui/button'
 import { Star } from 'lucide-react'
 
@@ -21,7 +20,7 @@ const testimonials = [
   }
 ]
 
-export default function TestimonialsSection() {
+export function TestimonialsSection() {
   return (
     <section className="py-10 md:py-16">
       <div className="container">

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { randomBytes } from "crypto";
+import { sendEmail } from "@/lib/email/email-service";
 
 // Get admin users to send messages to (you can modify this logic)
 async function getAdminUsers() {
@@ -88,6 +89,21 @@ export async function POST(req: Request) {
         message,
         userId: user.id
       }
+    });
+    // Send auto-reply to user
+    await sendEmail({
+      to: email,
+      subject: 'Thank you for contacting us',
+      template: 'contact-auto-reply',
+      data: { name, email, subject, message },
+    });
+
+    // Send notification to admin
+    await sendEmail({
+      to: process.env.NEXT_PUBLIC_APP_EMAIL!,
+      subject: `New Contact Form Submission: ${subject}`,
+      template: 'contact-auto-reply',
+      data: { name, email, subject, message },
     });
 
     return NextResponse.json({ 

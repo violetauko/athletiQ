@@ -34,7 +34,7 @@ async function getStats() {
   }
 }
 
-export default async function StatsSection() {
+export async function StatsSection() {
   const stats = await getStats()
 
   return (

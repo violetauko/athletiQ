@@ -117,7 +117,6 @@ import {
     Briefcase,
     MessageSquare,
     TrendingUp,
-    Calendar,
     Award,
     Clock,
     CheckCircle2,
@@ -125,7 +124,7 @@ import {
     AlertCircle
 } from 'lucide-react'
 import { notFound } from 'next/navigation'
-import DashboardCharts from '@/components/dashboard/client/dashboard-chart'
+import { DashboardCharts } from '@/components/dashboard/client/dashboard-chart'
 
 import { auth } from '@/auth'
 import { getClientDashboardData } from '@/lib/dashboard'

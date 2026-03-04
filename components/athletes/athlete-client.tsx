@@ -43,7 +43,7 @@ interface AthletesResponse {
   limit: number
 }
 
-const AthletesClient = ({sports}: { sports: Sport[] }) => {
+export function AthletesClient({sports}: { sports: Sport[] }){
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(8)
@@ -448,5 +448,3 @@ const AthletesClient = ({sports}: { sports: Sport[] }) => {
     </div>
   )
 }
-
-export default AthletesClient

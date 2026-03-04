@@ -265,8 +265,9 @@
 
 import { getSports } from '@/lib/sports'
 import { Sport } from '../types/athlete'
-import AthletesClient from '@/components/athletes/athlete-client'
+import { AthletesClient } from '@/components/athletes/athlete-client'
 
+export const dynamic = 'force-dynamic'
 
 interface SportsResponse {
   sports: Sport[]
@@ -275,5 +276,5 @@ interface SportsResponse {
 
 export default async function AthletesPage() {
   const sportsData: SportsResponse = await getSports()
-  return <AthletesClient sports={sportsData.sports} />
+  return <AthletesClient sports={sportsData.sports || []} />
 }

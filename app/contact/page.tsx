@@ -183,9 +183,18 @@ export default function ContactPage() {
                     <Mail className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Email</h3>
-                    <p className="text-muted-foreground">info@athletiq.com</p>
-                    <p className="text-muted-foreground">support@athletiq.com</p>
+                    <h3 className="font-semibold mb-1">Email</h3><a
+                      href="mailto:info@athletec.org"
+                      className="flex items-center gap-2 text-muted-foreground hover:text-amber-500 transition-colors"
+                    >
+                      info@athletec.org
+                    </a>
+                    <a
+                      href="mailto:support@athletec.org"
+                      className="flex items-center gap-2 text-muted-foreground hover:text-amber-500 transition-colors"
+                    >
+                      support@athletec.org
+                    </a>
                   </div>
                 </Card>
 
@@ -195,8 +204,13 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Phone</h3>
-                    <p className="text-muted-foreground">+1 (555) 123-4567</p>
-                    <p className="text-muted-foreground">+1 (555) 123-4568</p>
+                    <a href="tel:+254707979051" className="flex items-center gap-2 text-muted-foreground hover:text-amber-500 transition-colors">
+                      
+                      +254 (707) 979-051
+                    </a>
+                    <a href="tel:+254797725336" className="flex items-center gap-2 text-muted-foreground hover:text-amber-500 transition-colors">
+                      +254 (797)725-336
+                    </a>
                   </div>
                 </Card>
 
@@ -206,8 +220,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Address</h3>
-                    <p className="text-muted-foreground">123 Sports Avenue</p>
-                    <p className="text-muted-foreground">Los Angeles, CA 90001</p>
+                    <p className="text-muted-foreground">123 Ngong road</p>
+                    <p className="text-muted-foreground">Nairobi, Kenya 90001</p>
                   </div>
                 </Card>
 

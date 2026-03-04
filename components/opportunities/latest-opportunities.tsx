@@ -1,10 +1,9 @@
-// components/opportunities/latest-opportunities.tsx (Server Component with ISR)
 import { OpportunityCard } from './opportunity-card'
 import Link from 'next/link'
 
 import { getLatestOpportunities } from '@/lib/opportunites'
 
-export default async function LatestOpportunities() {
+export async function LatestOpportunities() {
   const data = await getLatestOpportunities()
   const opportunities = data.opportunities || []
 

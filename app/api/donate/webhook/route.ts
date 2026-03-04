@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
 import { prisma } from '@/lib/prisma'
+import { sendEmail } from '@/lib/email/email-service'
 
 /**
  * Stripe Webhook Handler
@@ -120,14 +121,17 @@ async function handleDonationSuccess(session: Stripe.Checkout.Session) {
       },
     })
    
-  //  ─── TODO: Send confirmation email ───────────────────────────────────────
-   
-  //  await sendEmail({
-  //    to: session.customer_email,
-  //    subject: `Thank you for your $${amountDollars} donation! 🏆`,
-  //    template: 'donation-confirmation',
-  //    data: { donorName, amount: amountDollars, tierId },
-  //  })
+   await sendEmail({
+    to: userEmail || '',
+    subject: `Thank you for your $${amountDollars} donation! 🏆`,
+    template: 'donation-confirmation',
+    data: {
+      donorName: donorName || 'Anonymous',
+      amount: amountDollars,
+      tierId: 'gold',
+      donationDate: new Date(),
+    },
+  });
    
    
 }
