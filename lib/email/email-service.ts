@@ -8,13 +8,17 @@ import { RegistrationConfirmationEmail } from './templates/registration-confirma
 import { ContactAutoReplyEmail } from './templates/contact-auto-reply';
 import { EmailVerificationEmail } from './templates/email-verification';
 import nodemailer from 'nodemailer';
+import { ForgotPasswordEmail } from './templates/forgot-password';
+import { PasswordResetConfirmationEmail } from './templates/password-reset-confirmation';
 
-// Types
+// Update EmailTemplate type
 export type EmailTemplate = 
   | 'donation-confirmation'
   | 'registration-confirmation'
   | 'contact-auto-reply'
-  | 'email-verification';
+  | 'email-verification'
+  | 'forgot-password'
+  | 'password-reset-confirmation'; 
 
 export interface EmailOptions {
   to: string | string[];
@@ -95,6 +99,28 @@ const renderTemplate = async (template: EmailTemplate, data: Record<string, any>
         name: data.name,
         verificationLink: data.verificationLink,
         expiresIn: data.expiresIn,
+      });
+      break;
+
+    case 'forgot-password':
+      emailComponent = React.createElement(ForgotPasswordEmail, {
+        name: data.name,
+        resetLink: data.resetLink,
+        expiresIn: data.expiresIn,
+        ipAddress: data.ipAddress,
+        location: data.location,
+        browser: data.browser,
+      });
+      break;
+
+    case 'password-reset-confirmation':
+      emailComponent = React.createElement(PasswordResetConfirmationEmail, {
+        name: data.name,
+        loginLink: data.loginLink,
+        ipAddress: data.ipAddress,
+        location: data.location,
+        browser: data.browser,
+        time: data.time,
       });
       break;
 

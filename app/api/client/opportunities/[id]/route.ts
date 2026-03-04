@@ -23,17 +23,19 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
   try {
     const params = await props.params;
     const session = await auth();
-    if (!session?.user || session.user.role !== "CLIENT") {
+    if (!session?.user || !["CLIENT", "ADMIN"].includes(session.user.role)) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
+    let userWithClient = null;
+    if (session.user.role === "CLIENT") {
+      userWithClient = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { ClientProfile: { select: { id: true } } }
+      });
 
-    const userWithClient = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { ClientProfile: { select: { id: true } } }
-    });
-
-    if (!userWithClient?.ClientProfile) {
-      return new NextResponse("Client Profile not found", { status: 404 });
+      if (!userWithClient?.ClientProfile) {
+        return new NextResponse("Client Profile not found", { status: 404 });
+      }
     }
 
     // Verify ownership
@@ -41,7 +43,8 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
       where: { id: params.id }
     });
 
-    if (!opportunity || opportunity.clientId !== userWithClient.ClientProfile.id) {
+
+    if (userWithClient?.ClientProfile && (!opportunity || opportunity.clientId !== userWithClient.ClientProfile.id)) {
       return new NextResponse("Not Found / Unauthorized", { status: 404 });
     }
 

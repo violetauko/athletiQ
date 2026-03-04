@@ -8,11 +8,13 @@ declare module "next-auth" {
       id: string;
       role: UserRole;
       image: string;
+      hasPaidFee: boolean;
     } & DefaultSession["user"];
   }
 
   interface User extends DefaultUser {
     role: UserRole;
+    hasPaidFee: boolean;
   }
 }
 
@@ -20,5 +22,6 @@ declare module "next-auth/jwt" {
   interface JWT extends DefaultJWT {
     id: string;
     role: UserRole;
+    hasPaidFee: boolean;
   }
 }

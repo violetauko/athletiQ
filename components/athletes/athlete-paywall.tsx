@@ -1,0 +1,293 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2, CreditCard, Smartphone, CheckCircle2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useSession } from "next-auth/react";
+
+export function AthletePaywall() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { data: session, update } = useSession();
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [mpesaPhone, setMpesaPhone] = useState("");
+    const [stanbicPhone, setStanbicPhone] = useState("");
+    const [stkStatus, setStkStatus] = useState<"idle" | "polling" | "success" | "failed">({
+        payment: searchParams.get("payment") === "success" ? "success" : "idle"
+    }.payment as any);
+
+    // Check for successful Stripe redirect 
+    useEffect(() => {
+        if (searchParams.get("payment") === "success") {
+            toast.success("Payment successful! Welcome to your dashboard.");
+            refreshSessionAndReload();
+        } else if (searchParams.get("payment") === "cancelled") {
+            toast.error("Payment was cancelled.");
+        }
+    }, [searchParams]);
+
+    const refreshSessionAndReload = async () => {
+        // Update the next-auth session token to include hasPaidFee = true
+        await update({ hasPaidFee: true });
+        router.refresh(); // Reload server components
+    };
+
+    // Poll for payment status
+    useEffect(() => {
+        if (stkStatus !== "polling") return;
+
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch("/api/payment/status");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.hasPaidFee) {
+                        clearInterval(interval);
+                        setStkStatus("success");
+                        toast.success("M-Pesa payment received!");
+                        await refreshSessionAndReload();
+                    }
+                }
+            } catch (err) {
+                console.error("Polling error", err);
+            }
+        }, 4000); // Check every 4 seconds
+
+        // Stop polling after 2 minutes (Mpesa timeout)
+        const timeout = setTimeout(() => {
+            if (stkStatus === "polling") {
+                clearInterval(interval);
+                setStkStatus("failed");
+                toast.error("Payment timed out. Please try again.");
+            }
+        }, 120 * 1000);
+
+        return () => {
+            clearInterval(interval);
+            clearTimeout(timeout);
+        };
+    }, [stkStatus]);
+
+    const handleStripeCheckout = async () => {
+        try {
+            setIsLoading(true);
+            const res = await fetch("/api/payment/stripe/checkout", { method: "POST" });
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || "Failed to initiate checkout");
+            if (data.url) {
+                window.location.href = data.url; // Redirect to Stripe
+            }
+        } catch (err: any) {
+            toast.error(err.message);
+            setIsLoading(false);
+        }
+    };
+
+    const handleMpesaSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!mpesaPhone) return toast.error("Please enter a valid M-Pesa phone number");
+
+        try {
+            setIsLoading(true);
+            setStkStatus("idle");
+
+            const res = await fetch("/api/payment/mpesa/initiate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phone: mpesaPhone }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || "Failed to initiate M-Pesa Push");
+
+            toast.info("Check your phone! An M-Pesa prompt has been sent.");
+            setStkStatus("polling");
+
+        } catch (err: any) {
+            toast.error(err.message);
+            setStkStatus("failed");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleStanbicSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!stanbicPhone) return toast.error("Please enter a valid M-Pesa phone number");
+
+        try {
+            setIsLoading(true);
+            setStkStatus("idle");
+
+            const res = await fetch("/api/payment/stanbic/initiate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ phone: stanbicPhone }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || "Failed to initiate Stanbic Push");
+
+            toast.info("Check your phone! An M-Pesa prompt has been sent via Stanbic.");
+            setStkStatus("polling");
+
+        } catch (err: any) {
+            toast.error(err.message);
+            setStkStatus("failed");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (stkStatus === "success" || session?.user.hasPaidFee) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+                <div className="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h2 className="text-2xl font-bold">Payment Complete</h2>
+                <p className="text-muted-foreground">Redirecting to your dashboard...</p>
+                <Loader2 className="w-6 h-6 animate-spin mx-auto mt-4" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex items-center justify-center min-h-[60vh] py-12 px-4">
+            <Card className="w-full max-w-md shadow-lg border-primary/10">
+                <CardHeader className="text-center space-y-2">
+                    <CardTitle className="text-2xl">Complete Registration</CardTitle>
+                    <CardDescription>
+                        A one-time entry fee of <strong>KES 1,000</strong> is required to access the athlete dashboard and apply to opportunities.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Tabs defaultValue="mpesa" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3 mb-6">
+                            <TabsTrigger value="mpesa" disabled={stkStatus === "polling"}>
+                                <Smartphone className="w-4 h-4 mr-2 hidden sm:block" />
+                                M-Pesa (Daraja)
+                            </TabsTrigger>
+                            <TabsTrigger value="stanbic" disabled={stkStatus === "polling"}>
+                                <Smartphone className="w-4 h-4 mr-2 hidden sm:block" />
+                                Stanbic
+                            </TabsTrigger>
+                            <TabsTrigger value="card" disabled={stkStatus === "polling"}>
+                                <CreditCard className="w-4 h-4 mr-2 hidden sm:block" />
+                                Card
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="mpesa">
+                            {stkStatus === "polling" ? (
+                                <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
+                                    <div className="relative">
+                                        <div className="w-16 h-16 border-4 border-green-500/20 border-t-green-500 rounded-full animate-spin"></div>
+                                        <Smartphone className="w-6 h-6 text-green-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+                                    </div>
+                                    <h3 className="font-semibold text-lg">Waiting for payment...</h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Please check your phone and enter your M-Pesa PIN to complete the transaction.
+                                    </p>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleMpesaSubmit} className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="phone">M-Pesa Phone Number</Label>
+                                        <Input
+                                            id="phone"
+                                            placeholder="e.g. 0712345678 or 2547..."
+                                            value={mpesaPhone}
+                                            onChange={(e) => setMpesaPhone(e.target.value)}
+                                            disabled={isLoading}
+                                            required
+                                        />
+                                    </div>
+                                    {stkStatus === "failed" && (
+                                        <div className="flex items-center text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                                            <AlertCircle className="w-4 h-4 mr-2 shrink-0" />
+                                            Payment failed or timed out. Please try again.
+                                        </div>
+                                    )}
+                                    <Button type="submit" className="w-full bg-[#52B44B] hover:bg-[#429E3C] text-white" disabled={isLoading || !mpesaPhone}>
+                                        {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                                        Pay KES 1,000 via M-Pesa
+                                    </Button>
+                                </form>
+                            )}
+                        </TabsContent>
+
+                        <TabsContent value="stanbic">
+                            {stkStatus === "polling" ? (
+                                <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
+                                    <div className="relative">
+                                        <div className="w-16 h-16 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+                                        <Smartphone className="w-6 h-6 text-blue-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+                                    </div>
+                                    <h3 className="font-semibold text-lg">Waiting for payment...</h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Please check your phone and enter your M-Pesa PIN to complete the Stanbic transaction.
+                                    </p>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleStanbicSubmit} className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="stanbicPhone">M-Pesa Phone Number</Label>
+                                        <Input
+                                            id="stanbicPhone"
+                                            placeholder="e.g. 0712345678"
+                                            value={stanbicPhone}
+                                            onChange={(e) => setStanbicPhone(e.target.value)}
+                                            disabled={isLoading}
+                                            required
+                                        />
+                                    </div>
+                                    {stkStatus === "failed" && (
+                                        <div className="flex items-center text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                                            <AlertCircle className="w-4 h-4 mr-2 shrink-0" />
+                                            Payment failed or timed out. Please try again.
+                                        </div>
+                                    )}
+                                    <Button type="submit" className="w-full bg-[#0033A1] hover:bg-[#002277] text-white" disabled={isLoading || !stanbicPhone}>
+                                        {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                                        Pay KES 1,000 via Stanbic
+                                    </Button>
+                                </form>
+                            )}
+                        </TabsContent>
+
+                        <TabsContent value="card" className="space-y-4">
+                            <div className="py-6 text-center space-y-4">
+                                <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+                                    <CreditCard className="w-8 h-8 text-primary" />
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    Pay securely using any major credit or debit card via Stripe.
+                                </p>
+                                <Button onClick={handleStripeCheckout} className="w-full" disabled={isLoading || stkStatus === "polling"}>
+                                    {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                                    Pay KES 1,000 by Card
+                                </Button>
+                            </div>
+                        </TabsContent>
+                    </Tabs>
+                </CardContent>
+                <CardFooter className="flex justify-center border-t p-4 pb-4">
+                    <p className="text-xs text-muted-foreground flex items-center">
+                        Payments are securely processed. Need help? <a href="/contact" className="underline ml-1">Contact Support</a>
+                    </p>
+                </CardFooter>
+            </Card>
+        </div>
+    );
+}

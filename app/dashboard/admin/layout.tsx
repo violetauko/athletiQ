@@ -11,11 +11,12 @@ import { useSession } from 'next-auth/react'
 const NAV_ITEMS = [
     { href: '/dashboard/admin', label: 'Dashboard', icon: TrendingUp },
     { href: '/dashboard/admin/users', label: 'Users', icon: Users },
-    { href: '/dashboard/admin/profile', label: 'My Profile', icon: User },
     // { href: '/dashboard/admin/applications', label: 'All Applications', icon: Briefcase },
-    { href: '/dashboard/admin/opportunities', label: 'My Opportunities', icon: FileText },
+    { href: '/dashboard/admin/opportunities', label: 'Opportunities', icon: FileText },
     // { href: '/dashboard/admin/reports', label: 'Reports', icon: FilesIcon },
     { href: '/dashboard/admin/messages', label: 'Messages', icon: MessageSquare },
+    { href: '/dashboard/admin/tokens', label: 'Tokens Management', icon: ShieldCheck },
+    { href: '/dashboard/admin/profile', label: 'My Profile', icon: User },
     // { href: '/dashboard/admin/system', label: 'System Status', icon: Settings },
 ] as const
 export default function AdminDashboardLayout({

@@ -122,12 +122,16 @@ function formatSalary(min?: number | null, max?: number | null): string | null {
 }
 
 function timeAgo(date: Date): string {
-  const diffDays = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24))
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return '1 day ago'
-  if (diffDays < 7) return `${diffDays} days ago`
-  if (diffDays < 14) return '1 week ago'
-  return `${Math.floor(diffDays / 7)} weeks ago`
+  if (date instanceof Date && !isNaN(date.getTime())) {
+    const diffDays = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24))
+    if (diffDays === 0) return 'Today'
+    if (diffDays === 1) return '1 day ago'
+    if (diffDays < 7) return `${diffDays} days ago`
+    if (diffDays < 14) return '1 week ago'
+    return `${Math.floor(diffDays / 7)} weeks ago`
+  } else {
+    return ''
+  }
 }
 
 export function OpportunityCard({
@@ -192,21 +196,25 @@ export function OpportunityCard({
 
         {/* Actions */}
         <div className="flex gap-2 pt-1">
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            className="flex-1 rounded-full text-xs"
-          >
-            <Link href={`/opportunities/${id}`}>Learn More</Link>
-          </Button>
-          <Button
-            asChild
-            size="sm"
-            className="flex-1 bg-black hover:bg-black/90 rounded-full text-xs"
-          >
-            <Link href={`/dashboard/athlete/opportunities/${id}/apply`}>Apply Now</Link>
-          </Button>
+          <Link href={`/opportunities/${id}`}>
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="flex-1 rounded-full text-xs"
+            >
+              Learn More
+            </Button>
+          </Link>
+          <Link href={`/dashboard/athlete/opportunities/${id}/apply`}>
+            <Button
+              asChild
+              size="sm"
+              className="flex-1 bg-black hover:bg-black/90 rounded-full text-xs"
+            >
+              Apply Now
+            </Button>
+          </Link>
         </div>
       </CardContent>
     </Card>

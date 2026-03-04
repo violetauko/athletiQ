@@ -41,13 +41,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) return null;
-
         return {
           id: user.id,
           email: user.email,
           name: user.name ?? undefined,
           image: user.image ?? undefined,
           role: user.role,
+          hasPaidFee: user.hasPaidFee,
         };
       },
     }),
@@ -61,16 +61,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id as string;
         token.role = user.role as UserRole;
+        token.hasPaidFee = user.hasPaidFee as boolean;
       }
+      
+      // Allow updating session (e.g., when payment completes)
+      if (trigger === "update" && session !== undefined) {
+        if (typeof session.hasPaidFee === "boolean") {
+          token.hasPaidFee = session.hasPaidFee;
+        }
+      }
+      
       return token;
     },
     async session({ session, token }) {
       session.user.id = token.id;
       session.user.role = token.role;
+      session.user.hasPaidFee = token.hasPaidFee as boolean;
       return session;
     },
   },

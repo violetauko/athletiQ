@@ -361,7 +361,7 @@ export default function AdminDashboard() {
                                                 <Button 
                                                     size="sm" 
                                                     className="bg-green-600 hover:bg-green-700 text-white"
-                                                    onClick={() => updateStatusMutation.mutate({ id: opp.id, status: 'APPROVED' })}
+                                                    onClick={() => updateStatusMutation.mutate({ id: opp.id, status: 'ACTIVE' })}
                                                     disabled={updateStatusMutation.isPending}
                                                 >
                                                     <Check className="w-4 h-4 mr-1" /> Approve

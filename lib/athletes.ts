@@ -7,7 +7,7 @@ export async function getFeaturedAthletes() {
     if (!res.ok) throw new Error('Failed to fetch featured athletes')
     return res.json()
   } catch (error) {
-    console.error('Error fetching featured athletes:', error)
+    console.error('Error getting featured athletes:', error)
     return []
   }
 }

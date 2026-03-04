@@ -67,7 +67,7 @@ export default function AboutPage() {
               <h2 className="text-4xl font-bold">Our Story</h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  Founded in 2020, AthletiQ was born from a simple observation: talented athletes 
+                  Founded in 2025, AthletiQ was born from a simple observation: talented athletes 
                   worldwide were struggling to find the right opportunities, while sports organizations 
                   were having difficulty discovering and recruiting top talent.
                 </p>
@@ -165,19 +165,14 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                name: 'Michael Johnson',
+                name: 'Cornelius Mokoro',
                 role: 'CEO & Founder',
-                image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
+                image: '/team/mokoro.jpeg',
               },
               {
-                name: 'Sarah Williams',
-                role: 'Head of Recruitment',
-                image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80',
-              },
-              {
-                name: 'David Chen',
-                role: 'Chief Technology Officer',
-                image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80',
+                name: 'Hezbon Obutu',
+                role: 'Coordinator',
+                image: '/team/hezbon.jpeg',
               },
             ].map((member, index) => (
               <div key={index} className="text-center">

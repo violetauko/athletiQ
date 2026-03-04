@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       imageUrl: athlete.profileImage || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80',
       achievements: athlete.achievements || [],
       gpa: athlete.gpa || 0,
-      experience: athlete.experience as 'Beginner' | 'Intermediate' | 'Advanced' | 'Professional' || 'Beginner',
+      experience: athlete.experience as 'Beginner' | 'Intermediate' | 'Advanced' | 'Professional',
       location: athlete.location,
       profileViews: athlete.profileViews
     }))

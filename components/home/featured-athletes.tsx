@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { AthleteCard } from '../athletes/athlete-card'
 import { getFeaturedAthletes } from '@/lib/athletes'
 
+export const dynamic = 'force-dynamic'
 export async function FeaturedAthletes() {
   const athletes = await getFeaturedAthletes()
 

@@ -2,10 +2,11 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Briefcase, FileText, Settings, TrendingUp, User } from 'lucide-react'
-import React from 'react'
 import Link from 'next/link'
 import { redirect, usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { AthletePaywall } from '@/components/athletes/athlete-paywall'
+import { prisma } from '@/lib/prisma'
 
 const NAV_ITEMS = [
     { href: '/dashboard/athlete', label: 'Dashboard', icon: TrendingUp, default: true },
@@ -22,7 +23,7 @@ export default function AthleteDashboardLayout({
     children: React.ReactNode
 }) {
     const pathname = usePathname()
-    
+
     const isActiveRoute = (href: string) => {
         // Exact match for root dashboard
         if (href === '/dashboard/athlete') {
@@ -31,11 +32,15 @@ export default function AthleteDashboardLayout({
         // Check if path starts with the href for nested routes
         return pathname.startsWith(href)
     }
-    
-    const{ data: session } = useSession()
+
+    const { data: session } = useSession()
 
     if (!session || session.user.role !== 'ATHLETE') {
         redirect('/login')
+    }
+
+    if (!session.user.hasPaidFee) {
+        return <AthletePaywall />
     }
 
     return (
@@ -70,8 +75,8 @@ export default function AthleteDashboardLayout({
                                                     variant={isActive ? "default" : "ghost"}
                                                     className={`
                                                         w-full justify-start 
-                                                        ${isActive 
-                                                            ? 'bg-black text-white hover:bg-black/90' 
+                                                        ${isActive
+                                                            ? 'bg-black text-white hover:bg-black/90'
                                                             : 'hover:bg-stone-100'
                                                         }
                                                     `}
@@ -81,7 +86,7 @@ export default function AthleteDashboardLayout({
                                                 </Button>
                                             </Link>
                                         )
-    })}
+                                    })}
                                 </nav>
                             </CardContent>
                         </Card>
