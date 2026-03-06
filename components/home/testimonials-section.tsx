@@ -5,7 +5,7 @@ const testimonials = [
   {
     name: 'Alex Thompson',
     role: 'Professional Athlete',
-    sport: 'Track & Field',
+    sport: 'Rugby',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80',
     content: "I am writing to express my sincere appreciation for the support you provided during my recruitment journey. Your expertise and guidance were invaluable in helping me navigate the process and ultimately secure a position that is a great fit for my skills and career goals.",
     rating: 5
@@ -13,7 +13,7 @@ const testimonials = [
   {
     name: 'Sarah Martinez',
     role: 'College Coach',
-    sport: 'Swimming',
+    sport: 'Rugby',
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80',
     content: "The platform has been instrumental in helping us find talented athletes. The verification process and quality of candidates is outstanding.",
     rating: 5

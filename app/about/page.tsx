@@ -174,6 +174,11 @@ export default function AboutPage() {
                 role: 'Coordinator',
                 image: '/team/hezbon.jpeg',
               },
+              {
+                name: 'Mike Ochieng',
+                role: 'Coach',
+                image: '/team/mike.jpeg',
+              }
             ].map((member, index) => (
               <div key={index} className="text-center">
                 <div className="relative w-48 h-48 mx-auto mb-4 rounded-full overflow-hidden border-4 border-amber-200">

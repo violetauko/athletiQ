@@ -363,7 +363,7 @@ export function AthleteProfileForm({ profile, sports }: AthleteProfileFormProps)
                                 {/* Profile Image */}
                                 <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start">
                                     <div
-                                        className="relative h-24 w-24 flex-shrink-0 cursor-pointer overflow-hidden rounded-full border-2 border-dashed border-muted-foreground/40 bg-muted transition hover:border-primary"
+                                        className="relative h-24 w-24 shrink-0 cursor-pointer overflow-hidden rounded-full border-2 border-dashed border-muted-foreground/40 bg-muted transition hover:border-primary"
                                         onClick={() => imageInputRef.current?.click()}
                                         title="Click to upload profile photo"
                                     >
@@ -527,7 +527,7 @@ export function AthleteProfileForm({ profile, sports }: AthleteProfileFormProps)
                                             <FormControl>
                                                 <Textarea
                                                     placeholder="Tell us about yourself, your journey, and your goals..."
-                                                    className="min-h-[120px]"
+                                                    className="min-h-30"
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -895,7 +895,7 @@ export function AthleteProfileForm({ profile, sports }: AthleteProfileFormProps)
                                                 className="flex items-center justify-between rounded-lg border bg-muted/40 px-3 py-2 text-sm"
                                             >
                                                 <div className="flex items-center gap-2 min-w-0">
-                                                    <Video className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                                                    <Video className="h-4 w-4 shrink-0 text-muted-foreground" />
                                                     <a
                                                         href={video}
                                                         target="_blank"

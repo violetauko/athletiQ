@@ -92,6 +92,7 @@ export async function POST(req: Request) {
     
     try {
       const validatedData = athleteProfileSchema.parse(body);
+      console.log("validated data: ",validatedData)
       
       // Create athlete profile
       const profile = await prisma.athleteProfile.create({

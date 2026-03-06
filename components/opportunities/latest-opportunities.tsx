@@ -18,14 +18,15 @@ export async function LatestOpportunities() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {opportunities.map((opportunity: any, index: number) => (
-        <Link href={`/opportunities/${opportunity.id}`} key={opportunity.id}>
+        // <Link href={`/opportunities/${opportunity.id}`} key={opportunity.id}>
           <div
             className="animate-slide-up cursor-pointer h-full"
             style={{ animationDelay: `${index * 100}ms` }}
+            key={opportunity.id}
           >
             <OpportunityCard {...opportunity} />
           </div>
-        </Link>
+        // </Link>
       ))}
     </div>
   )
