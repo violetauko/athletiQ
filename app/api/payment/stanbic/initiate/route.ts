@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
       billAccountRef: billAccountRef,
       amount: amount,
       mobileNumber: formattedPhone,
+      CallBackURL: "https://athletec.org/api/payment/stanbic/webhook"
     };
 
     const response = await fetch(
