@@ -22,8 +22,15 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "www.panamsports.org"
+      },
+      {
+        protocol: "https",
+        hostname: "2ificn6rp0vixv2a.private.blob.vercel-storage.com"
+      },
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com"
       }
-
     ],
   },
 };

@@ -240,8 +240,9 @@ model VerificationCode {
 
 model Donation {
   id              String        @id @default(cuid())
-  stripeSessionId String        @unique
+  stripeSessionId String?       @unique
   stripePaymentId String?       @unique
+  paypalOrderId   String?       @unique
 
   // Amount
   amount          Int           // stored in cents (e.g. 2500 = $25.00)
@@ -353,6 +354,7 @@ enum PaymentProvider {
   STRIPE
   MPESA
   STANBIC_MPESA
+  PAYPAL
 }
 
 enum PaymentStatus {

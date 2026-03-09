@@ -210,6 +210,7 @@ export function AthleteProfileForm({ profile, sports }: AthleteProfileFormProps)
             router.refresh();
         },
         onError: (error) => {
+            console.error('Failed to save profile:', error);
             toast.error('Failed to save profile', {
                 description: error instanceof Error ? error.message : 'Something went wrong.',
             });

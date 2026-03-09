@@ -16,7 +16,7 @@ const athleteProfileSchema = z.object({
     location: z.string().optional(),
     bio: z.string().max(500, 'Bio must not exceed 500 characters').optional(),
     profileImage: z.string().optional(),
-    resumeUrl: z.url('Please enter a valid URL').optional(),
+    resumeUrl: z.url('Please enter a valid URL').optional().nullable(),
 
     // Physical Stats
     height: z.coerce.number().min(100, 'Height must be at least 100cm').max(250, 'Height must not exceed 250cm').optional(),
@@ -137,6 +137,7 @@ export async function POST(req: Request) {
       }, { status: 201 });
 
     } catch (validationError) {
+      console.error("Validation error: ", validationError);
       if (validationError instanceof z.ZodError) {
         return NextResponse.json({
           error: "Validation failed",

@@ -1,23 +1,24 @@
 'use client'
 
-import { useState, useTransition, useMemo, Suspense } from 'react'
+import { useState, useTransition, useMemo, Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Heart, ArrowRight, AlertCircle, Sparkles, Trophy, Users, Target, Shield } from 'lucide-react'
 import { DONATION_TIERS } from '@/lib/stripe'
 import { cn } from '@/lib/utils'
+import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-// Impact stats configuration
-const IMPACT_STATS = [
-  { value: '247', label: 'Athletes Supported', icon: Trophy, color: 'text-blue-600' },
-  { value: '$48K', label: 'Raised This Year', icon: Sparkles, color: 'text-green-600' },
-  { value: '31', label: 'Scholarships Funded', icon: Users, color: 'text-amber-600' },
-  { value: '94%', label: 'Placed in Programs', icon: Target, color: 'text-purple-600' },
+// Impact stats configuration structure
+const DEFAULT_IMPACT_STATS = [
+  { id: 'athletesSupported', value: '0', label: 'Athletes Supported', icon: Trophy, color: 'text-blue-600' },
+  { id: 'raisedThisYear', value: '$0', label: 'Raised This Year', icon: Sparkles, color: 'text-green-600' },
+  { id: 'scholarshipsFunded', value: '0', label: 'Scholarships Funded', icon: Users, color: 'text-amber-600' },
+  { id: 'placedInPrograms', value: '0%', label: 'Placed in Programs', icon: Target, color: 'text-purple-600' },
 ] as const
 
 // Testimonials data
@@ -25,19 +26,19 @@ const TESTIMONIALS = [
   {
     quote: "This platform helped me get scouted by a D1 program. The donors made it possible.",
     name: "Marcus T.",
-    role: "Track & Field",
+    role: "Rugby",
     avatar: "🎯"
   },
   {
     quote: "I donated after seeing the impact reports. Knowing exactly where money goes is huge.",
     name: "Sarah K.",
-    role: "Donor since 2023",
+    role: "Donor since 2025",
     avatar: "💝"
   },
   {
     quote: "AthletiQ connected me with a coach I never could have afforded on my own.",
-    name: "Priya M.",
-    role: "Swimming",
+    name: "Brian Ratila",
+    role: "Rugby",
     avatar: "🏊"
   },
 ] as const
@@ -61,9 +62,9 @@ const DonateHeader = () => (
 )
 
 // Impact Stats Component
-const ImpactStats = () => (
+const ImpactStats = ({ stats }: { stats: typeof DEFAULT_IMPACT_STATS[number][] }) => (
   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-14">
-    {IMPACT_STATS.map((stat) => {
+    {stats.map((stat) => {
       const Icon = stat.icon
       return (
         <Card key={stat.label} className="border-stone-200 shadow-sm">
@@ -196,6 +197,9 @@ interface DonationSummaryProps {
   error: string | null
   isPending: boolean
   onDonate: () => void
+  // PayPal callbacks passed down from the stateful parent
+  onPayPalCreateOrder: () => Promise<string>
+  onPayPalApprove: (data: { orderID: string }) => Promise<void>
 }
 
 const DonationSummary = ({
@@ -208,7 +212,9 @@ const DonationSummary = ({
   onMessageChange,
   error,
   isPending,
-  onDonate
+  onDonate,
+  onPayPalCreateOrder,
+  onPayPalApprove,
 }: DonationSummaryProps) => (
   <Card className="border-stone-200 shadow-md sticky top-8">
     <CardContent className="p-6 space-y-5">
@@ -277,11 +283,31 @@ const DonationSummary = ({
         ) : (
           <>
             <Heart className="w-4 h-4 mr-2 fill-current" />
-            Donate{displayAmount > 0 ? ` $${displayAmount.toFixed(2)}` : ''}
+            Donate with Card
             <ArrowRight className="w-4 h-4 ml-2" />
           </>
         )}
       </Button>
+
+      {displayAmount > 0 && (
+        <>
+          <div className="relative flex py-2 items-center">
+            <div className="flex-grow border-t border-stone-200" />
+            <span className="shrink-0 mx-4 text-stone-400 text-xs uppercase tracking-widest">Or pay with</span>
+            <div className="flex-grow border-t border-stone-200" />
+          </div>
+
+          <div className="min-h-[48px]">
+            <PayPalButtons
+              style={{ layout: "vertical", shape: "rect", color: "gold", height: 48 }}
+              disabled={isPending}
+              createOrder={onPayPalCreateOrder}
+              onApprove={onPayPalApprove}
+              onError={(err) => console.error('PayPal Button Error', err)}
+            />
+          </div>
+        </>
+      )}
 
       <div className="flex items-center justify-center gap-3 text-[11px] text-stone-500">
         <Shield className="w-3 h-3" />
@@ -332,6 +358,26 @@ function DonatePage() {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
+  const [stats, setStats] = useState([...DEFAULT_IMPACT_STATS])
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/donate/stats')
+        if (res.ok) {
+          const data = await res.json()
+          setStats(prev => prev.map(stat => ({
+            ...stat,
+            value: data[stat.id] || stat.value
+          })))
+        }
+      } catch (error) {
+        console.error('Failed to fetch donation stats:', error)
+      }
+    }
+    fetchStats()
+  }, [])
+
   const selectedTier = useMemo(
     () => DONATION_TIERS.find((t) => t.id === selectedTierId),
     [selectedTierId]
@@ -358,7 +404,7 @@ function DonatePage() {
   async function handleDonate() {
     setError(null)
 
-    const amountCents = Math.round(displayAmount)
+    const amountCents = Math.round(displayAmount * 100)
 
     if (amountCents < 100) {
       setError('Minimum donation is $1.00')
@@ -411,7 +457,7 @@ function DonatePage() {
         )}
 
         <DonateHeader />
-        <ImpactStats />
+        <ImpactStats stats={stats} />
 
         <div className="grid lg:grid-cols-5 gap-6 items-start">
           {/* Left - Tier selection */}
@@ -451,6 +497,35 @@ function DonatePage() {
               error={error}
               isPending={isPending}
               onDonate={handleDonate}
+              onPayPalCreateOrder={async () => {
+                const res = await fetch('/api/donate/paypal/create-order', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ amount: Math.round(displayAmount * 100) }),
+                })
+                const order = await res.json()
+                if (!res.ok) throw new Error(order.error || 'Failed to create PayPal order')
+                return order.id
+              }}
+              onPayPalApprove={async (data) => {
+                const res = await fetch('/api/donate/paypal/capture-order', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    orderID: data.orderID,
+                    amount: Math.round(displayAmount * 100),
+                    tierId: isCustom ? undefined : selectedTier?.id,
+                    isCustom,
+                    donorName: donorName.trim() || undefined,
+                    message: message.trim() || undefined,
+                  }),
+                })
+                const captureData = await res.json()
+                if (!res.ok) throw new Error(captureData.error || 'Failed to capture payment')
+                if (captureData.success) {
+                  window.location.href = `/donate/success?session_id=${data.orderID}`
+                }
+              }}
             />
           </div>
         </div>
@@ -464,8 +539,10 @@ function DonatePage() {
 
 export default function DonatePageWrapper() {
   return (
-    <Suspense fallback={<div className="text-center py-20">Loading…</div>}>
-      <DonatePage />
-    </Suspense>
-  );
+    <PayPalScriptProvider options={{ clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ?? '', currency: 'USD' }}>
+      <Suspense fallback={<div className="text-center py-20">Loading…</div>}>
+        <DonatePage />
+      </Suspense>
+    </PayPalScriptProvider>
+  )
 }
