@@ -243,6 +243,7 @@ model Donation {
   stripeSessionId String?       @unique
   stripePaymentId String?       @unique
   paypalOrderId   String?       @unique
+  pesapalOrderId  String?       @unique
 
   // Amount
   amount          Int           // stored in cents (e.g. 2500 = $25.00)

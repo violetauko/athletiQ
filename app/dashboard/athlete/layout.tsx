@@ -33,7 +33,15 @@ export default function AthleteDashboardLayout({
         return pathname.startsWith(href)
     }
 
-    const { data: session } = useSession()
+    const { data: session, status } = useSession()
+
+    if (status === "loading") {
+        return (
+            <div className="flex h-screen w-full items-center justify-center">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        )
+    }
 
     if (!session || session.user.role !== 'ATHLETE') {
         redirect('/login')

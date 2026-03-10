@@ -197,6 +197,7 @@ interface DonationSummaryProps {
   error: string | null
   isPending: boolean
   onDonate: () => void
+  onPesapalDonate: () => void
   // PayPal callbacks passed down from the stateful parent
   onPayPalCreateOrder: () => Promise<string>
   onPayPalApprove: (data: { orderID: string }) => Promise<void>
@@ -213,6 +214,7 @@ const DonationSummary = ({
   error,
   isPending,
   onDonate,
+  onPesapalDonate,
   onPayPalCreateOrder,
   onPayPalApprove,
 }: DonationSummaryProps) => (
@@ -262,8 +264,9 @@ const DonationSummary = ({
         </div>
       )}
 
+      {/* Primary: Pesapal */}
       <Button
-        onClick={onDonate}
+        onClick={onPesapalDonate}
         disabled={isPending || displayAmount <= 0}
         className={cn(
           'w-full h-auto py-3.5 rounded-xl font-bold text-base transition-all duration-200',
@@ -278,12 +281,12 @@ const DonationSummary = ({
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            Redirecting to Stripe...
+            Redirecting...
           </>
         ) : (
           <>
             <Heart className="w-4 h-4 mr-2 fill-current" />
-            Donate with Card
+            Donate via Pesapal
             <ArrowRight className="w-4 h-4 ml-2" />
           </>
         )}
@@ -311,7 +314,7 @@ const DonationSummary = ({
 
       <div className="flex items-center justify-center gap-3 text-[11px] text-stone-500">
         <Shield className="w-3 h-3" />
-        <span>Secured by Stripe</span>
+        <span>Securely processed</span>
         <span>·</span>
         <span>SSL encrypted</span>
       </div>
@@ -410,10 +413,6 @@ function DonatePage() {
       setError('Minimum donation is $1.00')
       return
     }
-    // if (amountCents > 1_000_000) {
-    //   setError('Maximum donation is $10,000')
-    //   return
-    // }
 
     startTransition(async () => {
       try {
@@ -438,6 +437,46 @@ function DonatePage() {
 
         if (data.url) {
           window.location.href = data.url
+        }
+      } catch {
+        setError('Network error. Please check your connection and try again.')
+      }
+    })
+  }
+
+  async function handlePesapalDonate() {
+    setError(null)
+
+    const amountCents = Math.round(displayAmount * 100)
+
+    if (amountCents < 100) {
+      setError('Minimum donation is KES 1')
+      return
+    }
+
+    startTransition(async () => {
+      try {
+        const res = await fetch('/api/donate/pesapal/initiate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: amountCents,
+            tierId: isCustom ? undefined : selectedTierId,
+            isCustom,
+            donorName: donorName.trim() || undefined,
+            message: message.trim() || undefined,
+          }),
+        })
+
+        const data = await res.json()
+
+        if (!res.ok) {
+          setError(data.error ?? 'Something went wrong. Please try again.')
+          return
+        }
+
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url
         }
       } catch {
         setError('Network error. Please check your connection and try again.')
@@ -497,6 +536,7 @@ function DonatePage() {
               error={error}
               isPending={isPending}
               onDonate={handleDonate}
+              onPesapalDonate={handlePesapalDonate}
               onPayPalCreateOrder={async () => {
                 const res = await fetch('/api/donate/paypal/create-order', {
                   method: 'POST',

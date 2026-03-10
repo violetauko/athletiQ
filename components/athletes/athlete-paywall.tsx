@@ -189,12 +189,12 @@ export function AthletePaywall() {
                 </CardHeader>
                 <CardContent>
                     <Tabs defaultValue="pesapal" className="w-full">
-                        <TabsList className="grid w-full grid-cols-4 mb-6">
+                        <TabsList className="grid w-full mb-6">
                             <TabsTrigger value="pesapal" disabled={stkStatus === "polling"}>
                                 <CreditCard className="w-4 h-4 mr-2 hidden sm:block" />
                                 Pesapal
                             </TabsTrigger>
-                            <TabsTrigger value="mpesa" disabled={stkStatus === "polling"}>
+                            {/* <TabsTrigger value="mpesa" disabled={stkStatus === "polling"}>
                                 <Smartphone className="w-4 h-4 mr-2 hidden sm:block" />
                                 M-Pesa (Daraja)
                             </TabsTrigger>
@@ -205,7 +205,7 @@ export function AthletePaywall() {
                             <TabsTrigger value="card" disabled={stkStatus === "polling"}>
                                 <CreditCard className="w-4 h-4 mr-2 hidden sm:block" />
                                 Card
-                            </TabsTrigger>
+                            </TabsTrigger> */}
                         </TabsList>
 
                         <TabsContent value="pesapal" className="space-y-4">
