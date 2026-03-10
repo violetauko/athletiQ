@@ -340,6 +340,7 @@ model Payment {
   // External references
   referenceId     String?         // Stripe Session ID or M-Pesa CheckoutRequestID
   receiptNumber   String?         // Stripe Payment Intent or M-Pesa Receipt Number
+  merchantReference String?         // Our internal reference
   
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
@@ -355,6 +356,7 @@ enum PaymentProvider {
   MPESA
   STANBIC_MPESA
   PAYPAL
+  PESAPAL
 }
 
 enum PaymentStatus {

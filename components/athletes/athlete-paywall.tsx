@@ -91,6 +91,22 @@ export function AthletePaywall() {
         }
     };
 
+    const handlePesapalCheckout = async () => {
+        try {
+            setIsLoading(true);
+            const res = await fetch("/api/payment/pesapal/initiate", { method: "POST" });
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || "Failed to initiate Pesapal checkout");
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url; // Redirect to Pesapal iframe/hosted page
+            }
+        } catch (err: any) {
+            toast.error(err.message);
+            setIsLoading(false);
+        }
+    };
+
     const handleMpesaSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!mpesaPhone) return toast.error("Please enter a valid M-Pesa phone number");
@@ -172,8 +188,12 @@ export function AthletePaywall() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Tabs defaultValue="mpesa" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 mb-6">
+                    <Tabs defaultValue="pesapal" className="w-full">
+                        <TabsList className="grid w-full grid-cols-4 mb-6">
+                            <TabsTrigger value="pesapal" disabled={stkStatus === "polling"}>
+                                <CreditCard className="w-4 h-4 mr-2 hidden sm:block" />
+                                Pesapal
+                            </TabsTrigger>
                             <TabsTrigger value="mpesa" disabled={stkStatus === "polling"}>
                                 <Smartphone className="w-4 h-4 mr-2 hidden sm:block" />
                                 M-Pesa (Daraja)
@@ -187,6 +207,21 @@ export function AthletePaywall() {
                                 Card
                             </TabsTrigger>
                         </TabsList>
+
+                        <TabsContent value="pesapal" className="space-y-4">
+                            <div className="py-6 text-center space-y-4">
+                                <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+                                    <CreditCard className="w-8 h-8 text-primary" />
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    Pay securely via Pesapal (supports M-Pesa, Airtel Money, and Cards).
+                                </p>
+                                <Button onClick={handlePesapalCheckout} className="w-full" disabled={isLoading || stkStatus === "polling"}>
+                                    {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                                    Pay KES 1,000 via Pesapal
+                                </Button>
+                            </div>
+                        </TabsContent>
 
                         <TabsContent value="mpesa">
                             {stkStatus === "polling" ? (
