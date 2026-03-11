@@ -1,5 +1,5 @@
 const getBaseUrl = () => {
-  const env = process.env.PESAPAL_ENVIRONMENT || "sandbox";
+  const env = process.env.PESAPAL_ENVIRONMENT || "production";
   return env === "production"
     ? "https://pay.pesapal.com/v3"
     : "https://cybqa.pesapal.com/pesapalv3";
@@ -87,6 +87,7 @@ export async function getTransactionStatus(token: string, orderTrackingId: strin
     {
       method: "GET",
       headers: {
+        "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
@@ -95,7 +96,7 @@ export async function getTransactionStatus(token: string, orderTrackingId: strin
 
   const data = await response.json();
 
-  if (!response.ok || data.error) {
+  if (response.status!==200 || data.error?.code) {
     console.log("Error getting pesapal status: ",data.error)
     throw new Error(data.error?.message || "Failed to get transaction status");
   }
