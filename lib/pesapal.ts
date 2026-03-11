@@ -96,6 +96,7 @@ export async function getTransactionStatus(token: string, orderTrackingId: strin
   const data = await response.json();
 
   if (!response.ok || data.error) {
+    console.log("Error getting pesapal status: ",data.error)
     throw new Error(data.error?.message || "Failed to get transaction status");
   }
 

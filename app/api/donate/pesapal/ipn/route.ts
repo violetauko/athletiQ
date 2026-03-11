@@ -13,12 +13,15 @@ export async function POST(req: Request) {
 
     // 1. Get token and verify status from Pesapal
     const token = await getPesapalToken();
+    console.log("Pesapal token: ",token, "for transaction: ",OrderTrackingId)
     const statusData = await getTransactionStatus(token, OrderTrackingId);
+
 
     // 2. Find the donation record
     const donation = await prisma.donation.findUnique({
       where: { pesapalOrderId: OrderTrackingId },
     });
+    console.log("donation:",donation)
 
     if (!donation) {
       return NextResponse.json({ error: "Donation not found" }, { status: 404 });

@@ -6,6 +6,7 @@ import { PaymentStatus } from "@prisma/client";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    console.log("Pesapal payment callback body: ",body)
     const { OrderNotificationType, OrderTrackingId, OrderMerchantReference } = body;
 
     if (!OrderTrackingId) {
@@ -14,9 +15,11 @@ export async function POST(req: Request) {
 
     // 1. Get Pesapal token
     const token = await getPesapalToken();
+    console.log("Pesapal token: ",token)
 
     // 2. Fetch transaction status from Pesapal
     const statusData = await getTransactionStatus(token, OrderTrackingId);
+    console.log("pesapal payment status: ",statusData)
 
     // 3. Find the payment in our database
     const payment = await prisma.payment.findFirst({
