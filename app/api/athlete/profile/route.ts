@@ -16,7 +16,7 @@ const athleteProfileSchema = z.object({
     location: z.string().optional(),
     bio: z.string().max(500, 'Bio must not exceed 500 characters').optional(),
     profileImage: z.string().optional(),
-    resumeUrl: z.url('Please enter a valid URL').optional().nullable(),
+    resumeUrl: z.string().optional(),
 
     // Physical Stats
     height: z.coerce.number().min(100, 'Height must be at least 100cm').max(250, 'Height must not exceed 250cm').optional(),
