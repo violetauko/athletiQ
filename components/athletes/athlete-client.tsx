@@ -43,11 +43,11 @@ interface AthletesResponse {
   limit: number
 }
 
-export function AthletesClient({sports}: { sports: Sport[] }){
+export function AthletesClient({ sports }: { sports: Sport[] }) {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(8)
-  
+
   // Filter state
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedSport, setSelectedSport] = useState<string>('all')
@@ -93,20 +93,7 @@ export function AthletesClient({sports}: { sports: Sport[] }){
     // keepPreviousData: true
   })
 
-  // Fetch stats
-  const {
-    data: statsData
-  } = useQuery({
-    queryKey: ['athlete-stats'],
-    queryFn: async () => {
-      const response = await fetch('/api/athlete/stats')
-      if (!response.ok) {
-        throw new Error('Failed to fetch stats')
-      }
-      return response.json()
-    },
-    staleTime: 10 * 60 * 1000
-  })
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -137,7 +124,7 @@ export function AthletesClient({sports}: { sports: Sport[] }){
   // Generate page numbers for pagination
   const getPageNumbers = () => {
     if (!athletesData) return []
-    
+
     const totalPages = athletesData.totalPages
     const current = athletesData.page
     const delta = 2
@@ -249,29 +236,6 @@ export function AthletesClient({sports}: { sports: Sport[] }){
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-8 bg-linear-to-br from-amber-50 to-stone-100">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { label: 'Total Athletes', value: statsData?.totalAthletes || '10,000+' },
-              { label: 'Sports', value: statsData?.totalSports || '25+' },
-              { label: 'Countries', value: statsData?.totalCountries || '50+' },
-              { label: 'Success Rate', value: statsData?.successRate || '92%' },
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl font-bold text-amber-700 mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground font-medium">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Athletes Grid */}
       <section className="py-12 flex-1">
         <div className="">
@@ -360,8 +324,8 @@ export function AthletesClient({sports}: { sports: Sport[] }){
               {athletesData?.athletes.length === 0 && (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">No athletes found matching your criteria.</p>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="mt-4"
                     onClick={() => {
                       setSearchTerm('')
@@ -388,7 +352,7 @@ export function AthletesClient({sports}: { sports: Sport[] }){
               >
                 Previous
               </Button>
-              
+
               {getPageNumbers().map((page, index) => (
                 page === '...' ? (
                   <span key={`dots-${index}`} className="px-2">...</span>

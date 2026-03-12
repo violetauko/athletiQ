@@ -16,6 +16,7 @@ export function AthleteCard({ name, sport, imageUrl, position }: AthleteCardProp
           src={imageUrl}
           alt={name}
           fill
+          unoptimized
           className="object-cover group-hover:scale-105 transition-transform duration-500 rounded-b-lg"
         />
       </div>

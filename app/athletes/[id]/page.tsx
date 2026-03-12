@@ -27,17 +27,17 @@
 //     gender: 'Female',
 //     profileImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80',
 //     bio: 'Passionate basketball player with 8 years of competitive experience. Dedicated to excellence on and off the court. Looking to take my career to the professional level.',
-    
+
 //     // Physical Stats
 //     height: 180, // cm
 //     weight: 70, // kg
-    
+
 //     // Sports Info
 //     primarySport: 'Basketball',
 //     secondarySports: ['Track & Field', 'Volleyball'],
 //     position: 'Point Guard',
 //     experience: 'Advanced',
-    
+
 //     // Achievements
 //     achievements: [
 //       'State Championship Winner 2022',
@@ -46,12 +46,12 @@
 //       'Team Captain 2022-2023',
 //       'Top Scorer in Conference 2023',
 //     ],
-    
+
 //     // Academic
 //     gpa: 3.8,
 //     graduationYear: 2024,
 //     currentSchool: 'UCLA',
-    
+
 //     // Stats
 //     stats: {
 //       gamesPlayed: 120,
@@ -59,7 +59,7 @@
 //       avgAssists: 6.2,
 //       avgRebounds: 4.8,
 //     },
-    
+
 //     // Media
 //     videoHighlights: [
 //       'https://example.com/highlight1.mp4',
@@ -329,12 +329,12 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  Trophy, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Trophy,
   Target,
   Activity,
   GraduationCap,
@@ -396,12 +396,12 @@ async function getAthlete(id: string): Promise<Athlete | null> {
     const res = await fetch(`/api/athlete/${id}`, {
       next: { revalidate: 600 } // Revalidate every 60 seconds
     })
-    
+
     if (!res.ok) {
       if (res.status === 404) return null
       throw new Error('Failed to fetch athlete')
     }
-    
+
     return res.json()
   } catch (error) {
     console.error('Error fetching athlete:', error)
@@ -414,7 +414,7 @@ async function getAthleteStats(id: string) {
     const res = await fetch(`/api/athlete/${id}/stats`, {
       next: { revalidate: 300 } // Revalidate every 5 minutes
     })
-    
+
     if (!res.ok) return null
     return res.json()
   } catch (error) {
@@ -423,10 +423,10 @@ async function getAthleteStats(id: string) {
   }
 }
 
-export default function AthleteProfilePage({ 
-  params 
-}: { 
-  params: Promise<{ id: string } >
+export default function AthleteProfilePage({
+  params
+}: {
+  params: Promise<{ id: string }>
 }) {
   const { id } = use(params)
   // const athlete = await getAthlete(id)
@@ -435,11 +435,11 @@ export default function AthleteProfilePage({
     queryFn: () => getAthlete(id),
   })
   // const stats = await getAthleteStats(id)
-  const { data: stats} = useQuery({
-      queryKey: ['athlete-stats', id],
-      queryFn: () => getAthleteStats(id),
-    })
-  
+  const { data: stats } = useQuery({
+    queryKey: ['athlete-stats', id],
+    queryFn: () => getAthleteStats(id),
+  })
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -447,13 +447,13 @@ export default function AthleteProfilePage({
       </div>
     )
   }
-  
+
 
   if (isError || !athlete) {
     notFound()
   }
 
-  
+
 
   // Format date of birth
   const birthDate = athlete.dateOfBirth ? new Date(athlete.dateOfBirth) : null
@@ -731,8 +731,8 @@ export default function AthleteProfilePage({
                   <CardContent>
                     <ul className="space-y-3">
                       {athlete.achievements.map((achievement, index) => (
-                        <li 
-                          key={index} 
+                        <li
+                          key={index}
                           className="flex items-start gap-3 p-3 bg-linear-to-r from-amber-50 to-transparent rounded-lg"
                         >
                           <Trophy className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
@@ -756,7 +756,7 @@ export default function AthleteProfilePage({
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {athlete.videoHighlights.map((video, index) => (
-                        <div 
+                        <div
                           key={index}
                           className="aspect-video bg-gradient-to-br from-stone-200 to-stone-300 rounded-lg flex items-center justify-center group cursor-pointer hover:from-stone-300 hover:to-stone-400 transition-all"
                         >

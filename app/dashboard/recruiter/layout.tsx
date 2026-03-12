@@ -32,11 +32,19 @@ export default function RecruiterDashboardLayout({
         // Check if path starts with the href for nested routes
         return pathname.startsWith(href)
     }
-    const{ data: session } = useSession()
+    const { data: session, status } = useSession()
+    if (status === "loading") {
+        return (
+            <div className="flex h-screen w-full items-center justify-center">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        )
+    }
+
     if (!session || session.user.role !== 'CLIENT') {
         redirect('/login')
     }
-    
+
 
     return (
         <div className="min-h-screen">
@@ -64,15 +72,15 @@ export default function RecruiterDashboardLayout({
                                 <nav className="space-y-2">
                                     {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
                                         const isActive = isActiveRoute(href)
-                                        
+
                                         return (
                                             <Link key={href} href={href}>
                                                 <Button
                                                     variant={isActive ? "default" : "ghost"}
                                                     className={`
                                                         w-full justify-start 
-                                                        ${isActive 
-                                                            ? 'bg-black text-white hover:bg-black/90' 
+                                                        ${isActive
+                                                            ? 'bg-black text-white hover:bg-black/90'
                                                             : 'hover:bg-stone-100'
                                                         }
                                                     `}

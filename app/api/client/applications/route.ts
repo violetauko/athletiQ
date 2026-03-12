@@ -31,8 +31,9 @@ export async function GET() {
           select: {
             id: true,
             title: true,
+            ClientProfile: true
           }
-        }
+        },
       },
       orderBy: { appliedAt: "desc" }
     });

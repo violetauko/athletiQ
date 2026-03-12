@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Application } from '@/app/types/athlete'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -40,6 +40,23 @@ export default function ApplicationsTable({
   onStatusChange,
   onViewDetails
 }: ApplicationsTableProps) {
+
+  const queryClient = useQueryClient()
+
+  const { mutate: updateStatus, isPending: isUpdating } = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const response = await fetch(`/api/client/applications/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      })
+      if (!response.ok) throw new Error('Failed to update status')
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['applications', userType] })
+    },
+  })
 
   const { data: applications = [], isLoading } = useQuery<Application[]>({
     queryKey: ['applications', userType],
@@ -232,14 +249,14 @@ export default function ApplicationsTable({
 
                       <DropdownMenuSeparator />
 
-                      {userType === 'client' && onStatusChange && (
+                      {userType === 'client' && (
                         <>
                           <DropdownMenuLabel>Change Status</DropdownMenuLabel>
                           {['PENDING', 'REVIEWING', 'SHORTLISTED', 'INTERVIEWED', 'ACCEPTED', 'REJECTED'].map((status) => (
                             <DropdownMenuItem
                               key={status}
-                              onClick={() => onStatusChange(app.id, status)}
-                              disabled={status === app.status}
+                              onClick={() => updateStatus({ id: app.id, status })}
+                              disabled={status === app.status || isUpdating}
                             >
                               <Badge className={`${getStatusColor(status)} mr-2`}>
                                 {status}

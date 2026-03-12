@@ -14,10 +14,10 @@ interface LogoItem {
 // Real rugby club logos from teams around the world
 const rugbyLogos: LogoItem[] = [
   {
-    src: "https://1000logos.net/wp-content/uploads/2021/05/New-South-Wales-Waratahs-logo-500x281.png",
-    alt: "New South Wales Waratahs",
-    width: 120,
-    height: 60,
+    src: "/partners/posnania.webp",
+    alt: "Posnania",
+    width: 130,
+    height: 80,
   },
   {
     src: "https://assets.stickpng.com/thumbs/5ae2e54f33b73fa43b1a898f.png",

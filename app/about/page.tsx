@@ -1,3 +1,4 @@
+import { StatsBurner } from '@/components/shared/stats-burner'
 import TitleCard from '@/components/shared/title-card'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -29,20 +30,13 @@ export default function AboutPage() {
     },
   ]
 
-  const stats = [
-    { number: '10,000+', label: 'Athletes' },
-    { number: '500+', label: 'Organizations' },
-    { number: '50+', label: 'Countries' },
-    { number: '2,700+', label: 'Opportunities' },
-  ]
-
   return (
     <>
       {/* Hero Section */}
       <div className="my-12">
-        <TitleCard 
-          image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80" 
-          title="About AthletiQ" 
+        <TitleCard
+          image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
+          title="About AthletiQ"
           description="We're on a mission to connect talented athletes with world-class sports organizations, 
             creating opportunities that transform careers and lives."
           action="Let's talk"
@@ -67,18 +61,18 @@ export default function AboutPage() {
               <h2 className="text-4xl font-bold">Our Story</h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  Founded in 2025, AthletiQ was born from a simple observation: talented athletes 
-                  worldwide were struggling to find the right opportunities, while sports organizations 
+                  Founded in 2025, AthletiQ was born from a simple observation: talented athletes
+                  worldwide were struggling to find the right opportunities, while sports organizations
                   were having difficulty discovering and recruiting top talent.
                 </p>
                 <p>
-                  We set out to bridge this gap by creating a platform that makes athlete recruitment 
-                  transparent, efficient, and accessible to everyone. Today, we're proud to serve 
+                  We set out to bridge this gap by creating a platform that makes athlete recruitment
+                  transparent, efficient, and accessible to everyone. Today, we're proud to serve
                   thousands of athletes and hundreds of organizations across the globe.
                 </p>
                 <p>
-                  Our platform has facilitated thousands of successful placements, helping athletes 
-                  at every level - from promising youth talents to seasoned professionals - find their 
+                  Our platform has facilitated thousands of successful placements, helping athletes
+                  at every level - from promising youth talents to seasoned professionals - find their
                   perfect match.
                 </p>
               </div>
@@ -88,22 +82,7 @@ export default function AboutPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-linear-to-br from-amber-50 to-stone-100 rounded-2xl">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-5xl font-bold text-amber-700 mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-muted-foreground font-medium">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <StatsBurner />
 
       {/* Values Section */}
       <section className="py-20">
@@ -141,11 +120,11 @@ export default function AboutPage() {
             </div>
 
             {/* <Card className="p-12 w-full col-span-2"> */}
-              <p className="text-xl text-start col-span-2">
-                To democratize access to sports opportunities by creating a transparent, efficient, 
-                and inclusive platform that empowers athletes to achieve their dreams and helps 
-                organizations discover exceptional talent from around the world.
-              </p>
+            <p className="text-xl text-start col-span-2">
+              To democratize access to sports opportunities by creating a transparent, efficient,
+              and inclusive platform that empowers athletes to achieve their dreams and helps
+              organizations discover exceptional talent from around the world.
+            </p>
             {/* </Card> */}
           </div>
         </div>
@@ -204,7 +183,7 @@ export default function AboutPage() {
             Ready to Join AthletiQ?
           </h2>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            Whether you're an athlete looking for opportunities or an organization seeking talent, 
+            Whether you're an athlete looking for opportunities or an organization seeking talent,
             we're here to help you succeed.
           </p>
           <div className="flex gap-4 justify-center">

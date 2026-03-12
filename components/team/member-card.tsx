@@ -15,12 +15,13 @@ export function MemberCard({ name, imageUrl, position }: MemberCardProps) {
           src={imageUrl}
           alt={name}
           fill
+          unoptimized
           className="object-cover group-hover:scale-105 transition-transform duration-500 rounded-b-lg"
         />
       </div>
       <div className="p-4 text-center bg-linear-to-br from-stone-50 to-amber-50">
         <h3 className="font-bold text-lg">{name}</h3>
-        <p className="text-sm text-muted-foreground">{position }</p>
+        <p className="text-sm text-muted-foreground">{position}</p>
       </div>
     </Card>
   )
