@@ -10,9 +10,13 @@ export function formatDate(date: Date | string): string {
   return d.toLocaleDateString('en-US', { 
     year: 'numeric', 
     month: 'long', 
-    day: 'numeric' 
+    day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    
   })
 }
+
 
 export function formatSalary(min: number, max: number): string {
   return `$${min.toLocaleString()} - $${max.toLocaleString()}`
@@ -223,3 +227,20 @@ export function formatCurrencyAdvanced(
 // formatCompactCurrency(250000, 'USD') -> "$2.5K"
 // fromCents(2500) -> 25
 // toCents(25.99) -> 2599
+
+export const getStatusBadge = (status: string) => {
+    const styles = {
+      COMPLETED: 'bg-green-100 text-green-800 border-green-200',
+      PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      FAILED: 'bg-red-100 text-red-800 border-red-200',
+      REFUNDED: 'bg-purple-100 text-purple-800 border-purple-200',
+    }
+    return styles[status as keyof typeof styles] || 'bg-gray-100 text-gray-800 border-gray-200'
+  }
+
+export const getInitials = (name?: string, email?: string) => {
+    if (name) {
+      return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    }
+    return email?.charAt(0).toUpperCase() || '?'
+  }

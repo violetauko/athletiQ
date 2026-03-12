@@ -68,7 +68,7 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
             {/* Status Distribution */}
             <div>
               <h3 className="text-sm font-medium mb-4">By Status</h3>
-              <div className="h-[200px]">
+              <div className="h-50">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -106,7 +106,7 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
             {/* Daily Trend */}
             <div>
               <h3 className="text-sm font-medium mb-4">Last 30 Days</h3>
-              <div className="h-[200px]">
+              <div className="h-50">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={dailyData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -167,8 +167,8 @@ function DonationsAnalyticsSkeleton() {
           <Skeleton className="h-24" />
         </div>
         <div className="grid grid-cols-2 gap-6">
-          <Skeleton className="h-[200px]" />
-          <Skeleton className="h-[200px]" />
+          <Skeleton className="h-50" />
+          <Skeleton className="h-50" />
         </div>
       </CardContent>
     </Card>
