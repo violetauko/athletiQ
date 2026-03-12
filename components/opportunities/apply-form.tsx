@@ -669,9 +669,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 // import { Badge } from '@/components/ui/badge'
-import { CheckCircle2, Upload, ArrowLeft } from 'lucide-react'
+import { CheckCircle2, Info, Upload, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { use, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import TitleCard from '@/components/shared/title-card'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
@@ -695,7 +695,7 @@ interface FormData {
   city: string
   state: string
   address: string
-  
+
   // Athletic Background
   height: string
   weight: string
@@ -704,7 +704,7 @@ interface FormData {
   currentTeam: string
   achievements: string
   stats: string
-  
+
   // Documents
   coverLetter: string
   // Note: File uploads would need a different approach (multipart/form-data)
@@ -712,12 +712,26 @@ interface FormData {
   resumeFileName: string
   portfolioFileNames: string
   additionalDocsFileNames: string
-  
+
   // Terms
   termsAccepted: boolean
 }
 
-export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: string, successRedirect: string }>}) {
+interface AthleteProfileData {
+  firstName?: string | null
+  lastName?: string | null
+  phone?: string | null
+  dateOfBirth?: string | null
+  location?: string | null
+  height?: number | null
+  weight?: number | null
+  position?: string | null
+  experience?: string | null
+  achievements?: string[] | null
+  User?: { email?: string | null }
+}
+
+export function ApplyForm({ params }: { params: Promise<{ id: string, backHref: string, successRedirect: string }> }) {
   const [step, setStep] = useState(1)
   const router = useRouter()
   const { id, backHref, successRedirect } = use(params);
@@ -733,7 +747,7 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
     city: '',
     state: '',
     address: '',
-    
+
     // Athletic Background
     height: '',
     weight: '',
@@ -742,16 +756,60 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
     currentTeam: '',
     achievements: '',
     stats: '',
-    
+
     // Documents
     coverLetter: '',
     resumeFileName: '',
     portfolioFileNames: '',
     additionalDocsFileNames: '',
-    
+
     // Terms
     termsAccepted: false
   })
+
+  const [prefilled, setPrefilled] = useState(false)
+
+  // Fetch the athlete's profile to prefill the form
+  const { data: profile } = useQuery<AthleteProfileData>({
+    queryKey: ['athlete-profile-prefill'],
+    queryFn: async () => {
+      const res = await fetch('/api/athlete/profile')
+      if (!res.ok) return null
+      return res.json()
+    },
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  })
+
+  // Seed form from profile once it loads
+  useEffect(() => {
+    if (!profile) return
+    const formatDate = (d: string | null | undefined) => {
+      if (!d) return ''
+      const date = new Date(d)
+      if (isNaN(date.getTime())) return ''
+      return date.toISOString().split('T')[0]
+    }
+    const updates: Partial<FormData> = {
+      firstName: profile.firstName ?? '',
+      lastName: profile.lastName ?? '',
+      email: profile.User?.email ?? '',
+      phone: profile.phone ?? '',
+      dateOfBirth: formatDate(profile.dateOfBirth),
+      city: profile.location ?? '',
+      height: profile.height != null ? String(profile.height) : '',
+      weight: profile.weight != null ? String(profile.weight) : '',
+      position: profile.position ?? '',
+      experience: profile.experience ?? '',
+      achievements: Array.isArray(profile.achievements) ? profile.achievements.join('\n') : '',
+    }
+    const hasPrefill = Object.values(updates).some(v => v !== '')
+    if (hasPrefill) {
+      setFormData(prev => ({ ...prev, ...updates }))
+      setPrefilled(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile])
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -794,7 +852,7 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
           city: formData.city,
           state: formData.state,
           address: formData.address,
-          
+
           // Athletic Background
           height: formData.height ? parseInt(formData.height) : null,
           weight: formData.weight ? parseInt(formData.weight) : null,
@@ -803,7 +861,7 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
           currentTeam: formData.currentTeam,
           achievements: formData.achievements,
           stats: formData.stats,
-          
+
           // Documents
           coverLetter: formData.coverLetter,
           resumeFileName: formData.resumeFileName,
@@ -827,7 +885,7 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
   }
 
   const isStepValid = (stepNum: number) => {
-    switch(stepNum) {
+    switch (stepNum) {
       case 1:
         return formData.firstName && formData.lastName && formData.email && formData.phone && formData.dateOfBirth && formData.city && formData.state
       case 2:
@@ -871,11 +929,10 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
               <div key={s.num} className="flex items-center flex-1">
                 <div className="flex flex-col items-center flex-1">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                      step >= s.num
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${step >= s.num
                         ? 'bg-black text-white'
                         : 'bg-stone-200 text-muted-foreground'
-                    }`}
+                      }`}
                   >
                     {step > s.num ? <CheckCircle2 className="w-5 h-5" /> : s.num}
                   </div>
@@ -883,9 +940,8 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
                 </div>
                 {index < 3 && (
                   <div
-                    className={`h-1 flex-1 ${
-                      step > s.num ? 'bg-black' : 'bg-stone-200'
-                    }`}
+                    className={`h-1 flex-1 ${step > s.num ? 'bg-black' : 'bg-stone-200'
+                      }`}
                   />
                 )}
               </div>
@@ -911,25 +967,31 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Step 1: Personal Info */}
+            {step === 1 && prefilled && (
+              <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800 mb-2">
+                <Info className="w-4 h-4 shrink-0 mt-0.5 text-blue-500" />
+                <span>Pre-filled from your profile — you can edit any field before submitting.</span>
+              </div>
+            )}
             {step === 1 && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name *</Label>
-                    <Input 
-                      id="firstName" 
-                      placeholder="John" 
-                      required 
+                    <Input
+                      id="firstName"
+                      placeholder="John"
+                      required
                       value={formData.firstName}
                       onChange={handleInputChange}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name *</Label>
-                    <Input 
-                      id="lastName" 
-                      placeholder="Doe" 
-                      required 
+                    <Input
+                      id="lastName"
+                      placeholder="Doe"
+                      required
                       value={formData.lastName}
                       onChange={handleInputChange}
                     />
@@ -939,22 +1001,22 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email *</Label>
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      placeholder="john.doe@email.com" 
-                      required 
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="john.doe@email.com"
+                      required
                       value={formData.email}
                       onChange={handleInputChange}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number *</Label>
-                    <Input 
-                      id="phone" 
-                      type="tel" 
-                      placeholder="+1 (555) 000-0000" 
-                      required 
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      required
                       value={formData.phone}
                       onChange={handleInputChange}
                     />
@@ -963,10 +1025,10 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
 
                 <div className="space-y-2">
                   <Label htmlFor="dateOfBirth">Date of Birth *</Label>
-                  <Input 
-                    id="dateOfBirth" 
-                    type="date" 
-                    required 
+                  <Input
+                    id="dateOfBirth"
+                    type="date"
+                    required
                     value={formData.dateOfBirth}
                     onChange={handleInputChange}
                   />
@@ -975,20 +1037,20 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="city">City *</Label>
-                    <Input 
-                      id="city" 
-                      placeholder="Los Angeles" 
-                      required 
+                    <Input
+                      id="city"
+                      placeholder="Los Angeles"
+                      required
                       value={formData.city}
                       onChange={handleInputChange}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="state">State/Province *</Label>
-                    <Input 
-                      id="state" 
-                      placeholder="California" 
-                      required 
+                    <Input
+                      id="state"
+                      placeholder="California"
+                      required
                       value={formData.state}
                       onChange={handleInputChange}
                     />
@@ -997,9 +1059,9 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
 
                 <div className="space-y-2">
                   <Label htmlFor="address">Street Address</Label>
-                  <Input 
-                    id="address" 
-                    placeholder="123 Main Street" 
+                  <Input
+                    id="address"
+                    placeholder="123 Main Street"
                     value={formData.address}
                     onChange={handleInputChange}
                   />
@@ -1013,22 +1075,22 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="height">Height (cm) *</Label>
-                    <Input 
-                      id="height" 
-                      type="number" 
-                      placeholder="180" 
-                      required 
+                    <Input
+                      id="height"
+                      type="number"
+                      placeholder="180"
+                      required
                       value={formData.height}
                       onChange={handleInputChange}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="weight">Weight (kg) *</Label>
-                    <Input 
-                      id="weight" 
-                      type="number" 
-                      placeholder="75" 
-                      required 
+                    <Input
+                      id="weight"
+                      type="number"
+                      placeholder="75"
+                      required
                       value={formData.weight}
                       onChange={handleInputChange}
                     />
@@ -1037,10 +1099,10 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
 
                 <div className="space-y-2">
                   <Label htmlFor="position">Primary Position *</Label>
-                  <Input 
-                    id="position" 
-                    placeholder="Point Guard" 
-                    required 
+                  <Input
+                    id="position"
+                    placeholder="Point Guard"
+                    required
                     value={formData.position}
                     onChange={handleInputChange}
                   />
@@ -1048,11 +1110,11 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
 
                 <div className="space-y-2">
                   <Label htmlFor="experience">Years of Experience *</Label>
-                  <Input 
-                    id="experience" 
-                    type="number" 
-                    placeholder="5" 
-                    required 
+                  <Input
+                    id="experience"
+                    type="number"
+                    placeholder="5"
+                    required
                     value={formData.experience}
                     onChange={handleInputChange}
                   />
@@ -1060,9 +1122,9 @@ export function ApplyForm({ params }: { params: Promise<{ id: string,backHref: s
 
                 <div className="space-y-2">
                   <Label htmlFor="currentTeam">Current/Most Recent Team</Label>
-                  <Input 
-                    id="currentTeam" 
-                    placeholder="UCLA Bruins" 
+                  <Input
+                    id="currentTeam"
+                    placeholder="UCLA Bruins"
                     value={formData.currentTeam}
                     onChange={handleInputChange}
                   />

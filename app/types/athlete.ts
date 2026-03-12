@@ -34,20 +34,45 @@ export interface Opportunity {
   benefits: string[];
   deadline?: string;
   client: ClientProfile;
+  ClientProfile?: ClientProfile;
   responsibilities: string[];
   imageUrl?: string;
   createdAt?: string;
   count?: number;
 }
 
+// app/types/athlete.ts
+
 export interface Application {
   id: string;
-  status: ApplicationStatus;
-  appliedAt: string;
-  opportunity: Opportunity;
+  athleteId: string;
   opportunityId: string;
+  userId: string;
+  status: ApplicationStatus;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  city?: string;
+  state?: string;
+  address?: string;
+  height?: number;
+  weight?: number;
+  position?: string;
+  experience?: number;
+  currentTeam?: string;
+  achievements?: string;
+  stats?: string;
+  coverLetter?: string;
+  resumeFileName?: string;
+  portfolioFileNames?: string;
+  additionalDocsFileNames?: string;
+  notes?: string | null;
+  appliedAt: string;
+  updatedAt: string;
+  Opportunity?: Opportunity
 }
-
 export interface AthleteProfile {
   id: string;
   firstName: string;
