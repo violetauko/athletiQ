@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 
 
 // Export donation statistics endpoint
-export async function GET_STATS(request: Request) {
+export async function GET() {
   try {
     const session = await auth()
     if (!session || session.user.role !== 'ADMIN') {
