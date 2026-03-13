@@ -65,3 +65,68 @@ export interface PaginatedResponse<T> {
   }
   stats?: any
 }
+
+export interface OpportunityDetail {
+  id: string
+  title: string
+  organization: string
+  description: string
+  sport: string
+  type: string
+  status: string
+  location: string
+  requirements: string
+  createdAt: string
+  user: {
+    id: string
+    name: string
+    email: string
+    ClientProfile?: {
+      id: string
+      organization: string
+      title: string
+      name: string
+      email: string
+    }
+  }
+  Application: Array<{
+    id: string
+    status: string
+    appliedAt: string
+    achievements: string
+    additionalDocsFileNames: string
+    address: string
+    athleteId:string
+    city:string
+    coverLetter: string
+    currentTeam: string
+    dateOfBirth: string
+    email: string
+    experience: number
+    firstName: string
+    height: number
+    lastName: string
+    notes?: string
+    opportunityId: string
+    phone: string
+    portfolioFileNames: string
+    position: string
+    resumeFileName: string
+    state: string
+    stats: string
+    updatedAt: string
+    userId: string
+    weight: number
+    athlete: {
+      user: {
+        name: string
+        email: string
+        image: string
+      }
+    }
+  }>
+  _count: {
+    Application: number
+    savedBy: number
+  }
+}

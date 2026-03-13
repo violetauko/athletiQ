@@ -2,7 +2,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
-import { Prisma } from '@prisma/client'
 import { getDonationStats } from '@/lib/donations'
 
 export async function GET(request: Request) {
@@ -191,8 +190,8 @@ export async function GET(request: Request) {
     const hasNextPage = page < totalPages
     const hasPrevPage = page > 1
 
-    return NextResponse.json({
-      donations,
+    const responseData = {
+      items:donations,
       pagination: {
         page,
         limit,
@@ -202,6 +201,16 @@ export async function GET(request: Request) {
         hasPrevPage
       },
       stats
+    }
+
+    // Serialize with BigInt handling
+    const serialized = JSON.stringify(responseData, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    )
+
+    return new NextResponse(serialized, {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     })
 
   } catch (error) {

@@ -50,6 +50,7 @@ export default function DonationsPage() {
         },
         staleTime: 5 * 60 * 1000,
     })
+    console.log("donations:",donationsData)
 
     const donations = donationsData?.items || []
     const donationPagination = donationsData?.pagination
@@ -191,7 +192,7 @@ export default function DonationsPage() {
                                                         <div className="flex items-center gap-3">
                                                             <Avatar className="h-8 w-8">
                                                                 <AvatarFallback className="text-xs bg-stone-200">
-                                                                    {getInitials(donation.donorName, donation.donorEmail)}
+                                                                    {getInitials(donation.donorName??'anonymous', donation.donorEmail??'anonymous')}
                                                                 </AvatarFallback>
                                                             </Avatar>
                                                             <div>
@@ -205,7 +206,7 @@ export default function DonationsPage() {
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="font-medium">
-                                                        {formatCurrency(donation.amount, donation.currency, false)}
+                                                        {formatCurrency(donation.amount/100, donation.currency, false)}
                                                     </TableCell>
                                                     <TableCell>
                                                         {getTierBadge(donation.tierId, donation.isCustom)}

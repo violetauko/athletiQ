@@ -8,47 +8,9 @@ import { ThumbsUp, ThumbsDown, Clock, ArrowLeft, Mail, User, Calendar, FileText 
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { OpportunityDetail } from '@/lib/types/types'
+import ApplicationsViewTable from '@/components/applications/applications-view-table'
 
-interface OpportunityDetail {
-  id: string
-  title: string
-  organization: string
-  description: string
-  sport: string
-  type: string
-  status: string
-  location: string
-  requirements: string
-  createdAt: string
-  user: {
-    id: string
-    name: string
-    email: string
-    ClientProfile?: {
-      id: string
-      organization: string
-      title: string
-      name: string
-      email: string
-    }
-  }
-  Application: Array<{
-    id: string
-    status: string
-    appliedAt: string
-    athlete: {
-      user: {
-        name: string
-        email: string
-        image: string
-      }
-    }
-  }>
-  _count: {
-    applications: number
-    savedBy: number
-  }
-}
 
 export default function OpportunityDetailPage() {
   const params = useParams()
@@ -63,6 +25,7 @@ export default function OpportunityDetailPage() {
       return response.json()
     }
   })
+  console.log("Opportunity:",opportunity)
 
   const statusMutation = useMutation({
     mutationFn: async (status: string) => {
@@ -103,7 +66,7 @@ export default function OpportunityDetailPage() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <div className="mx-auto py-8 px-4 max-w-6xl">
+      <div className="mx-auto py-8 px-4">
         {/* Back button */}
         <Button variant="ghost" asChild className="mb-6">
           <Link href="/dashboard/admin/opportunities">
@@ -154,7 +117,7 @@ export default function OpportunityDetailPage() {
           <Card>
             <CardContent className="p-4">
               <p className="text-sm text-stone-500">Applications</p>
-              <p className="text-2xl font-bold">{opportunity._count.applications}</p>
+              <p className="text-2xl font-bold">{opportunity._count.Application}</p>
             </CardContent>
           </Card>
           <Card>
@@ -188,35 +151,6 @@ export default function OpportunityDetailPage() {
                   <h3 className="font-semibold mb-2">Requirements</h3>
                   <p className="text-stone-600 whitespace-pre-line">{opportunity.requirements}</p>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Applications */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Applications</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {opportunity.Application.length === 0 ? (
-                  <p className="text-stone-500 text-center py-4">No applications yet</p>
-                ) : (
-                  <div className="space-y-4">
-                    {opportunity.Application.map((app) => (
-                      <div key={app.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
-                          <p className="font-medium">{app.athlete.user.name}</p>
-                          <p className="text-sm text-stone-500">{app.athlete.user.email}</p>
-                        </div>
-                        <div className="text-right">
-                          <Badge variant="outline">{app.status}</Badge>
-                          <p className="text-xs text-stone-400 mt-1">
-                            {new Date(app.appliedAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </CardContent>
             </Card>
           </div>
@@ -276,6 +210,21 @@ export default function OpportunityDetailPage() {
             </Card>
           </div>
         </div>
+        {/* Applications */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Applications</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {opportunity.Application.length === 0 ? (
+                  <p className="text-stone-500 text-center py-4">No applications yet</p>
+                ) : (
+                  <div className="space-y-4">
+                    <ApplicationsViewTable opportunity={opportunity}/>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
       </div>
     </div>
   )
