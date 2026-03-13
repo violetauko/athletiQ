@@ -77,6 +77,18 @@ export interface OpportunityDetail {
   location: string
   requirements: string
   createdAt: string
+  ClientProfile?: {
+      id: string
+      organization: string
+      title: string
+      name: string
+      email: string
+      User: {
+        id: string
+        name: string
+        email: string
+      }
+    }
   user: {
     id: string
     name: string

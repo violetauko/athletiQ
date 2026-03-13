@@ -168,15 +168,15 @@ export default function OpportunityDetailPage() {
                     <User className="w-5 h-5 text-stone-600" />
                   </div>
                   <div>
-                    <p className="font-medium">{opportunity.user?.ClientProfile?.name || 'Unknown'}</p>
-                    <p className="text-sm text-stone-500">{opportunity?.user?.ClientProfile?.email}</p>
+                    <p className="font-medium">{opportunity.ClientProfile?.organization || 'Unknown'}</p>
+                    <p className="text-sm text-stone-500">{opportunity?.ClientProfile?.email}</p>
                   </div>
                 </div>
-                {opportunity.user?.ClientProfile && (
+                {opportunity?.ClientProfile && (
                   <div className="pt-3 border-t">
                     <p className="text-sm text-stone-500">Organization</p>
-                    <p className="font-medium">{opportunity.user?.ClientProfile.organization}</p>
-                    <p className="text-sm text-stone-500 mt-1">Title: {opportunity.user.ClientProfile.title}</p>
+                    <p className="font-medium">{opportunity?.ClientProfile.organization}</p>
+                    <p className="text-sm text-stone-500 mt-1">Title: {opportunity.ClientProfile.title}</p>
                   </div>
                 )}
               </CardContent>
@@ -189,13 +189,13 @@ export default function OpportunityDetailPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button className="w-full justify-start" variant="outline" asChild>
-                  <Link href={`/dashboard/admin/users/${opportunity.user?.ClientProfile?.id}`}>
+                  <Link href={`/dashboard/admin/users/${opportunity?.ClientProfile?.id}`}>
                     <User className="w-4 h-4 mr-2" />
                     View Creator Profile
                   </Link>
                 </Button>
                 <Button className="w-full justify-start" variant="outline" asChild>
-                  <Link href={`/dashboard/admin/users?search=${opportunity.user?.ClientProfile?.email}`}>
+                  <Link href={`/dashboard/admin/users?search=${opportunity?.ClientProfile?.User?.email}`}>
                     <Mail className="w-4 h-4 mr-2" />
                     Contact Creator
                   </Link>

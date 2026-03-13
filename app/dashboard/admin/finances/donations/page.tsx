@@ -50,7 +50,6 @@ export default function DonationsPage() {
         },
         staleTime: 5 * 60 * 1000,
     })
-    console.log("donations:",donationsData)
 
     const donations = donationsData?.items || []
     const donationPagination = donationsData?.pagination

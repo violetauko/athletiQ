@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import { OpportunityDetail } from "@/lib/types/types";
 import { Eye, Download, FileText, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 type SortableField =
   | "firstName"
@@ -121,7 +121,7 @@ const ApplicationsViewTable = ({ opportunity }:{opportunity: OpportunityDetail})
           </TableHeader>
           <TableBody>
             {sortedApplications.map((app) => (
-              <>
+              <Fragment key={app.id}>
                 <TableRow 
                   key={app.id}
                   className="cursor-pointer hover:bg-muted/50"
@@ -189,7 +189,7 @@ const ApplicationsViewTable = ({ opportunity }:{opportunity: OpportunityDetail})
                 </TableRow>
                 
                 {expandedRow === app.id && (
-                  <TableRow>
+                  <TableRow key={`${app.id}-details`}>
                     <TableCell colSpan={7} className="bg-muted/30 p-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Left Column - Personal & Contact */}
@@ -312,7 +312,7 @@ const ApplicationsViewTable = ({ opportunity }:{opportunity: OpportunityDetail})
                     </TableCell>
                   </TableRow>
                 )}
-              </>
+              </Fragment>
             ))}
           </TableBody>
         </Table>
