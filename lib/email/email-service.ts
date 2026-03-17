@@ -37,19 +37,6 @@ export interface EmailOptions {
 
 // Create transporter
 const createTransporter = () => {
-  // For development/testing with ethereal.email
-  if (process.env.NODE_ENV === 'development') {
-    return nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    });
-  }
-
   // Production with Gmail/SendGrid/etc
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
