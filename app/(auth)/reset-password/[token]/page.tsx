@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 };
 
 interface NewPasswordPageProps {
-  params: {
+  params: Promise<{
     token: string;
-  };
+  }>;
 }
 
 async function validateToken(token: string) {
@@ -42,7 +42,7 @@ async function validateToken(token: string) {
 }
 
 export default async function NewPasswordPage({ params }: NewPasswordPageProps) {
-  const { token } = params;
+  const { token } = await params;
   
   if (!token) {
     notFound();

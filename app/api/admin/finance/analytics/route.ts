@@ -93,8 +93,9 @@ export async function GET(request: Request) {
         _sum: { amount: true }
       })
     ])
+    const currentDonationSum = currentDonations._sum.amount
 
-    const currentTotal = (currentDonations._sum.amount || 0) + (currentPayments._sum.amount || 0)
+    const currentTotal = (currentDonationSum ? currentDonationSum/100 : 0) + (currentPayments._sum.amount || 0)
     const previousTotal = (previousDonations._sum.amount || 0) + (previousPayments._sum.amount || 0)
 
     // Calculate growth percentages
@@ -112,7 +113,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       totalRevenue: currentTotal,
-      totalDonations: currentDonations._sum.amount || 0,
+      totalDonations: currentDonationSum ? currentDonationSum/100 : 0,
       totalPayments: currentPayments._sum.amount || 0,
       uniqueDonors: uniqueDonors.length,
       growth: {
@@ -232,7 +233,7 @@ async function getDailyDonationStats(startDate: Date) {
     }
     const current = statsMap.get(date)
     current.count += stat._count
-    current.total += stat._sum.amount || 0
+    current.total += stat._sum.amount ? stat._sum.amount/100 : 0
   })
 
   return last30Days.map(date => ({

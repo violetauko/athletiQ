@@ -9,9 +9,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { amount, tierId, isCustom, donorName, message } = body;
 
-    if (!amount || amount < 100) {
-      return NextResponse.json({ error: "Minimum donation is KES 1" }, { status: 400 });
-    }
 
     const session = await auth();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";

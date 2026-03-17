@@ -37,7 +37,7 @@ export const DonationConfirmationEmail = ({
       {/* Hero Section */}
       <Section style={{ textAlign: 'center', marginBottom: '30px' }}>
         <Img
-          src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&q=80"
+          src="https://athletec.org/logo1.png"
           alt="Thank you"
           width="100%"
           height="auto"

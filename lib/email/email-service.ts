@@ -40,12 +40,12 @@ const createTransporter = () => {
   // For development/testing with ethereal.email
   if (process.env.NODE_ENV === 'development') {
     return nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
+      host: process.env.SMTP_HOST,
       port: 587,
       secure: false,
       auth: {
-        user: process.env.ETHEREAL_EMAIL,
-        pass: process.env.ETHEREAL_PASSWORD,
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD,
       },
     });
   }
@@ -153,10 +153,6 @@ export async function sendEmail(options: EmailOptions): Promise<{
 
     const info = await transporter.sendMail(mailOptions);
 
-    // Log for development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-    }
 
     return {
       success: true,

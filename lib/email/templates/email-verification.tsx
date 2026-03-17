@@ -20,7 +20,7 @@ export const EmailVerificationEmail = ({
       {/* Header */}
       <Section style={{ textAlign: 'center', marginBottom: '30px' }}>
         <Img
-          src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=600&q=80"
+          src="https://athletec.org/logo1.png"
           alt="Verify Email"
           width="100%"
           height="auto"

@@ -18,6 +18,7 @@ interface DonationsAnalyticsProps {
 const COLORS = ['#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
 
 export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps) {
+  console.log("Data: ",data)
   if (isLoading) {
     return <DonationsAnalyticsSkeleton />
   }
@@ -47,17 +48,17 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
             <div className="bg-stone-50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">Total Donations</p>
               <p className="text-2xl font-bold">
-                {formatCurrency(data?.byStatus?.COMPLETED?.total || 0, 'KES')}
+                {formatCurrency(data?.byStatus?.PAID?.total || 0, 'KES',true)}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                {data?.byStatus?.COMPLETED?.count || 0} completed donations
+                {data?.byStatus?.PAID?.count || 0} completed donations
               </p>
             </div>
             <div className="bg-stone-50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">Average Donation</p>
               <p className="text-2xl font-bold">
                 {formatCurrency(
-                  (data?.byStatus?.COMPLETED?.total || 0) / (data?.byStatus?.COMPLETED?.count || 1),
+                  (data?.byStatus?.PAID?.total ?data?.byStatus.PAID.total/100 : 0) / (data?.byStatus?.PAID?.count || 1),
                   'KES'
                 )}
               </p>
@@ -85,7 +86,7 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value?: number) => formatCurrency(value ?? 0, 'KES', false)}
+                      formatter={(value?: number) => formatCurrency(value?value/100 : 0, 'KES', false)}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -113,7 +114,7 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
                     <XAxis dataKey="date" tick={{ fontSize: 10 }} interval={6} />
                     <YAxis tick={{ fontSize: 10 }} />
                     <Tooltip
-                      formatter={(value?: number) => formatCurrency(value ?? 0, 'KES', false)}
+                      formatter={(value?: number) => formatCurrency(value ? value : 0, 'KES', false)}
                     />
                     <Bar dataKey="total" fill="#10b981" />
                   </BarChart>
@@ -137,7 +138,7 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
                       <div
                         className="h-full bg-green-500 rounded-full"
                         style={{
-                          width: `${(tier.value / (data?.byStatus?.COMPLETED?.total || 1)) * 100}%`
+                          width: `${(tier.value / (data?.byStatus?.PAID?.total?data?.byStatus.PAID.total/100 : 1)) * 100}%`
                         }}
                       />
                     </div>

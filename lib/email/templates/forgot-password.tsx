@@ -24,7 +24,7 @@ export const ForgotPasswordEmail = ({
       {/* Header Section */}
       <Section style={{ textAlign: 'center', marginBottom: '30px' }}>
         <Img
-          src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=600&q=80"
+          src="https://athletec.org/logo1.png"
           alt="Password Reset"
           width="100%"
           height="auto"
