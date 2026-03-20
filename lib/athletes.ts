@@ -53,9 +53,9 @@ export async function getFeaturedAthletes(limit: number = 4) {
 export async function getAthleteCount() {
   try {
     const totalCount = await prisma.athleteProfile.count()
-    return totalCount || 10000 // Default to 10000 if total is missing
+    return totalCount || 0 // Default to 10000 if total is missing
   } catch (error) {
     console.error('Error getting athlete count:', error)
-    return 10000 // Fallback
+    return 0 // Fallback
   }
 }
