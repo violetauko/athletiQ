@@ -38,6 +38,7 @@ export async function getClientDashboardData(userId: string) {
         const clientId = clientProfile?.id
         const opportunities = await prisma.opportunity.findMany({
             where: { clientId },
+            take: 5,
             include: {
                 Application: {
                     include: {

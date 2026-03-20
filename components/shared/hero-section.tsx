@@ -145,7 +145,7 @@ export function HeroSection() {
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-600 rounded-full filter blur-3xl"></div>
       </div>
 
-      <div className="container relative z-10 px-4 py-8">
+      <div className="container relative z-10 px-2 py-4 md:px-4 md:py-8">
         {/* Top Bar */}
         <div className="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 my-7">
           {/* Left Section */}
@@ -154,7 +154,7 @@ export function HeroSection() {
               <Target className="w-4 h-4 text-amber-400" />
               <span className="text-sm text-black">Sports Recruitment Platform</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-black leading-tight">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-black leading-tight">
               Take the Next Step in Your{' '}
               <span className="text-amber-400">Career</span>
               <br />with Us
@@ -198,11 +198,11 @@ export function HeroSection() {
 
 
         {/* Content */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center pb-20 mt-10">
-          <div className="space-y-8 text-black h-full">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-center pb-10 md:pb-20 mt-5 md:mt-10">
+          <div className="space-y-4 md:space-y-8 text-black h-full">
 
             {/* Search Box */}
-            <div className="relative overflow-hidden rounded-2xl p-6 shadow-2xl h-full">
+            <div className="relative overflow-hidden rounded-2xl p-3 md:p-6 shadow-2xl h-full">
 
               {/* Background Image */}
               <Image
@@ -323,7 +323,7 @@ export function HeroSection() {
 
                   {/* Quick Filters */}
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <span className="text-sm text-white/60">Popular:</span>
+                    <span className="text-sm text-white/60 w-full overflow-x-hidden">Popular:</span>
                     {sports.slice(0, 4).map((sport) => (
                       <button
                         key={sport.id}
@@ -342,20 +342,20 @@ export function HeroSection() {
           </div>
 
           {/* Right Side - Stats */}
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-3 md:gap-6">
             {/* Managing Stats */}
-            <div className="bg-black/80 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-amber-500/50 transition-all group">
-              <div className="flex items-center gap-3 mb-4">
+            <div className="bg-black/80 backdrop-blur-sm rounded-2xl p-4 md:p-8 border border-white/10 hover:border-amber-500/50 transition-all group">
+              <div className="flex items-center gap-2 mb-2 md:gap-3 md:mb-4">
                 <div className="p-3 bg-amber-500/20 rounded-xl">
-                  <Users className="w-6 h-6 text-amber-400" />
+                  <Users className="w-4 h-4 md:w-6 md:h-6 text-amber-400" />
                 </div>
-                <h3 className="text-white font-bold text-xl">RECRUITING EXCELLENCE</h3>
+                <h3 className="text-white font-bold text-base md:text-xl">RECRUITING EXCELLENCE</h3>
               </div>
               <p className="text-white/70 text-sm mb-6">
                 Connect with top talent across all sports disciplines. Join thousands of successful placements.
               </p>
 
-              <div className="flex gap-3">
+              <div className="flex gap-2 md:gap-3 justify-center">
                 <Link href="/athletes">
                   <Button className="bg-white text-black hover:bg-white/90 rounded-full group-hover:scale-105 transition-transform">
                     Find Athletes
@@ -370,34 +370,34 @@ export function HeroSection() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2  gap-2 md:gap-4">
               <div
-                className="bg-linear-to-br from-amber-900/80 to-amber-800/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:scale-105 transition-transform cursor-pointer"
+                className="bg-linear-to-br from-amber-900/80 to-amber-800/80 backdrop-blur-sm rounded-xl p-3 md:p-6 border border-white/10 hover:scale-105 transition-transform cursor-pointer"
                 onClick={() => handleQuickSearch('organizations')}
               >
                 <Briefcase className="w-8 h-8 text-white mb-3" />
-                <div className="text-4xl font-bold text-white mb-2">500+</div>
+                <div className="text-3xl md:text-4xl font-bold text-white mb-1 md:mb-2">500+</div>
                 <div className="text-white/90 text-sm">Organizations</div>
-                <p className="text-white/70 text-xs mt-2">
+                <p className="text-white/70 text-xs mt-1 md:mt-2">
                   Leading sports organizations trust us
                 </p>
               </div>
 
               <div
-                className="bg-linear-to-br from-yellow-700/80 to-yellow-600/80 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:scale-105 transition-transform cursor-pointer"
+                className="bg-linear-to-br from-yellow-700/80 to-yellow-600/80 backdrop-blur-sm rounded-xl p-3 md:p-6 border border-white/10 hover:scale-105 transition-transform cursor-pointer"
                 onClick={() => handleQuickSearch('opportunities')}
               >
                 <Trophy className="w-8 h-8 text-white mb-3" />
-                <div className="text-4xl font-bold text-white mb-2">2,700+</div>
+                <div className="text-3xl md:text-4xl font-bold text-white mb-1 md:mb-2">2,700+</div>
                 <div className="text-white/90 text-sm">Active Opportunities</div>
-                <p className="text-white/70 text-xs mt-2">
+                <p className="text-white/70 text-xs mt-1 md:mt-2">
                   Find your perfect position today
                 </p>
               </div>
             </div>
 
             {/* Trust Badges */}
-            <div className="flex items-center gap-4 pt-2">
+            <div className="flex items-center gap-2 md:gap-4 pt-2">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 <span className="text-black text-sm">Live Opportunities</span>

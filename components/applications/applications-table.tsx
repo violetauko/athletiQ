@@ -25,7 +25,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { MoreHorizontal, Eye, Download, Edit } from 'lucide-react'
+import { useState } from 'react'
+import { MoreHorizontal, Eye, Download, Edit, ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface ApplicationsTableProps {
   userType?: 'athlete' | 'admin' | 'client'
@@ -40,6 +41,8 @@ export default function ApplicationsTable({
   onStatusChange,
   onViewDetails
 }: ApplicationsTableProps) {
+  const [page, setPage] = useState(1)
+  const limit = 10
 
   const queryClient = useQueryClient()
 
@@ -58,24 +61,26 @@ export default function ApplicationsTable({
     },
   })
 
-  const { data: applications = [], isLoading } = useQuery<Application[]>({
-    queryKey: ['applications', userType],
+  const { data, isLoading } = useQuery<{ applications: Application[]; pagination: any }>({
+    queryKey: ['applications', userType, page],
     queryFn: async () => {
       const endpoint = userType === 'athlete'
-        ? '/api/athlete/applications'
+        ? `/api/athlete/applications?page=${page}&limit=${limit}`
         : userType === 'client'
-          ? '/api/client/applications'
-          : '/api/admin/applications'
+          ? `/api/client/applications?page=${page}&limit=${limit}`
+          : `/api/admin/applications?page=${page}&limit=${limit}`
 
       const response = await fetch(endpoint)
       if (!response.ok) throw new Error('Failed to fetch applications')
       return response.json()
     },
-    initialData,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
   })
+
+  const applications = data?.applications || []
+  const pagination = data?.pagination
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -122,9 +127,9 @@ export default function ApplicationsTable({
   if (applications.length === 0) {
     return (
       <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="rounded-full bg-stone-100 p-3 mb-4">
-            <FileText className="h-6 w-6 text-stone-400" />
+        <CardContent className="flex flex-col items-center justify-center py-4 md:py-12 text-center">
+          <div className="rounded-full bg-stone-100 p-2 md:p-3 mb-2 md:mb-4">
+            <FileText className="h-4 w-4 md:h-6 md:w-6 text-stone-400" />
           </div>
           <h3 className="text-lg font-semibold mb-2">No applications found</h3>
           <p className="text-sm text-muted-foreground mb-4">
@@ -143,8 +148,8 @@ export default function ApplicationsTable({
   }
 
   return (
-    <Card className='min-h-screen'>
-      <CardContent className="p-0">
+    <Card className='min-h-screen flex flex-col'>
+      <CardContent className="p-0 flex-1">
         <Table>
           <TableHeader>
             <TableRow>
@@ -273,6 +278,40 @@ export default function ApplicationsTable({
           </TableBody>
         </Table>
       </CardContent>
+
+      {/* Pagination Footer */}
+      {pagination && pagination.pages > 1 && (
+        <div className="flex items-center justify-between px-6 py-4 border-t bg-stone-50/50">
+          <div className="text-sm text-muted-foreground">
+            Showing <span className="font-medium">{(page - 1) * limit + 1}</span> to <span className="font-medium">{Math.min(page * limit, pagination.total)}</span> of <span className="font-medium">{pagination.total}</span> results
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span className="sr-only">Previous page</span>
+            </Button>
+            <div className="text-sm font-medium">
+              Page {page} of {pagination.pages}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
+              disabled={page === pagination.pages}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+              <span className="sr-only">Next page</span>
+            </Button>
+          </div>
+        </div>
+      )}
     </Card>
   )
 }

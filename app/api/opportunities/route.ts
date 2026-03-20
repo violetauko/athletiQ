@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
+import { getLatestOpportunities } from '@/lib/opportunites'
 
 // GET /api/opportunities - List all opportunities
 export async function GET(request: Request) {
@@ -16,7 +17,16 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || (latest ? '6' : '10'))
     const skip = (page - 1) * limit
 
-    // Build query filters
+    // Special case for latest=true - use library function
+    if (latest) {
+      const data = await getLatestOpportunities(limit)
+      return NextResponse.json({
+        opportunities: data.opportunities,
+        pagination: null
+      })
+    }
+
+    // Build query filters (original logic for paginated results)
     const where: any = {
       status: 'ACTIVE',
     }
@@ -58,13 +68,9 @@ export async function GET(request: Request) {
       skip: latest ? 0 : skip,
     })
 
-    const totalQuery = latest
-      ? prisma.opportunity.count({ where })
-      : prisma.opportunity.count({ where })
-
     const [opportunities, total] = await Promise.all([
       opportunitiesQuery,
-      totalQuery,
+      prisma.opportunity.count({ where }),
     ])
 
     return NextResponse.json({

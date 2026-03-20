@@ -38,9 +38,9 @@ export async function StatsSection() {
   const stats = await getStats()
 
   return (
-    <section className="py-12 bg-stone-50">
+    <section className="py-6 md:py-12 bg-stone-50">
       <div className="container">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
           {[
             { label: 'Total Athletes', value: stats.totalAthletes },
             { label: 'Sports', value: stats.totalSports },
@@ -48,7 +48,7 @@ export async function StatsSection() {
             { label: 'Opportunities', value: stats.totalOpportunities },
           ].map((stat, index) => (
             <div key={index} className="text-center group">
-              <div className="text-4xl font-bold text-amber-700 mb-2 group-hover:scale-110 transition-transform">
+              <div className="text-2xl md:text-4xl font-bold text-amber-700 mb-2 group-hover:scale-110 transition-transform">
                 {stat.value}
               </div>
               <div className="text-sm text-muted-foreground font-medium">

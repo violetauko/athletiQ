@@ -22,17 +22,17 @@ const testimonials = [
 
 export function TestimonialsSection() {
   return (
-    <section className="py-10 md:py-16">
+    <section className="py-6 md:py-16">
       <div className="container">
         <div className="border-t border-gray-500 mb-20"></div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-center">
           <div className="space-y-3 md:space-y-6">
             <p className="text-sm font-semibold text-amber-600 tracking-wider uppercase">
               Testimonials
             </p>
             <h2 className="text-2xl md:text-4xl font-bold">What People Say About Us</h2>
-            <p className="text-muted-foreground text-base md:text-lg">
+            <p className="text-muted-foreground text-sm md:text-lg">
               Hear what athletes and organizations say about their experience with AthletiQ
             </p>
             <Button className="bg-black hover:bg-black/90 rounded-full">
@@ -40,13 +40,13 @@ export function TestimonialsSection() {
             </Button>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {testimonials.map((testimonial, index) => (
-              <div 
+              <div
                 key={index}
-                className="bg-linear-to-br from-stone-100 to-amber-50 rounded-2xl p-8 shadow-lg border border-stone-200"
+                className="bg-linear-to-br from-stone-100 to-amber-50 rounded-2xl p-4 md:p-8 shadow-lg border border-stone-200"
               >
-                <div className="flex items-start gap-4 mb-6">
+                <div className="flex items-start gap-2 md:gap-4 mb-4 md:mb-6">
                   <div className="w-16 h-16 rounded-full overflow-hidden shrink-0 border-2 border-white shadow-md">
                     <img
                       src={testimonial.image}
@@ -65,15 +65,15 @@ export function TestimonialsSection() {
                     </div>
                   </div>
                 </div>
-                <p className="text-muted-foreground leading-relaxed italic">
+                <p className="text-muted-foreground leading-relaxed italic text-sm md:text-base">
                   &quot;{testimonial.content}&quot;
                 </p>
               </div>
             ))}
           </div>
         </div>
-        
-        <div className="border-t border-gray-500 mt-20"></div>
+
+        <div className="border-t border-gray-500 mt-10 md:mt-20"></div>
       </div>
     </section>
   )

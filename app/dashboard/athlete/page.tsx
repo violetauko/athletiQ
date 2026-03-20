@@ -36,7 +36,7 @@ const STATS_CARDS = [
 
 // Skeleton components for loading states
 const StatsSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {[...Array(4)].map((_, i) => (
             <Card key={i}>
                 <CardContent className="p-6">
@@ -105,12 +105,12 @@ export default function AthleteDashboard() {
     return (
         <div className="container min-h-screen">
             {(isLoading) ? (
-                <div className="lg:col-span-3 space-y-8">
+                <div className="lg:col-span-3 space-y-4 md:space-y-8">
                     <StatsSkeleton />
                     <ApplicationsSkeleton />
                 </div>
-                ):
-                <MainContent 
+            ) :
+                <MainContent
                     stats={stats}
                     recentApplications={recentApplications}
                     recommendedOpportunities={recommendedOpportunities}
@@ -128,13 +128,13 @@ interface MainContentProps {
     getStatusConfig: (status: string) => { color: string; icon: any }
 }
 
-const MainContent = ({ 
-    stats, 
-    recentApplications, 
-    recommendedOpportunities, 
-    getStatusConfig 
+const MainContent = ({
+    stats,
+    recentApplications,
+    recommendedOpportunities,
+    getStatusConfig
 }: MainContentProps) => (
-    <div className="lg:col-span-3 space-y-8">
+    <div className="lg:col-span-3 space-y-4 md:space-y-8">
         <StatsGrid stats={stats} />
         <ProfileCompletionAlert completion={stats.profileCompletion} />
         <RecentApplications applications={recentApplications} getStatusConfig={getStatusConfig} />
@@ -143,14 +143,14 @@ const MainContent = ({
 )
 
 const StatsGrid = ({ stats }: { stats: AthleteDashboardData['stats'] }) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {STATS_CARDS.map(({ key, icon: Icon, color, label, suffix = '' }) => (
             <Card key={key}>
-                <CardContent className="p-6">
+                <CardContent className="p-2 md:p-6 flex gap-2 md:gap-4">
                     <div className="flex items-center justify-between mb-2">
-                        <Icon className={`w-8 h-8 ${color}`} />
+                        <Icon className={`w-4 h-4 md:w-8 md:h-8 ${color}`} />
                     </div>
-                    <div className="text-3xl font-bold mb-1">
+                    <div className="text-base md:text-3xl font-bold mb-1">
                         {stats[key as keyof typeof stats]}{suffix}
                     </div>
                     <div className="text-sm text-muted-foreground">{label}</div>
@@ -162,21 +162,21 @@ const StatsGrid = ({ stats }: { stats: AthleteDashboardData['stats'] }) => (
 
 const ProfileCompletionAlert = ({ completion }: { completion: number }) => {
     if (completion >= 100) return null
-    
+
     return (
         <Card className="border-amber-200 bg-linear-to-r from-amber-50 to-transparent">
-            <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                    <div className="shrink-0 w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-amber-600" />
+            <CardContent className="p-4 md:p-6">
+                <div className="flex items-start gap-2 md:gap-4">
+                    <div className="shrink-0 w-8 h-8 md:w-12 md:h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                        <TrendingUp className="w-4 h-4 md:w-6 md:h-6 text-amber-600" />
                     </div>
                     <div className="flex-1">
-                        <h3 className="font-bold text-lg mb-1">Complete Your Profile</h3>
-                        <p className="text-muted-foreground mb-4">
+                        <h3 className="font-bold text-base md:text-lg mb-1">Complete Your Profile</h3>
+                        <p className="text-muted-foreground text-sm md:text-base mb-4">
                             Your profile is {completion}% complete. Complete your profile to increase visibility to recruiters.
                         </p>
-                        <Button size="sm" className="bg-amber-600 hover:bg-amber-700" asChild>
-                            <Link href="/dashboard/athlete/profile">Complete Profile</Link>
+                        <Button className="bg-amber-600 hover:bg-amber-700" asChild>
+                            <Link href="/dashboard/athlete/profile" className="text-sm md:text-base">Complete Profile</Link>
                         </Button>
                     </div>
                 </div>
@@ -185,10 +185,10 @@ const ProfileCompletionAlert = ({ completion }: { completion: number }) => {
     )
 }
 
-const RecentApplications = ({ 
-    applications, 
-    getStatusConfig 
-}: { 
+const RecentApplications = ({
+    applications,
+    getStatusConfig
+}: {
     applications: AthleteDashboardData['recentApplications']
     getStatusConfig: (status: string) => { color: string; icon: any }
 }) => (

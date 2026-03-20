@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
-import { Heart, LogOut, User } from 'lucide-react'
+import { Heart, LogOut, Menu, User } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,18 +17,54 @@ import Image from 'next/image'
 export function Header() {
   const { data: session, status } = useSession()
   const isLoading = status === 'loading'
- 
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-band-20 backdrop-blur supports-backdrop-filter:bg-band-10">
       <div className="container mx-auto px-2 sm:px-0 lg:px-0 flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
+          {/* Mobile Navigation */}
+          {!session?.user && (<div className="md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 mt-2">
+                <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/about" className="w-full">About Us</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/opportunities" className="w-full">Opportunities</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/athletes" className="w-full">Athletes</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/contact" className="w-full">Contact Us</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/donate" className="flex items-center gap-2 w-full">
+                    Donate
+                    <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>)}
+
           <Link href="/" className="flex items-center space-x-2">
-            
             <Image src="/logo1.png" alt="Athletiq Logo" width={120} height={30} className="hidden sm:block" />
+            {/* Added a mobile-only text logo since the image is hidden on sm */}
+            <Image src="/logo1.png" alt="Athletiq Logo1" width={60} height={20} className="sm:hidden" />
           </Link>
         </div>
 
-        {!session?.user &&
+        {!session?.user && (
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
             <Link
               href="/about"
@@ -62,7 +98,7 @@ export function Header() {
               <Heart className="w-4 h-4 text-red-500 fill-red-500" />
             </Link>
           </nav>
-        }
+        )}
 
         <div className="flex items-center gap-2">
           {isLoading ? (
