@@ -131,16 +131,16 @@ export default function HomePage() {
       <HeroSection />
 
       {/* Benefits Section - Static */}
-      <section className="py-12 md:py-16">
+      <section className="py-10 md:py-16">
         <div className="container">
-          <div className="border-t border-gray-500 mb-20"></div>
-          
+          <div className="border-t border-gray-500 mb-10 md:mb-20"></div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-start">
             <div className="space-y-3 md:space-y-6">
               <h2 className="text-2xl md:text-4xl font-bold">
                 Recruitment Benefits With Us
               </h2>
-              <p className="text-muted-foreground text-base md:text-lg">
+              <p className="text-muted-foreground text-sm md:text-lg">
                 Join the leading platform connecting athletes with opportunities worldwide.
                 We&apos;ve been the trusted partner for sports recruitment since our founding.
               </p>
@@ -151,13 +151,13 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-2 md:space-y-4">
               {benefits.map((benefit, index) => {
                 const Icon = benefit.icon
                 return (
-                  <div 
-                    key={index} 
-                    className="flex gap-4 p-6 bg-white rounded-xl shadow-sm border border-stone-200 hover:shadow-md transition-shadow"
+                  <div
+                    key={index}
+                    className="flex gap-3 md:gap-4 p-4 md:p-6 bg-white rounded-xl shadow-sm border border-stone-200 hover:shadow-md transition-shadow"
                   >
                     <div className={`shrink-0 w-12 h-12 bg-linear-to-br ${benefit.color} rounded-xl flex items-center justify-center`}>
                       <Icon className="w-6 h-6 text-stone-700" />
@@ -172,7 +172,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-500 mt-20"></div>
+          <div className="border-t border-gray-500 mt-10 md:mt-20"></div>
         </div>
       </section>
 
@@ -182,14 +182,14 @@ export default function HomePage() {
       </Suspense>
 
       {/* Team Section - Static */}
-      <section className="py-12">
-        <div className="container space-y-8">
+      <section className="py-6 md:py-12">
+        <div className="container space-y-4 md:space-y-8">
           <div className="text-start space-y-1 md:space-y-2">
             <p className="text-sm font-semibold text-muted-foreground tracking-wider uppercase mb-2 md:mb-4">
               The Team
             </p>
             <h2 className="text-2xl md:text-4xl font-bold">Our Dedicated Team</h2>
-            <p className="text-muted-foreground max-w-2xl">
+            <p className="text-muted-foreground max-w-2xl text-sm md:text-lg">
               Meet the passionate individuals behind AthletiQ, working tirelessly to connect athletes with opportunities.
             </p>
           </div>
@@ -197,9 +197,9 @@ export default function HomePage() {
           <Suspense fallback={<TeamSkeleton />}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {ourTeam.map((team, index) => (
-                <div 
-                  key={index} 
-                  className="animate-slide-up" 
+                <div
+                  key={index}
+                  className="animate-slide-up"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <MemberCard {...team} />
@@ -211,7 +211,7 @@ export default function HomePage() {
       </section>
 
       {/* Categories/Sectors Section - Static */}
-      <section className="py-16 bg-stone-50">
+      <section className="py-6 md:py-16 bg-stone-50">
         <div className="container space-y-4 md:space-y-8">
           <div className="space-y-2 flex flex-col md:flex-row justify-between items-start md:items-end">
             <div>
@@ -220,7 +220,7 @@ export default function HomePage() {
               </p>
               <h2 className="text-2xl md:text-4xl font-bold">Explore by Category</h2>
             </div>
-            <p className="text-muted-foreground text-base md:text-lg max-w-2xl">
+            <p className="text-muted-foreground text-sm md:text-lg max-w-2xl">
               Discover opportunities across various sports sectors and find the perfect match for your skills and ambitions.
             </p>
           </div>
@@ -228,9 +228,9 @@ export default function HomePage() {
           <Suspense fallback={<CategoriesSkeleton />}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 md:mt-12">
               {categories.map((category, index) => (
-                <div 
-                  key={index} 
-                  className="animate-slide-up h-full" 
+                <div
+                  key={index}
+                  className="animate-slide-up h-full"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <CategoryCard {...category} />
@@ -242,8 +242,8 @@ export default function HomePage() {
       </section>
 
       {/* Featured Athletes - Dynamic */}
-      <section className="py-16">
-        <div className="container space-y-8">
+      <section className="py-6 md:py-16">
+        <div className="container space-y-4 md:space-y-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
               <p className="text-sm font-semibold text-amber-600 tracking-wider uppercase mb-2">
@@ -265,8 +265,8 @@ export default function HomePage() {
       </section>
 
       {/* Latest Opportunities - Dynamic */}
-      <section className="py-16 bg-stone-50">
-        <div className="container space-y-8">
+      <section className="py-6 md:py-16 bg-stone-50">
+        <div className="container space-y-4 md:space-y-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
               <p className="text-sm font-semibold text-amber-600 tracking-wider uppercase mb-2">
@@ -291,7 +291,7 @@ export default function HomePage() {
       <TestimonialsSection />
 
       {/* Contact CTA Section - Static */}
-      <section className="min-h-80 pt-12 pb-20">
+      <section className="min-h-80 pt-6 md:pt-12 pb-10 md:pb-20">
         <TitleCard
           image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1920&q=80"
           title="Contact Us"

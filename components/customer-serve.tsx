@@ -58,13 +58,13 @@ const CustomersWeServe: React.FC = () => {
   return (
     <section className="w-full py-2 md:py-4 lg:py-6 overflow-hidden">
       <div className="mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-8">
           {/* LEFT SIDE - STATIC CONTENT */}
           <div className="text-start">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">
               Customers we serve
             </h2>
-            <p className="text-lg text-gray-600 mb-6">
+            <p className="text-sm md:text-lg text-gray-600 mb-3 md:mb-6">
               Trusted by rugby clubs and organizations worldwide.
             </p>
             {/* Brand name from your image */}
@@ -81,7 +81,7 @@ const CustomersWeServe: React.FC = () => {
               {marqueeLogos.map((logo, index) => (
                 <div
                   key={`${logo.alt}-${index}`}
-                  className="inline-flex mx-4 shrink-0 items-center justify-center"
+                  className="inline-flex mx-2 md:mx-4 shrink-0 items-center justify-center"
                 >
                   <Image
                     src={logo.src}
