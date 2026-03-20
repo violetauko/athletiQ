@@ -10,9 +10,9 @@ export const StatsBurner = async () => {
     }
 
     return (
-        <section className="py-8 bg-linear-to-br from-amber-50 to-stone-100">
+        <section className="py-6 md:py-8 bg-linear-to-br from-amber-50 to-stone-100">
             <div className="container mx-auto">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
                     {[
                         { label: 'Total Athletes', value: statsData?.totalAthletes || '10,000+' },
                         { label: 'Sports', value: statsData?.totalSports || '25+' },
@@ -20,10 +20,10 @@ export const StatsBurner = async () => {
                         { label: 'Success Rate', value: statsData?.successRate || '92%' },
                     ].map((stat, index) => (
                         <div key={index} className="text-center">
-                            <div className="text-4xl font-bold text-amber-700 mb-2">
+                            <div className="text-2xl md:text-4xl font-bold text-amber-700 mb-2">
                                 {stat.value}
                             </div>
-                            <div className="text-sm text-muted-foreground font-medium">
+                            <div className="text-sm md:text-base text-muted-foreground font-medium">
                                 {stat.label}
                             </div>
                         </div>

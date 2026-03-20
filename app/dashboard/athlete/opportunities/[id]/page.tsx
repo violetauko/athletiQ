@@ -57,19 +57,19 @@ export default function AthleteOpportunityDetailsPage() {
     if (!opportunity) return <div className="text-center py-12">Opportunity not found.</div>
 
     return (
-        <div className="min-h-screen  pb-8">
-            <div className="container mx-auto space-y-8">
+        <div className="min-h-screen  pb-4 md:pb-8">
+            <div className="container mx-auto space-y-4 md:space-y-8">
 
                 {/* Navigation */}
-                <div className="flex items-center gap-4">
-                    <Button 
-                        variant="ghost" 
+                <div className="flex items-center gap-2 md:gap-4">
+                    <Button
+                        variant="ghost"
                         onClick={() => router.back()}
                         className="hover:bg-transparent"
                     >
                         ← Back
                     </Button>
-                    <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <nav className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-muted-foreground">
                         <Link href="/dashboard/athlete" className="hover:text-foreground">
                             Dashboard
                         </Link>
@@ -86,16 +86,16 @@ export default function AthleteOpportunityDetailsPage() {
 
                 {/* Header Section */}
                 <Card>
-                    <CardContent className="p-8">
-                        <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+                    <CardContent className="p-4 md:p-8">
+                        <div className="flex flex-col md:flex-row justify-between items-start gap-2 md:gap-4 mb-4 md:mb-6">
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
                                     <Badge variant="outline">{opportunity.sport}</Badge>
                                     <Badge>{opportunity.type}</Badge>
                                     <Badge variant="secondary">{opportunity.category}</Badge>
                                 </div>
-                                <h1 className="text-3xl font-bold mb-2">{opportunity.title}</h1>
-                                <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
+                                <h1 className="text-xl md:text-3xl font-bold mb-2">{opportunity.title}</h1>
+                                <div className="flex flex-wrap items-center gap-2 md:gap-4 text-muted-foreground">
                                     <div className="flex items-center gap-1"><Building className="w-4 h-4" /> {opportunity.client?.organization}</div>
                                     <div className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {opportunity.location}</div>
                                     <div className="flex items-center gap-1"><Calendar className="w-4 h-4" /> Posted: {new Date(opportunity.postedDate).toLocaleDateString()}</div>
@@ -106,7 +106,7 @@ export default function AthleteOpportunityDetailsPage() {
                                     {isSaved ? <BookmarkCheck className="w-4 h-4 mr-2" /> : <Bookmark className="w-4 h-4 mr-2" />}
                                     {isSaved ? 'Saved' : 'Save'}
                                 </Button>
-                                <Button size="lg" asChild>
+                                <Button asChild>
                                     <Link href={`/dashboard/athlete/opportunities/${id}/apply`}>
                                         Apply Now <ArrowRight className="w-4 h-4 ml-2" />
                                     </Link>
@@ -114,7 +114,7 @@ export default function AthleteOpportunityDetailsPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 border-y">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 py-2 md:py-6 border-y">
                             <div>
                                 <p className="text-sm text-muted-foreground mb-1">Salary Range</p>
                                 <p className="font-semibold">{opportunity.salaryMin ? `$${opportunity.salaryMin.toLocaleString()}` : 'Negotiable'} {opportunity.salaryMax && `- $${opportunity.salaryMax.toLocaleString()}`}</p>
@@ -127,12 +127,12 @@ export default function AthleteOpportunityDetailsPage() {
                     </CardContent>
                 </Card>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="md:col-span-2 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+                    <div className="md:col-span-2 space-y-4 md:space-y-6">
                         <Card>
                             <CardHeader><CardTitle>Description</CardTitle></CardHeader>
                             <CardContent className="prose max-w-none">
-                                <p className="whitespace-pre-wrap">{opportunity.description}</p>
+                                <p className="whitespace-pre-wrap text-sm md:text-base">{opportunity.description}</p>
                             </CardContent>
                         </Card>
 
@@ -153,7 +153,7 @@ export default function AthleteOpportunityDetailsPage() {
                         <Card>
                             <CardHeader><CardTitle>Benefits</CardTitle></CardHeader>
                             <CardContent>
-                                <ul className="space-y-2">
+                                <ul className="space-y-2 text-sm md:text-base">
                                     {opportunity.benefits?.map((benefit: string, i: number) => (
                                         <li key={i} className="flex items-start gap-2">
                                             <CheckCircle className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
@@ -170,11 +170,11 @@ export default function AthleteOpportunityDetailsPage() {
                                 <CardTitle>Application Process</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="space-y-4">
-                                    <p className="text-muted-foreground">
+                                <div className="space-y-2 md:space-y-4">
+                                    <p className="text-muted-foreground text-sm md:text-base">
                                         This opportunity requires a comprehensive application including:
                                     </p>
-                                    <ul className="space-y-2">
+                                    <ul className="space-y-2 text-sm md:text-base">
                                         <li className="flex items-start gap-2">
                                             <CheckCircle className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
                                             <span>Personal information and contact details</span>
@@ -201,22 +201,22 @@ export default function AthleteOpportunityDetailsPage() {
                         </Card>
                     </div>
 
-                    <div className="md:col-span-1 space-y-6">
+                    <div className="md:col-span-1 space-y-4 md:space-y-6">
                         <Card className="sticky top-6">
                             <CardHeader>
                                 <CardTitle>Ready to Apply?</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-6">
+                            <CardContent className="space-y-4 md:space-y-6">
                                 <div className="bg-primary/5 p-4 rounded-lg">
                                     <p className="text-sm font-medium mb-2">Complete Application Required</p>
                                     <p className="text-sm text-muted-foreground">
                                         This position requires a detailed application. Please use our dedicated application form to ensure all required information is submitted.
                                     </p>
                                 </div>
-                                
-                                <Button 
-                                    className="w-full" 
-                                    size="lg" 
+
+                                <Button
+                                    className="w-full"
+                                    size="lg"
                                     asChild
                                 >
                                     <Link href={`/dashboard/athlete/opportunities/${id}/apply`}>
@@ -253,12 +253,12 @@ export default function AthleteOpportunityDetailsPage() {
                         <CardTitle>Similar Opportunities</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <p className="text-muted-foreground col-span-full text-center py-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
+                            <p className="text-muted-foreground col-span-full text-center py-4 md:py-8">
                                 Similar opportunities will appear here based on your preferences.
                             </p>
                         </div>
-                        <div className="flex justify-center mt-4">
+                        <div className="flex justify-center mt-2 md:mt-4">
                             <Button variant="outline" asChild>
                                 <Link href="/dashboard/athlete/opportunities">
                                     Browse All Opportunities

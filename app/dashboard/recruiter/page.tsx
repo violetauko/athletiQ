@@ -1,117 +1,6 @@
-// 'use client'
-
-// import { Card, CardContent } from '@/components/ui/card'
-// import {
-//     Users,
-//     Briefcase,
-//     MessageSquare,
-//     Loader2,
-//     // Settings,
-//     // CheckCircle2
-// } from 'lucide-react'
-// import { useQuery } from '@tanstack/react-query'
-
-
-// export default function ClientDashboard() {
-//     // Data Fetching
-//     const { data: opportunities = [], isLoading: oppsLoading } = useQuery({
-//         queryKey: ['client-opportunities'],
-//         queryFn: async () => {
-//             const res = await fetch('/api/client/opportunities')
-//             if (!res.ok) throw new Error('Failed to fetch opportunities')
-//             return res.json()
-//         },
-//         staleTime: 1000 * 60 * 10
-//     })
-
-//     const { data: applications = [], isLoading: appsLoading } = useQuery({
-//         queryKey: ['client-applications'],
-//         queryFn: async () => {
-//             const res = await fetch('/api/client/applications')
-//             if (!res.ok) throw new Error('Failed to fetch applications')
-//             return res.json()
-//         },
-//         staleTime: 1000 * 60 * 10
-//     })
-
-//     const { data: messages = [], isLoading: msgsLoading } = useQuery({
-//         queryKey: ['client-messages'],
-//         queryFn: async () => {
-//             const res = await fetch('/api/client/messages')
-//             if (!res.ok) throw new Error('Failed to fetch messages')
-//             return res.json()
-//         }
-//     })
-
-
-
-//     const isLoading = oppsLoading || appsLoading || msgsLoading
-
-//     const stats = {
-//         activeListings: opportunities.filter((o: any) => o.status === 'ACTIVE').length,
-//         pendingListings: opportunities.filter((o: any) => o.status === 'DRAFT' || o.status === 'PENDING_APPROVAL').length,
-//         totalApplicants: applications.length,
-//         newMessages: messages.filter((m: any) => !m.isRead).length,
-//     }
-
-
-//     return (
-//         <div className="min-h-screen">
-//             {/* Main Content Area */}
-//             <div className="lg:col-span-3 space-y-8">
-//                 {isLoading ? (
-//                     <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-stone-400" /></div>
-//                 ) : (
-//                     <>
-//                         {/* {activeTab === 'overview' && ( */}
-//                         <div className="space-y-6">
-//                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-//                                 <Card>
-//                                     <CardContent className="p-6">
-//                                         <Briefcase className="w-8 h-8 text-blue-600 mb-2" />
-//                                         <div className="text-3xl font-bold mb-1">{stats.activeListings}</div>
-//                                         <div className="text-sm text-muted-foreground">Active Listings</div>
-//                                     </CardContent>
-//                                 </Card>
-//                                 <Card>
-//                                     <CardContent className="p-6">
-//                                         <Loader2 className="w-8 h-8 text-amber-600 mb-2" />
-//                                         <div className="text-3xl font-bold mb-1">{stats.pendingListings}</div>
-//                                         <div className="text-sm text-muted-foreground">Pending Approval</div>
-//                                     </CardContent>
-//                                 </Card>
-//                                 <Card>
-//                                     <CardContent className="p-6">
-//                                         <Users className="w-8 h-8 text-green-600 mb-2" />
-//                                         <div className="text-3xl font-bold mb-1">{stats.totalApplicants}</div>
-//                                         <div className="text-sm text-muted-foreground">Total Applicants</div>
-//                                     </CardContent>
-//                                 </Card>
-//                                 <Card>
-//                                     <CardContent className="p-6">
-//                                         <MessageSquare className="w-8 h-8 text-purple-600 mb-2" />
-//                                         <div className="text-3xl font-bold mb-1">{stats.newMessages}</div>
-//                                         <div className="text-sm text-muted-foreground">Unread Messages</div>
-//                                     </CardContent>
-//                                 </Card>
-//                             </div>
-//                         </div>
-
-//                     </>
-//                 )}
-//             </div>
-
-//             {/* <ApplicationModal
-//                 isOpen={!!selectedApp}
-//                 onClose={() => setSelectedApp(null)}
-//                 application={selectedApp}
-//             /> */}
-
-//         </div>
-//     )
-// }
 // app/client/dashboard/page.tsx (Server Component)
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
     Users,
     Briefcase,
@@ -132,7 +21,7 @@ import { getClientDashboardData } from '@/lib/dashboard'
 
 export default async function ClientDashboardPage() {
     const session = await auth()
-    
+
     if (!session?.user?.id) {
         notFound()
     }
@@ -165,75 +54,100 @@ export default async function ClientDashboardPage() {
                 </div>
 
                 {/* Key Metrics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <Card className="hover:shadow-lg transition-shadow">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                    <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 border-none bg-white">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-blue-600"></div>
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <Briefcase className="w-10 h-10 text-blue-600 bg-blue-100 p-2 rounded-lg" />
-                                <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                                <div className="p-2 bg-blue-50 rounded-xl group-hover:bg-blue-100 transition-colors">
+                                    <Briefcase className="w-6 h-6 text-blue-600" />
+                                </div>
+                                <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-none">
                                     Active
-                                </span>
+                                </Badge>
                             </div>
-                            <div className="text-3xl font-bold mb-1">{stats.activeListings}</div>
-                            <div className="text-sm text-muted-foreground">Active Listings</div>
-                            <div className="mt-3 text-xs text-green-600">
-                                +{stats.totalOpportunities - stats.activeListings} pending/draft
+                            <div className="space-y-1 flex items-center justify-between space-x-4 md:flex-col md:items-start">
+                                <h3 className="text-3xl font-bold tracking-tight">{stats.activeListings}</h3>
+                                <p className="text-sm font-medium text-stone-500 uppercase tracking-wider">Active Listings</p>
                             </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardContent className="p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <Users className="w-10 h-10 text-green-600 bg-green-100 p-2 rounded-lg" />
-                                <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                                    Total
-                                </span>
-                            </div>
-                            <div className="text-3xl font-bold mb-1">{stats.totalApplicants}</div>
-                            <div className="text-sm text-muted-foreground">Total Applicants</div>
-                            <div className="mt-3 flex gap-2 text-xs">
-                                <span className="text-amber-600">{stats.newApplications} new</span>
-                                <span className="text-blue-600">{stats.shortlistedApplications} shortlisted</span>
+                            <div className="mt-4 pt-4 border-t border-stone-100 flex items-center justify-between text-xs">
+                                <span className="text-stone-400">Total: {stats.totalOpportunities}</span>
+                                <span className="text-blue-600 font-medium">{stats.draftListings} drafts</span>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="hover:shadow-lg transition-shadow">
+                    <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 border-none bg-white">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-green-600"></div>
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <MessageSquare className="w-10 h-10 text-purple-600 bg-purple-100 p-2 rounded-lg" />
-                                <span className="text-xs font-medium text-purple-600 bg-purple-100 px-2 py-1 rounded-full">
-                                    Unread: {stats.unreadMessages}
-                                </span>
+                                <div className="p-2 bg-green-50 rounded-xl group-hover:bg-green-100 transition-colors">
+                                    <Users className="w-6 h-6 text-green-600" />
+                                </div>
+                                <Badge variant="secondary" className="bg-green-50 text-green-700 hover:bg-green-100 border-none">
+                                    {stats.newApplications} New
+                                </Badge>
                             </div>
-                            <div className="text-3xl font-bold mb-1">{stats.totalMessages}</div>
-                            <div className="text-sm text-muted-foreground">Total Messages</div>
-                            <div className="mt-3 text-xs text-muted-foreground">
-                                Avg response: {stats.averageResponseTime}
+                            <div className="space-y-1 flex items-center justify-between space-x-4 md:flex-col md:items-start">
+                                <h3 className="text-3xl font-bold tracking-tight">{stats.totalApplicants}</h3>
+                                <p className="text-sm font-medium text-stone-500 uppercase tracking-wider">Total Applicants</p>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-stone-100 flex items-center justify-between text-xs">
+                                <span className="text-stone-400">Reviewed: {stats.reviewedApplications}</span>
+                                <span className="text-green-600 font-medium">{stats.shortlistedApplications} shortlisted</span>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="hover:shadow-lg transition-shadow">
+                    <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 border-none bg-white">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-purple-600"></div>
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <TrendingUp className="w-10 h-10 text-amber-600 bg-amber-100 p-2 rounded-lg" />
-                                <span className="text-xs font-medium text-amber-600 bg-amber-100 px-2 py-1 rounded-full">
-                                    Success: {stats.successRate}%
-                                </span>
+                                <div className="p-2 bg-purple-50 rounded-xl group-hover:bg-purple-100 transition-colors">
+                                    <MessageSquare className="w-6 h-6 text-purple-600" />
+                                </div>
+                                {stats.unreadMessages > 0 && (
+                                    <Badge className="bg-purple-600 text-white border-none animate-pulse">
+                                        {stats.unreadMessages} Unread
+                                    </Badge>
+                                )}
                             </div>
-                            <div className="text-3xl font-bold mb-1">{stats.applicationRate}/opp</div>
-                            <div className="text-sm text-muted-foreground">Avg Applications</div>
-                            <div className="mt-3 flex gap-2 text-xs">
-                                <span className="text-green-600">{stats.interviewRate}% interview</span>
+                            <div className="space-y-1 flex items-center justify-between space-x-4 md:flex-col md:items-start">
+                                <h3 className="text-3xl font-bold tracking-tight">{stats.totalMessages}</h3>
+                                <p className="text-sm font-medium text-stone-500 uppercase tracking-wider">Total Messages</p>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-stone-100 flex items-center justify-between text-xs">
+                                <span className="text-stone-400">Response Rate: 98%</span>
+                                <span className="text-purple-600 font-medium">{stats.averageResponseTime} avg</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 border-none bg-white">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-amber-600"></div>
+                        <CardContent className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="p-2 bg-amber-50 rounded-xl group-hover:bg-amber-100 transition-colors">
+                                    <TrendingUp className="w-6 h-6 text-amber-600" />
+                                </div>
+                                <Badge variant="secondary" className="bg-amber-50 text-amber-700 hover:bg-amber-100 border-none">
+                                    {stats.successRate}% rate
+                                </Badge>
+                            </div>
+                            <div className="space-y-1 flex items-center justify-between space-x-4 md:flex-col md:items-start">
+                                <h3 className="text-3xl font-bold tracking-tight">{stats.applicationRate}/opp</h3>
+                                <p className="text-sm font-medium text-stone-500 uppercase tracking-wider">Avg Applications</p>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-stone-100 flex items-center justify-between text-xs">
+                                <span className="text-stone-400">Interview: {stats.interviewRate}%</span>
+                                <span className="text-amber-600 font-medium">Trending Up</span>
                             </div>
                         </CardContent>
                     </Card>
                 </div>
 
                 {/* Charts Section */}
-                <DashboardCharts 
+                <DashboardCharts
                     applicationTrends={applicationTrends}
                     categoryDistribution={categoryDistribution}
                     stats={stats}
@@ -263,8 +177,8 @@ export default async function ClientDashboardPage() {
                                     </div>
                                 </div>
                                 <div className="w-full bg-stone-200 rounded-full h-2">
-                                    <div 
-                                        className="bg-amber-500 h-2 rounded-full" 
+                                    <div
+                                        className="bg-amber-500 h-2 rounded-full"
                                         style={{ width: `${(stats.newApplications / stats.totalApplicants) * 100}%` }}
                                     ></div>
                                 </div>
@@ -282,8 +196,8 @@ export default async function ClientDashboardPage() {
                                     </div>
                                 </div>
                                 <div className="w-full bg-stone-200 rounded-full h-2">
-                                    <div 
-                                        className="bg-blue-500 h-2 rounded-full" 
+                                    <div
+                                        className="bg-blue-500 h-2 rounded-full"
                                         style={{ width: `${(stats.reviewedApplications / stats.totalApplicants) * 100}%` }}
                                     ></div>
                                 </div>
@@ -301,8 +215,8 @@ export default async function ClientDashboardPage() {
                                     </div>
                                 </div>
                                 <div className="w-full bg-stone-200 rounded-full h-2">
-                                    <div 
-                                        className="bg-green-500 h-2 rounded-full" 
+                                    <div
+                                        className="bg-green-500 h-2 rounded-full"
                                         style={{ width: `${(stats.shortlistedApplications / stats.totalApplicants) * 100}%` }}
                                     ></div>
                                 </div>
@@ -320,8 +234,8 @@ export default async function ClientDashboardPage() {
                                     </div>
                                 </div>
                                 <div className="w-full bg-stone-200 rounded-full h-2">
-                                    <div 
-                                        className="bg-red-500 h-2 rounded-full" 
+                                    <div
+                                        className="bg-red-500 h-2 rounded-full"
                                         style={{ width: `${(stats.rejectedApplications / stats.totalApplicants) * 100}%` }}
                                     ></div>
                                 </div>
@@ -344,8 +258,8 @@ export default async function ClientDashboardPage() {
                                         <div key={app.id} className="flex items-start gap-3 p-3 bg-stone-50 rounded-lg">
                                             <div className="w-10 h-10 rounded-full bg-stone-200 overflow-hidden flex-shrink-0">
                                                 {app.athlete?.profileImage ? (
-                                                    <img 
-                                                        src={app.athlete.profileImage} 
+                                                    <img
+                                                        src={app.athlete.profileImage}
                                                         alt={`${app.athlete.firstName} ${app.athlete.lastName}`}
                                                         className="w-full h-full object-cover"
                                                     />
@@ -363,16 +277,15 @@ export default async function ClientDashboardPage() {
                                                     Applied to {app.opportunity?.title}
                                                 </p>
                                                 <div className="flex items-center gap-2 mt-1">
-                                                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                                        app.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
+                                                    <span className={`text-xs px-2 py-0.5 rounded-full ${app.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
                                                         app.status === 'REVIEWED' ? 'bg-blue-100 text-blue-700' :
-                                                        app.status === 'SHORTLISTED' ? 'bg-green-100 text-green-700' :
-                                                        'bg-red-100 text-red-700'
-                                                    }`}>
+                                                            app.status === 'SHORTLISTED' ? 'bg-green-100 text-green-700' :
+                                                                'bg-red-100 text-red-700'
+                                                        }`}>
                                                         {app.status}
                                                     </span>
                                                     <span className="text-xs text-muted-foreground">
-                                                        {new Date(app.createdAt).toLocaleDateString()}
+                                                        {app.updatedAt ? new Date(app.updatedAt).toLocaleDateString() : 'N/A'}
                                                     </span>
                                                 </div>
                                             </div>

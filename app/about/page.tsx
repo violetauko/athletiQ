@@ -9,22 +9,22 @@ import Link from 'next/link'
 export default function AboutPage() {
   const values = [
     {
-      icon: <Trophy className="w-8 h-8" />,
+      icon: <Trophy className="w-6 h-6 md:w-8 md:h-8" />,
       title: 'Excellence',
       description: 'We strive for excellence in everything we do, from athlete recruitment to organizational partnerships.',
     },
     {
-      icon: <Users className="w-8 h-8" />,
+      icon: <Users className="w-6 h-6 md:w-8 md:h-8" />,
       title: 'Community',
       description: 'Building a strong community of athletes, coaches, and sports organizations worldwide.',
     },
     {
-      icon: <Target className="w-8 h-8" />,
+      icon: <Target className="w-6 h-6 md:w-8 md:h-8" />,
       title: 'Opportunity',
       description: 'Creating opportunities for athletes to reach their full potential and achieve their dreams.',
     },
     {
-      icon: <Heart className="w-8 h-8" />,
+      icon: <Heart className="w-6 h-6 md:w-8 md:h-8" />,
       title: 'Passion',
       description: 'Driven by passion for sports and dedication to helping athletes succeed.',
     },
@@ -33,7 +33,7 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero Section */}
-      <div className="my-12">
+      <div className="my-6 md:my-12">
         <TitleCard
           image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
           title="About AthletiQ"
@@ -45,10 +45,10 @@ export default function AboutPage() {
       </div>
 
       {/* Story Section */}
-      <section className="py-20">
+      <section className="py-10 md:py-20">
         <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative h-60 lg:h-90 rounded-2xl overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 items-center">
+            <div className="relative h-60 lg:h-90 rounded-2xl overflow-hidden hidden md:block">
               <Image
                 src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
                 alt="Athletes training"
@@ -57,9 +57,9 @@ export default function AboutPage() {
               />
             </div>
 
-            <div className="space-y-6">
-              <h2 className="text-4xl font-bold">Our Story</h2>
-              <div className="space-y-4 text-muted-foreground">
+            <div className="space-y-3 md:space-y-6 text-center md:text-start">
+              <h2 className="text-2xl md:text-4xl font-bold">Our Story</h2>
+              <div className="space-y-2 md:space-y-4 text-muted-foreground text-sm md:text-base ">
                 <p>
                   Founded in 2025, AthletiQ was born from a simple observation: talented athletes
                   worldwide were struggling to find the right opportunities, while sports organizations
@@ -85,22 +85,22 @@ export default function AboutPage() {
       <StatsBurner />
 
       {/* Values Section */}
-      <section className="py-20">
+      <section className="py-10 md:py-20">
         <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Our Values</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <div className="text-center mb-6 md:mb-12">
+            <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">Our Values</h2>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               The principles that guide everything we do
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {values.map((value, index) => (
-              <Card key={index} className="p-8 text-center space-y-4 hover:shadow-lg transition-shadow">
+              <Card key={index} className="p-4 md:p-8 text-center space-y-4 hover:shadow-lg transition-shadow">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-amber-200 to-amber-100 rounded-2xl">
                   {value.icon}
                 </div>
-                <h3 className="text-xl font-bold">{value.title}</h3>
+                <h3 className="text-lg md:text-xl font-bold">{value.title}</h3>
                 <p className="text-muted-foreground text-sm">
                   {value.description}
                 </p>
@@ -112,15 +112,15 @@ export default function AboutPage() {
 
       {/* Mission Section */}
       <section className="py-4">
-        <div className="border-t border-gray-500 mb-20"></div>
+        <div className="border-t border-gray-500 mb-12 md:mb-20"></div>
         <div className="w-full">
           <div className="grid grid-cols-3 mx-auto">
-            <div className="text-start mb-12">
-              <h2 className="text-4xl font-bold mb-4">Our Mission</h2>
+            <div className="text-start mb-6 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">Our Mission</h2>
             </div>
 
             {/* <Card className="p-12 w-full col-span-2"> */}
-            <p className="text-xl text-start col-span-2">
+            <p className="text-base md:text-xl text-start col-span-2">
               To democratize access to sports opportunities by creating a transparent, efficient,
               and inclusive platform that empowers athletes to achieve their dreams and helps
               organizations discover exceptional talent from around the world.
@@ -132,11 +132,11 @@ export default function AboutPage() {
       </section>
 
       {/* Team Section */}
-      <section className="py-12">
+      <section className="py-4 md:py-12">
         <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Meet Our Team</h2>
-            <p className="text-xl text-muted-foreground">
+          <div className="text-center mb-6 md:mb-12">
+            <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">Meet Our Team</h2>
+            <p className="text-base md:text-xl text-muted-foreground">
               Passionate professionals dedicated to your success
             </p>
           </div>
@@ -160,7 +160,7 @@ export default function AboutPage() {
               }
             ].map((member, index) => (
               <div key={index} className="text-center">
-                <div className="relative w-48 h-48 mx-auto mb-4 rounded-full overflow-hidden border-4 border-amber-200">
+                <div className="relative w-48 h-48 mx-auto mb-2 md:mb-4 rounded-full overflow-hidden border-4 border-amber-200">
                   <Image
                     src={member.image}
                     alt={member.name}
@@ -177,12 +177,12 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-linear-to-br from-stone-900 to-black text-white rounded-2xl mb-20">
+      <section className="py-4 md:py-20 bg-linear-to-br from-stone-900 to-black text-white rounded-2xl mb-4 md:mb-20">
         <div className="container text-center">
-          <h2 className="text-4xl font-bold mb-6">
+          <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-6">
             Ready to Join AthletiQ?
           </h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-base md:text-xl text-white/80 mb-8 max-w-2xl mx-auto">
             Whether you're an athlete looking for opportunities or an organization seeking talent,
             we're here to help you succeed.
           </p>

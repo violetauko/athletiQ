@@ -44,21 +44,21 @@ export default function AthleteSavedOpportunitiesPage() {
     }
 
     return (
-        <div className="min-h-screen w-full ps-3 pt-4 pb-8">
+        <div className="min-h-screen w-full ps-3 pt-2 md:pt-4 pb-4 md:pb-8">
             <div className="container mx-auto">
-                <h1 className="text-3xl font-bold mb-6">Saved Opportunities</h1>
+                <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">Saved Opportunities</h1>
 
                 {loading ? (
-                    <div className="text-center py-12">Loading saved opportunities...</div>
+                    <div className="text-center py-6 md:py-12">Loading saved opportunities...</div>
                 ) : opportunities.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground flex flex-col items-center gap-4">
+                    <div className="text-center py-6 md:py-12 text-muted-foreground flex flex-col items-center gap-4">
                         <p>You haven&apos;t saved any opportunities yet.</p>
                         <Button asChild>
                             <Link href="/dashboard/athlete/opportunities">Explore Opportunities</Link>
                         </Button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         {opportunities.map((opp) => (
                             <Card key={opp.id} className="flex flex-col hover:border-black transition-colors relative">
                                 <Button

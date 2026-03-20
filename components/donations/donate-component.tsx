@@ -46,7 +46,7 @@ const TESTIMONIALS = [
 // Header Component
 const DonateHeader = () => (
 
-  <div className="text-start px-12 pt-5 pb-12 mb-16 bg-linear-to-r from-stone-900 to-black text-white rounded-2xl">
+  <div className="text-start px-4 md:px-12 pt-4 md:pt-5 pb-4 md:pb-12 mb-4 md:mb-16 bg-linear-to-r from-stone-900 to-black text-white rounded-2xl">
     <Badge variant="outline" className="mb-6 px-4 py-1.5 text-white border-white/30 bg-white/10 hover:bg-white/20">
       <Heart className="w-3 h-3 text-red-400 fill-red-400 mr-2" />
       Support the cause
@@ -54,7 +54,7 @@ const DonateHeader = () => (
     <h1 className="text-3xl md:text-5xl text-white leading-[0.95] font-bold mb-5">
       Fuel the next champion
     </h1>
-    <p className="text-lg max-w-md leading-relaxed text-white/80">
+    <p className="text-sm md:text-lg max-w-md leading-relaxed text-white/80">
       Your donation gives undiscovered athletes the platform, coaching, and opportunity
       they deserve.
     </p>
@@ -63,7 +63,7 @@ const DonateHeader = () => (
 
 // Impact Stats Component
 const ImpactStats = ({ stats }: { stats: typeof DEFAULT_IMPACT_STATS[number][] }) => (
-  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-14">
+  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4 md:mb-14">
     {stats.map((stat) => {
       const Icon = stat.icon
       return (
@@ -222,7 +222,7 @@ const DonationSummary = ({
     <CardContent className="p-6 space-y-5">
       <div>
         <p className="text-xs uppercase tracking-widest text-stone-500 mb-1">Your donation</p>
-        <div className="font-black text-4xl text-stone-900 tabular-nums">
+        <div className="font-black text-2xl md:text-4xl text-stone-900 tabular-nums">
           {displayAmount > 0 ? `$${displayAmount.toFixed(2)}` : '—'}
         </div>
         {selectedTier && !isCustom && (
@@ -324,7 +324,7 @@ const DonationSummary = ({
 
 // Testimonials Component
 const Testimonials = () => (
-  <div className="mt-20 pt-12 border-t border-stone-200">
+  <div className="mt-4 md:mt-20 pt-4 md:pt-12 border-t border-stone-200">
     <p className="text-xs uppercase tracking-widest text-stone-500 text-center mb-8">
       From our community
     </p>

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { useMutation } from '@tanstack/react-query'
 import { Mail, Phone, MapPin, Clock, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useState } from 'react'
-              
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -55,7 +55,7 @@ export default function ContactPage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <div className="my-12">
+      <div className="my-6 md:my-12">
         <TitleCard
           image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
           title="Get In Touch"
@@ -64,34 +64,34 @@ export default function ContactPage() {
       </div>
 
       {/* Contact Section */}
-      <section className="py-20">
+      <section className="py-4 md:py-20">
         <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12">
             {/* Contact Form */}
-            <Card className="p-8 shadow-lg">
-              <h2 className="text-3xl font-bold mb-6">Send Us a Message</h2>
+            <Card className="p-4 md:p-8 shadow-lg">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6">Send Us a Message</h2>
               {isSuccess && (
                 <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
-                  <p className="text-green-700">Message sent successfully! We'll get back to you soon.</p>
+                  <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-green-600 shrink-0" />
+                  <p className="text-green-700 text-sm md:text-base">Message sent successfully! We'll get back to you soon.</p>
                 </div>
               )}
 
               {isError && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
-                  <p className="text-red-700">
+                  <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-red-600 shrink-0" />
+                  <p className="text-red-700 text-sm md:text-base">
                     Error: {error instanceof Error ? error.message : 'Failed to send message'}
                   </p>
                 </div>
               )}
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-3 md:space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name *</Label>
-                    <Input 
-                      id="firstName" 
-                      placeholder="John" 
+                    <Input
+                      id="firstName"
+                      placeholder="John"
                       required
                       value={formData.firstName}
                       onChange={handleInputChange}
@@ -99,9 +99,9 @@ export default function ContactPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name *</Label>
-                    <Input 
-                      id="lastName" 
-                      placeholder="Doe" 
+                    <Input
+                      id="lastName"
+                      placeholder="Doe"
                       required
                       value={formData.lastName}
                       onChange={handleInputChange}
@@ -111,10 +111,10 @@ export default function ContactPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email *</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="john.doe@example.com" 
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="john.doe@example.com"
                     required
                     value={formData.email}
                     onChange={handleInputChange}
@@ -123,9 +123,9 @@ export default function ContactPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
-                  <Input 
-                    id="phone" 
-                    type="tel" 
+                  <Input
+                    id="phone"
+                    type="tel"
                     placeholder="+1 (555) 000-0000"
                     value={formData.phone}
                     onChange={handleInputChange}
@@ -134,9 +134,9 @@ export default function ContactPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="subject">Subject *</Label>
-                  <Input 
-                    id="subject" 
-                    placeholder="How can we help?" 
+                  <Input
+                    id="subject"
+                    placeholder="How can we help?"
                     required
                     value={formData.subject}
                     onChange={handleInputChange}
@@ -156,9 +156,9 @@ export default function ContactPage() {
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
-                  className="w-full bg-black hover:bg-black/90 rounded-full" 
+                <Button
+                  type="submit"
+                  className="w-full bg-black hover:bg-black/90 rounded-full"
                   size="lg"
                   disabled={isPending}
                 >
@@ -166,19 +166,19 @@ export default function ContactPage() {
                 </Button>
               </form>
             </Card>
-  
+
 
             {/* Contact Information */}
-            <div className="space-y-8">
+            <div className="space-y-4 md:space-y-8">
               <div className='text-center sm:text-start'>
-                <h2 className="text-3xl font-bold mb-6">Contact Information</h2>
+                <h2 className="text-2xl md:text-3xl font-bold mb-6">Contact Information</h2>
                 <p className="text-muted-foreground mb-8">
                   Fill up the form and our team will get back to you within 24 hours.
                 </p>
               </div>
 
-              <div className="space-y-6">
-                <Card className="p-6 flex items-start gap-4 hover:shadow-lg transition-shadow">
+              <div className="space-y-3 md:space-y-6">
+                <Card className="p-4 md:p-6 flex items-start gap-3 md:gap-4 hover:shadow-lg transition-shadow">
                   <div className="shrink-0 w-12 h-12 bg-linear-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
                     <Mail className="w-6 h-6" />
                   </div>
@@ -198,14 +198,14 @@ export default function ContactPage() {
                   </div>
                 </Card>
 
-                <Card className="p-6 flex items-start gap-4 hover:shadow-lg transition-shadow">
+                <Card className="p-4 md:p-6 flex items-start gap-3 md:gap-4 hover:shadow-lg transition-shadow">
                   <div className="shrink-0 w-12 h-12 bg-linear-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
                     <Phone className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Phone</h3>
                     <a href="tel:+254707979051" className="flex items-center gap-2 text-muted-foreground hover:text-amber-500 transition-colors">
-                      
+
                       +254 (707) 979-051
                     </a>
                     <a href="tel:+254797725336" className="flex items-center gap-2 text-muted-foreground hover:text-amber-500 transition-colors">
@@ -214,7 +214,7 @@ export default function ContactPage() {
                   </div>
                 </Card>
 
-                <Card className="p-6 flex items-start gap-4 hover:shadow-lg transition-shadow">
+                <Card className="p-4 md:p-6 flex items-start gap-3 md:gap-4 hover:shadow-lg transition-shadow">
                   <div className="shrink-0 w-12 h-12 bg-linear-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
                     <MapPin className="w-6 h-6" />
                   </div>
@@ -225,7 +225,7 @@ export default function ContactPage() {
                   </div>
                 </Card>
 
-                <Card className="p-6 flex items-start gap-4 hover:shadow-lg transition-shadow">
+                <Card className="p-4 md:p-6 flex items-start gap-3 md:gap-4 hover:shadow-lg transition-shadow">
                   <div className="shrink-0 w-12 h-12 bg-linear-to-br from-amber-200 to-amber-100 rounded-xl flex items-center justify-center">
                     <Clock className="w-6 h-6" />
                   </div>
@@ -243,7 +243,7 @@ export default function ContactPage() {
       </section>
 
       {/* Map Section (Placeholder) */}
-      <section className="h-96 bg-stone-200">
+      <section className="h-64 md:h-96 bg-stone-200">
         <div className="w-full h-full flex items-center justify-center text-muted-foreground">
           <div className="text-center">
             <MapPin className="w-12 h-12 mx-auto mb-4" />
@@ -254,11 +254,11 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20">
+      <section className="py-4 md:py-20">
         <div className="container">
-          <div className="text-center mb-12">
+          <div className="text-center mb-6 md:mb-12">
             <h2 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">Frequently Asked Questions</h2>
-            <p className="text-xl md:text-xl text-muted-foreground">
+            <p className="text-lg md:text-xl text-muted-foreground">
               Quick answers to common questions
             </p>
           </div>
@@ -282,7 +282,7 @@ export default function ContactPage() {
                 answer: 'Absolutely! You can apply to as many opportunities as you like. We recommend tailoring your application to each position for the best results.',
               },
             ].map((faq, index) => (
-              <Card key={index} className="p-6">
+              <Card key={index} className="p-4 md:p-6">
                 <h3 className="font-semibold text-lg mb-2">{faq.question}</h3>
                 <p className="text-muted-foreground">{faq.answer}</p>
               </Card>

@@ -165,7 +165,7 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
   return (
     <div className="flex flex-col">
       {/* Page Header */}
-      <div className="my-12">
+      <div className="my-6 md:my-12">
         <TitleCard
           image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80"
           title="Discover Talented Athletes"
@@ -176,8 +176,8 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
 
       {/* Search and Filter Section */}
       <section className="bg-white border-b sticky top-16 z-40 rounded-2xl">
-        <div className="container py-6">
-          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+        <div className="container py-4 md:py-6">
+          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-2 md:gap-4">
             <div className="flex-1 flex gap-2">
               <Input
                 placeholder="Search by name, sport, or position..."
@@ -186,16 +186,16 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
                 className="flex-1"
               />
               <Button type="submit" className="bg-black hover:bg-black/90">
-                <Search className="w-4 h-4 mr-2" />
+                <Search className="w-4 h-4 mr-2 text-sm md:text-base" />
                 Search
               </Button>
             </div>
             <div className="flex gap-2">
               <Select value={selectedExperience} onValueChange={handleExperienceFilter}>
-                <SelectTrigger className="w-37.5">
+                <SelectTrigger className="w-37.5 text-sm md:text-base">
                   <SelectValue placeholder="Experience" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="text-sm md:text-base">
                   <SelectItem value="all">All Levels</SelectItem>
                   <SelectItem value="Beginner">Beginner</SelectItem>
                   <SelectItem value="Intermediate">Intermediate</SelectItem>
@@ -204,14 +204,14 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
                 </SelectContent>
               </Select>
               <Button variant="outline" type="button" className="gap-2">
-                <Filter className="w-4 h-4" />
+                <Filter className="w-4 h-4 text-sm md:text-base" />
                 More Filters
               </Button>
             </div>
           </form>
 
           {/* Quick Filters */}
-          <div className="flex flex-wrap gap-2 mt-4">
+          <div className="flex flex-wrap gap-2 mt-2 md:mt-4">
             <Button
               key="all"
               variant={selectedSport === 'all' ? 'default' : 'outline'}
@@ -237,20 +237,20 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
       </section>
 
       {/* Athletes Grid */}
-      <section className="py-12 flex-1">
+      <section className="py-6 md:py-12 flex-1">
         <div className="">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-4 md:mb-8">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Featured Athletes</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">Featured Athletes</h2>
               <p className="text-muted-foreground">
                 {isLoadingAthletes ? (
                   'Loading athletes...'
                 ) : (
                   <>
-                    Showing <span className="font-semibold text-foreground">
+                    Showing <span className="font-semibold text-foreground text-sm md:text-base">
                       {athletesData?.athletes.length || 0}
                     </span> of{' '}
-                    <span className="font-semibold text-foreground">
+                    <span className="font-semibold text-foreground text-sm md:text-base">
                       {athletesData?.total || 0}
                     </span> athletes
                   </>
@@ -260,10 +260,10 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
             <div className="flex gap-2 items-center">
               <span className="text-sm text-muted-foreground">Sort by:</span>
               <Select value={sortBy} onValueChange={handleSortChange}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-[140px] text-sm md:text-base">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="text-sm md:text-base">
                   <SelectItem value="recent">Most Recent</SelectItem>
                   <SelectItem value="name">Name A-Z</SelectItem>
                   <SelectItem value="gpa_desc">Highest GPA</SelectItem>
@@ -274,7 +274,7 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
           </div>
 
           {isLoadingAthletes ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {[...Array(8)].map((_, index) => (
                 <div key={index} className="animate-pulse">
                   <div className="bg-gray-200 h-64 rounded-lg mb-3"></div>
@@ -287,7 +287,7 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {athletesData?.athletes.map((athlete, index) => (
                   <Link href={`/athletes/${athlete.id}`} key={athlete.id}>
                     <div
@@ -322,7 +322,7 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
               </div>
 
               {athletesData?.athletes.length === 0 && (
-                <div className="text-center py-12">
+                <div className="text-center py-6 md:py-12">
                   <p className="text-muted-foreground">No athletes found matching your criteria.</p>
                   <Button
                     variant="outline"
@@ -344,7 +344,7 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
 
           {/* Pagination */}
           {athletesData && athletesData.totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-12">
+            <div className="flex justify-center items-center gap-2 mt-6 md:mt-12">
               <Button
                 variant="outline"
                 onClick={() => handlePageChange(currentPage - 1)}
@@ -382,16 +382,15 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-linear-to-br from-stone-900 to-black text-white mb-12 rounded-2xl">
+      <section className="py-16 bg-linear-to-br from-stone-900 to-black text-white mb-6 md:mb-12 rounded-2xl">
         <div className="container text-center">
-          <h2 className="text-4xl font-bold mb-4">Are You an Athlete?</h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+          <h2 className="text-2xl md:text-4xl font-bold mb-4">Are You an Athlete?</h2>
+          <p className="text-lg md:text-xl text-white/80 mb-8 max-w-2xl mx-auto">
             Create your profile and get discovered by top sports organizations worldwide
           </p>
           <div className="flex gap-4 justify-center">
             <Link href={'/register'}>
               <Button
-                size="lg"
                 className="bg-white text-black hover:bg-white/90 rounded-full px-8"
               >
                 Create Profile
@@ -399,7 +398,6 @@ export function AthletesClient({ sports }: { sports: Sport[] }) {
             </Link>
             <Link href={'/about'}>
               <Button
-                size="lg"
                 variant="outline"
                 className="rounded-full px-8 text-black border-white hover:bg-white/10"
               >

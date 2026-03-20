@@ -122,9 +122,9 @@ export default function ApplicationsTable({
   if (applications.length === 0) {
     return (
       <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="rounded-full bg-stone-100 p-3 mb-4">
-            <FileText className="h-6 w-6 text-stone-400" />
+        <CardContent className="flex flex-col items-center justify-center py-4 md:py-12 text-center">
+          <div className="rounded-full bg-stone-100 p-2 md:p-3 mb-2 md:mb-4">
+            <FileText className="h-4 w-4 md:h-6 md:w-6 text-stone-400" />
           </div>
           <h3 className="text-lg font-semibold mb-2">No applications found</h3>
           <p className="text-sm text-muted-foreground mb-4">

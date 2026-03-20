@@ -8,12 +8,12 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { 
-    Search, 
-    MapPin, 
-    Building, 
-    Calendar, 
-    Bookmark, 
+import {
+    Search,
+    MapPin,
+    Building,
+    Calendar,
+    Bookmark,
     BookmarkCheck,
     Eye,
     ChevronLeft,
@@ -97,13 +97,13 @@ export default function AthleteOpportunitiesPage() {
 
         // Handle strings
         if (typeof aValue === 'string' && typeof bValue === 'string') {
-            return sortDirection === 'asc' 
+            return sortDirection === 'asc'
                 ? aValue.localeCompare(bValue)
                 : bValue.localeCompare(aValue)
         }
 
         // Handle numbers
-        return sortDirection === 'asc' 
+        return sortDirection === 'asc'
             ? (aValue || 0) - (bValue || 0)
             : (bValue || 0) - (aValue || 0)
     })
@@ -127,7 +127,7 @@ export default function AthleteOpportunitiesPage() {
     const handleSave = async (opportunityId: string, e: React.MouseEvent) => {
         e.preventDefault() // Prevent navigation if inside a link
         e.stopPropagation()
-        
+
         try {
             const response = await fetch(`/api/athlete/opportunities/${opportunityId}/save`, {
                 method: 'POST'
@@ -143,7 +143,7 @@ export default function AthleteOpportunitiesPage() {
     const handleShare = (opportunity: Opportunity, e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
-        
+
         // Share functionality - could open a modal or use Web Share API
         if (navigator.share) {
             navigator.share({
@@ -161,10 +161,10 @@ export default function AthleteOpportunitiesPage() {
     }
 
     return (
-        <div className="min-h-screen pb-8">
+        <div className="min-h-screen pb-4 md:pb-8">
             <div className="container mx-auto">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold">Explore Opportunities</h1>
+                <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+                    <h1 className="text-2xl md:text-3xl font-bold">Explore Opportunities</h1>
                     <Button variant="outline" asChild>
                         <Link href="/dashboard/athlete/saved">
                             <Bookmark className="w-4 h-4 mr-2" />
@@ -175,8 +175,8 @@ export default function AthleteOpportunitiesPage() {
 
                 {/* Search & Filter */}
                 <Card className="mb-2">
-                    <CardContent className="p-6">
-                        <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+                    <CardContent className="p-4 md:p-6">
+                        <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-2 md:gap-4">
                             <div className="flex-1 relative">
                                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                                 <Input
@@ -188,10 +188,10 @@ export default function AthleteOpportunitiesPage() {
                             </div>
                             <div className="w-full md:w-48">
                                 <Select value={sport} onValueChange={setSport}>
-                                    <SelectTrigger>
+                                    <SelectTrigger className='text-sm md:text-base'>
                                         <SelectValue placeholder="Sport" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className='text-sm md:text-base'>
                                         <SelectItem value="All">All Sports</SelectItem>
                                         <SelectItem value="Basketball">Basketball</SelectItem>
                                         <SelectItem value="Football">Football</SelectItem>
@@ -208,7 +208,7 @@ export default function AthleteOpportunitiesPage() {
                 {/* Results Table */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>Available Opportunities</CardTitle>
+                        <CardTitle className="text-xl md:text-2xl">Available Opportunities</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {loading ? (
@@ -223,7 +223,7 @@ export default function AthleteOpportunitiesPage() {
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead className="w-75">
+                                                <TableHead className="w-25 md:w-75">
                                                     <Button
                                                         variant="ghost"
                                                         onClick={() => handleSort('title')}
@@ -271,9 +271,9 @@ export default function AthleteOpportunitiesPage() {
                                         </TableHeader>
                                         <TableBody>
                                             {paginatedOpportunities.map((opp) => (
-                                                <TableRow key={opp.id} className="hover:bg-muted/50">
+                                                <TableRow key={opp.id} className="hover:bg-muted/50 ">
                                                     <TableCell className="font-medium">
-                                                        <Link 
+                                                        <Link
                                                             href={`/dashboard/athlete/opportunities/${opp.id}`}
                                                             className="hover:text-primary hover:underline"
                                                         >
@@ -283,7 +283,7 @@ export default function AthleteOpportunitiesPage() {
                                                     <TableCell>
                                                         <div className="flex items-center gap-1">
                                                             <Building className="w-3 h-3 text-muted-foreground" />
-                                                            {opp.client?.organization}
+                                                            {opp.ClientProfile?.organization}
                                                         </div>
                                                     </TableCell>
                                                     <TableCell>
@@ -328,7 +328,7 @@ export default function AthleteOpportunitiesPage() {
                                                             <DropdownMenuContent align="end">
                                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                                 <DropdownMenuItem asChild>
-                                                                    <Link 
+                                                                    <Link
                                                                         href={`/dashboard/athlete/opportunities/${opp.id}`}
                                                                         className="flex items-center cursor-pointer"
                                                                     >
@@ -337,7 +337,7 @@ export default function AthleteOpportunitiesPage() {
                                                                     </Link>
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem asChild>
-                                                                    <Link 
+                                                                    <Link
                                                                         href={`/dashboard/athlete/opportunities/${opp.id}/apply`}
                                                                         className="flex items-center cursor-pointer"
                                                                     >
