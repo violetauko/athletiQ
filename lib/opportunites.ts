@@ -1,13 +1,33 @@
-export async function getLatestOpportunities() {
+import { prisma } from './prisma'
+
+export async function getLatestOpportunities(limit: number = 4) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/opportunities?limit=4&sort=recent`, {
-      next: { revalidate: 60 } // Revalidate every minute
+    const opportunities = await prisma.opportunity.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+      include: {
+        ClientProfile: {
+          include: {
+            User: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        postedDate: 'desc',
+      },
+      take: limit,
     })
-    
-    if (!res.ok) throw new Error('Failed to fetch opportunities')
-    return res.json()
+
+    return { opportunities }
   } catch (error) {
     console.error('Error fetching opportunities:', error)
     return { opportunities: [] }
   }
 }
+
