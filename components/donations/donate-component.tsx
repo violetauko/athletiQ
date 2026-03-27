@@ -221,7 +221,7 @@ const DonationSummary = ({
   <Card className="border-stone-200 shadow-md sticky top-8">
     <CardContent className="p-6 space-y-5">
       <div>
-        <p className="text-xs uppercase tracking-widest text-stone-500 mb-1">Your donation</p>
+        <p className="text-xs uppercase tracking-widest text-stone-500 mb-1">Your Impact</p>
         <div className="font-black text-2xl md:text-4xl text-stone-900 tabular-nums">
           {displayAmount > 0 ? `$${displayAmount.toFixed(2)}` : '—'}
         </div>
@@ -286,7 +286,7 @@ const DonationSummary = ({
         ) : (
           <>
             <Heart className="w-4 h-4 mr-2 fill-current" />
-            Donate via Pesapal
+            Get Badge via Pesapal
             <ArrowRight className="w-4 h-4 ml-2" />
           </>
         )}

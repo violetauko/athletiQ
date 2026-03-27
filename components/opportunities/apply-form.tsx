@@ -675,6 +675,8 @@ import { use, useEffect, useState } from 'react'
 import TitleCard from '@/components/shared/title-card'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { uploadFile } from '@/lib/upload'
+import { toast } from 'sonner'
 
 interface OpportunitySummary {
   id: string
@@ -767,6 +769,7 @@ export function ApplyForm({ params }: { params: Promise<{ id: string, backHref: 
     termsAccepted: false
   })
 
+  const [isUploading, setIsUploading] = useState<Record<string, boolean>>({})
   const [prefilled, setPrefilled] = useState(false)
 
   // Fetch the athlete's profile to prefill the form
@@ -822,9 +825,19 @@ export function ApplyForm({ params }: { params: Promise<{ id: string, backHref: 
     setFormData(prev => ({ ...prev, [id]: checked }))
   }
 
-  // Handle file upload (simplified - you'll need to implement actual file upload)
-  const handleFileUpload = (fieldName: string, fileName: string) => {
-    setFormData(prev => ({ ...prev, [fieldName]: fileName }))
+  // Handle file upload
+  const handleFileUpload = async (fieldName: string, file: File) => {
+    try {
+      setIsUploading(prev => ({ ...prev, [fieldName]: true }))
+      const url = await uploadFile(file, 'resume') // 'resume' config works for other docs too (PDF/DOCX)
+      setFormData(prev => ({ ...prev, [fieldName]: url }))
+      toast.success('File uploaded successfully')
+    } catch (error) {
+      console.error('Upload failed:', error)
+      toast.error(error instanceof Error ? error.message : 'Upload failed')
+    } finally {
+      setIsUploading(prev => ({ ...prev, [fieldName]: false }))
+    }
   }
 
   // Fetch just the summary info for the header
@@ -1167,12 +1180,14 @@ export function ApplyForm({ params }: { params: Promise<{ id: string, backHref: 
                       className="hidden"
                       onChange={(e) => {
                         const file = e.target.files?.[0]
-                        if (file) handleFileUpload('resumeFileName', file.name)
+                        if (file) handleFileUpload('resumeFileName', file)
                       }}
                     />
                     <label htmlFor="resume" className="cursor-pointer">
-                      <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="font-medium mb-2">Upload Resume/CV *</p>
+                      <Upload className={`w-12 h-12 mx-auto mb-4 ${isUploading['resumeFileName'] ? 'animate-bounce text-blue-500' : 'text-muted-foreground'}`} />
+                      <p className="font-medium mb-2">
+                        {isUploading['resumeFileName'] ? 'Uploading...' : 'Upload Resume/CV *'}
+                      </p>
                       <p className="text-sm text-muted-foreground mb-4">
                         PDF or Word document, max 5MB
                       </p>
@@ -1193,15 +1208,18 @@ export function ApplyForm({ params }: { params: Promise<{ id: string, backHref: 
                       className="hidden"
                       onChange={(e) => {
                         const files = e.target.files
-                        if (files) {
-                          const fileNames = Array.from(files).map(f => f.name).join(', ')
-                          handleFileUpload('portfolioFileNames', fileNames)
+                        if (files && files.length > 0) {
+                          // For simplicity, we'll just upload the first one or combine them if needed
+                          // But the schema expects a string, so we'll just handle one for now as a fix
+                          handleFileUpload('portfolioFileNames', files[0])
                         }
                       }}
                     />
                     <label htmlFor="portfolio" className="cursor-pointer">
-                      <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="font-medium mb-2">Athletic Portfolio</p>
+                      <Upload className={`w-12 h-12 mx-auto mb-4 ${isUploading['portfolioFileNames'] ? 'animate-bounce text-blue-500' : 'text-muted-foreground'}`} />
+                      <p className="font-medium mb-2">
+                        {isUploading['portfolioFileNames'] ? 'Uploading...' : 'Athletic Portfolio'}
+                      </p>
                       <p className="text-sm text-muted-foreground mb-4">
                         Photos, videos, or links to highlight reels
                       </p>
@@ -1222,15 +1240,16 @@ export function ApplyForm({ params }: { params: Promise<{ id: string, backHref: 
                       className="hidden"
                       onChange={(e) => {
                         const files = e.target.files
-                        if (files) {
-                          const fileNames = Array.from(files).map(f => f.name).join(', ')
-                          handleFileUpload('additionalDocsFileNames', fileNames)
+                        if (files && files.length > 0) {
+                          handleFileUpload('additionalDocsFileNames', files[0])
                         }
                       }}
                     />
                     <label htmlFor="additionalDocs" className="cursor-pointer">
-                      <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="font-medium mb-2">Additional Documents</p>
+                      <Upload className={`w-12 h-12 mx-auto mb-4 ${isUploading['additionalDocsFileNames'] ? 'animate-bounce text-blue-500' : 'text-muted-foreground'}`} />
+                      <p className="font-medium mb-2">
+                        {isUploading['additionalDocsFileNames'] ? 'Uploading...' : 'Additional Documents'}
+                      </p>
                       <p className="text-sm text-muted-foreground mb-4">
                         References, certifications, transcripts (optional)
                       </p>

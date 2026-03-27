@@ -49,7 +49,7 @@ export function Header() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/donate" className="flex items-center gap-2 w-full">
-                    Donate
+                    Get Badge
                     <Heart className="w-4 h-4 text-red-500 fill-red-500" />
                   </Link>
                 </DropdownMenuItem>
@@ -94,7 +94,7 @@ export function Header() {
               href="/donate"
               className="inline-flex items-center gap-1 transition-colors hover:text-foreground/80 text-foreground/60"
             >
-              Donate
+              Make Impact
               <Heart className="w-4 h-4 text-red-500 fill-red-500" />
             </Link>
           </nav>
@@ -127,7 +127,7 @@ export function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard/donate">Donate<Heart className="w-4 h-4 text-red-500 fill-red-500" /></Link>
+                  <Link href="/dashboard/donate">Make Impact<Heart className="w-4 h-4 text-red-500 fill-red-500" /></Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>

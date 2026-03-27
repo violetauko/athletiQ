@@ -139,8 +139,9 @@ export interface AthleteDashboardData {
 export interface Sport {
   id: string
   name: string
-  icon?: string
-  category?: string
+  description?: string | null
+  icon?: string | null
+  category?: string | null
 }
 export interface OpportunityCardProps {
   id: string
