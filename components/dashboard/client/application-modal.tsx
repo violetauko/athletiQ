@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { X, MapPin, User, Mail, GraduationCap, Award } from "lucide-react"
+import { X, MapPin, User, Mail, GraduationCap, Award, Eye, Download, FileText } from "lucide-react"
+import { toast } from "sonner"
 
 interface ApplicationModalProps {
     isOpen: boolean;
@@ -10,6 +11,34 @@ interface ApplicationModalProps {
 }
 
 export function ApplicationModal({ isOpen, onClose, application }: ApplicationModalProps) {
+    const isExternalUrl = (url: string) => {
+        return url && (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("blob:"));
+    };
+
+    const handleFileOpen = async (url: string) => {
+        if (!url) return;
+
+        if (isExternalUrl(url)) {
+            window.open(url, "_blank");
+            return;
+        }
+
+        // Legacy filename resolution
+        const resolveToastId = toast.loading("Resolving legacy document link...");
+        try {
+            const response = await fetch(`/api/documents/resolve?filename=${encodeURIComponent(url)}`);
+            if (!response.ok) {
+                throw new Error("Document not found");
+            }
+            const data = await response.json();
+            toast.success("Document found", { id: resolveToastId });
+            window.open(data.url, "_blank");
+        } catch (error) {
+            console.error("Failed to resolve document:", error);
+            toast.error("This document was uploaded using an older version of the system and may be unavailable.", { id: resolveToastId });
+        }
+    };
+
     if (!isOpen || !application) return null
 
     const { athlete, opportunity } = application
@@ -154,6 +183,98 @@ export function ApplicationModal({ isOpen, onClose, application }: ApplicationMo
                                 <p className="text-sm border-l-2 border-stone-200 pl-3 italic">{athlete.bio}</p>
                             </div>
                         )}
+
+                        {/* Application Documents */}
+                        <div className="pt-6 border-t border-stone-200">
+                            <h3 className="font-semibold text-lg flex items-center gap-2 mb-4">
+                                <FileText className="h-5 w-5 text-amber-600" /> Application Materials
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {application.resumeFileName && (
+                                    <div className="flex items-center justify-between p-3 border rounded-lg bg-stone-50">
+                                        <span className="text-sm font-medium flex items-center gap-2">
+                                            <FileText className="h-4 w-4 text-stone-400" /> Resume
+                                        </span>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0"
+                                                onClick={() => handleFileOpen(application.resumeFileName)}
+                                                title="Preview"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0"
+                                                onClick={() => handleFileOpen(application.resumeFileName)}
+                                                title="Download"
+                                            >
+                                                <Download className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {application.portfolioFileNames && (
+                                    <div className="flex items-center justify-between p-3 border rounded-lg bg-stone-50">
+                                        <span className="text-sm font-medium flex items-center gap-2">
+                                            <FileText className="h-4 w-4 text-stone-400" /> Portfolio
+                                        </span>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0"
+                                                onClick={() => handleFileOpen(application.portfolioFileNames)}
+                                                title="Preview"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0"
+                                                onClick={() => handleFileOpen(application.portfolioFileNames)}
+                                                title="Download"
+                                            >
+                                                <Download className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {application.additionalDocsFileNames && (
+                                    <div className="flex items-center justify-between p-3 border rounded-lg bg-stone-50">
+                                        <span className="text-sm font-medium flex items-center gap-2">
+                                            <FileText className="h-4 w-4 text-stone-400" /> Additional Docs
+                                        </span>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0"
+                                                onClick={() => handleFileOpen(application.additionalDocsFileNames)}
+                                                title="Preview"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0"
+                                                onClick={() => handleFileOpen(application.additionalDocsFileNames)}
+                                                title="Download"
+                                            >
+                                                <Download className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </section>
 
                 </CardContent>

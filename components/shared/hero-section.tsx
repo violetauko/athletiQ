@@ -9,8 +9,8 @@ import Link from 'next/link'
 import CustomersWeServe from '../customer-serve'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSports } from '@/lib/sports'
-import { getAthleteCount } from '@/lib/athletes'
+// import { getSports } from '@/lib/sports' // Removed to avoid Prisma in browser
+// import { getAthleteCount } from '@/lib/athletes' // Removed to avoid Prisma in browser
 
 interface Sport {
   id: string
@@ -35,10 +35,12 @@ export function HeroSection() {
     const fetchSports = async () => {
       try {
         setIsLoadingSports(true)
-        const data = await getSports()
-        setSports(data.sports || [])
-        const athletesCount = await getAthleteCount()
-        setAthletesCount(athletesCount)
+        const sportsResponse = await fetch('/api/sports')
+        const sportsData = await sportsResponse.json()
+        setSports(sportsData.sports || [])
+        const response = await fetch('/api/athlete/count')
+        const countData = await response.json()
+        setAthletesCount(countData.count || 0)
       } catch (error) {
         console.error('Error fetching sports:', error)
         // Fallback sports data in case of error

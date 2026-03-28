@@ -17,6 +17,7 @@ import {
 import { OpportunityDetail } from "@/lib/types/types";
 import { Eye, Download, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { Fragment, useState } from "react";
+import { toast } from "sonner";
 
 type SortableField =
   | "firstName"
@@ -30,6 +31,34 @@ const ApplicationsViewTable = ({ opportunity }:{opportunity: OpportunityDetail})
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [sortField, setSortField] = useState<SortableField>("appliedAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+
+  const isExternalUrl = (url: string) => {
+    return url && (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("blob:"));
+  };
+
+  const handleFileOpen = async (url: string) => {
+    if (!url) return;
+    
+    if (isExternalUrl(url)) {
+      window.open(url, "_blank");
+      return;
+    }
+
+    // Legacy filename resolution
+    const resolveToastId = toast.loading("Resolving legacy document link...");
+    try {
+      const response = await fetch(`/api/documents/resolve?filename=${encodeURIComponent(url)}`);
+      if (!response.ok) {
+        throw new Error("Document not found");
+      }
+      const data = await response.json();
+      toast.success("Document found", { id: resolveToastId });
+      window.open(data.url, "_blank");
+    } catch (error) {
+      console.error("Failed to resolve document:", error);
+      toast.error("This document was uploaded using an older version of the system and may be unavailable.", { id: resolveToastId });
+    }
+  };
 
   const handleSort = (field: SortableField) => {
     if (sortField === field) {
@@ -276,23 +305,38 @@ const ApplicationsViewTable = ({ opportunity }:{opportunity: OpportunityDetail})
                             <h4 className="font-semibold mb-2">Documents</h4>
                             <div className="flex flex-wrap gap-2">
                               {app.resumeFileName && (
-                                <Button variant="outline" size="sm" className="gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="gap-2"
+                                  onClick={() => handleFileOpen(app.resumeFileName!)}
+                                >
                                   <FileText className="h-4 w-4" />
                                   Resume
                                 </Button>
                               )}
-                              {app.portfolioFileNames?.split(',').map((file, i) => (
-                                <Button key={i} variant="outline" size="sm" className="gap-2">
+                              {app.portfolioFileNames && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="gap-2"
+                                  onClick={() => handleFileOpen(app.portfolioFileNames!)}
+                                >
                                   <FileText className="h-4 w-4" />
-                                  Portfolio {i + 1}
+                                  Portfolio
                                 </Button>
-                              ))}
-                              {app.additionalDocsFileNames?.split(',').map((file, i) => (
-                                <Button key={i} variant="outline" size="sm" className="gap-2">
+                              )}
+                              {app.additionalDocsFileNames && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="gap-2"
+                                  onClick={() => handleFileOpen(app.additionalDocsFileNames!)}
+                                >
                                   <FileText className="h-4 w-4" />
-                                  Doc {i + 1}
+                                  Additional Doc
                                 </Button>
-                              ))}
+                              )}
                             </div>
                           </div>
 
