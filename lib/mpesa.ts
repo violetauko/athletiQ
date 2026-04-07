@@ -12,7 +12,7 @@ export async function getMpesaToken(): Promise<string> {
   const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
 
   const response = await fetch(
-    "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
+    `${process.env.MPESA_BASE_URL || "https://sandbox.safaricom.co.ke"}/oauth/v1/generate?grant_type=client_credentials`,
     {
       method: "GET",
       headers: {

@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     };
 
     const response = await fetch(
-      "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+      `${process.env.MPESA_BASE_URL || "https://sandbox.safaricom.co.ke"}/mpesa/stkpush/v1/processrequest`,
       {
         method: "POST",
         headers: {
@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
     );
 
     const mpesaResponse = await response.json();
+    console.log("M-Pesa STK Push Response:", mpesaResponse);
 
     if (mpesaResponse.ResponseCode !== "0") {
       console.error("M-Pesa STK Push Error:", mpesaResponse);
