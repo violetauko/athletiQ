@@ -67,7 +67,7 @@ export function AthletePaywall() {
                 setStkStatus("failed");
                 toast.error("Payment timed out. Please try again.");
             }
-        }, 120 * 1000);
+        }, 5 * 1000);
 
         return () => {
             clearInterval(interval);
@@ -124,6 +124,7 @@ export function AthletePaywall() {
             const data = await res.json();
 
             if (!res.ok) throw new Error(data.error || "Failed to initiate M-Pesa Push");
+            console.log("M-Pesa STK Push initiated:", data);
 
             toast.info("Check your phone! An M-Pesa prompt has been sent.");
             setStkStatus("polling");
@@ -188,17 +189,17 @@ export function AthletePaywall() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Tabs defaultValue="pesapal" className="w-full">
+                    <Tabs defaultValue="mpesa" className="w-full">
                         <TabsList className="grid w-full mb-6">
-                            <TabsTrigger value="pesapal" disabled={stkStatus === "polling"}>
+                            {/* <TabsTrigger value="pesapal" disabled={stkStatus === "polling"}>
                                 <CreditCard className="w-4 h-4 mr-2 hidden sm:block" />
                                 Pesapal
-                            </TabsTrigger>
-                            {/* <TabsTrigger value="mpesa" disabled={stkStatus === "polling"}>
+                            </TabsTrigger> */}
+                            {<TabsTrigger value="mpesa" disabled={stkStatus === "polling"}>
                                 <Smartphone className="w-4 h-4 mr-2 hidden sm:block" />
                                 M-Pesa (Daraja)
                             </TabsTrigger>
-                            <TabsTrigger value="stanbic" disabled={stkStatus === "polling"}>
+                            /* <TabsTrigger value="stanbic" disabled={stkStatus === "polling"}>
                                 <Smartphone className="w-4 h-4 mr-2 hidden sm:block" />
                                 Stanbic
                             </TabsTrigger>
