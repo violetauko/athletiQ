@@ -147,9 +147,9 @@ export function VerifyEmailForm({ initialEmail = '', token }: VerifyEmailFormPro
         setCountdown(60); // 60 seconds cooldown
         form.setValue('code', ''); // Clear any existing code
       }
-    } catch (error: any) {
+    } catch (error) {
       setVerificationStatus('error');
-      setErrorMessage(error.message || 'Failed to send verification email');
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to send verification email');
     } finally {
       setIsLoading(false);
     }
@@ -165,8 +165,8 @@ export function VerifyEmailForm({ initialEmail = '', token }: VerifyEmailFormPro
     try {
       await sendVerificationEmail(email);
       setCountdown(60);
-    } catch (error: any) {
-      setErrorMessage(error.message);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to resend verification email');
     } finally {
       setIsResending(false);
     }

@@ -132,7 +132,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.log("Creation error",error)
     if (error instanceof z.ZodError) {
-      return new NextResponse(error.message, { status: 400 });
+      return new NextResponse(error.message || "Validation error", { status: 400 });
     }
     console.error("[CLIENT_OPPORTUNITIES_POST]", error);
     return new NextResponse("Internal Error", { status: 500 });
