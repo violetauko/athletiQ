@@ -585,7 +585,7 @@ export default function UserDetailClient({ user }: UserDetailProps) {
                   <div>
                     <h4 className="text-sm font-medium mb-3">Connected Accounts</h4>
                     <div className="space-y-2">
-                      {user?.accounts.map((account: any) => (
+                      {user?.Account?.map((account: any) => (
                         <div key={account.provider} className="flex items-center gap-2 text-sm">
                           <Shield className="w-4 h-4 text-stone-400" />
                           <span className="capitalize">{account.provider}</span>
@@ -593,7 +593,7 @@ export default function UserDetailClient({ user }: UserDetailProps) {
                           <span className="text-muted-foreground">{account.providerAccountId}</span>
                         </div>
                       ))}
-                      {user?.accounts.length === 0 && (
+                      {user?.Account?.length === 0 && (
                         <p className="text-sm text-muted-foreground">No connected accounts</p>
                       )}
                     </div>
@@ -605,13 +605,13 @@ export default function UserDetailClient({ user }: UserDetailProps) {
                   <div>
                     <h4 className="text-sm font-medium mb-3">Recent Sessions</h4>
                     <div className="space-y-2">
-                      {user?.sessions.map((session: any, index: number) => (
+                      {user?.Session?.map((session: any, index: number) => (
                         <div key={index} className="flex items-center gap-2 text-sm">
                           <Clock className="w-4 h-4 text-stone-400" />
                           <span>Expires: {format(new Date(session.expires), 'MMM d, yyyy')}</span>
                         </div>
                       ))}
-                      {user?.sessions.length === 0 && (
+                      {user?.Session?.length === 0 && (
                         <p className="text-sm text-muted-foreground">No active sessions</p>
                       )}
                     </div>
@@ -628,12 +628,7 @@ export default function UserDetailClient({ user }: UserDetailProps) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button variant="outline" className="w-full justify-start" asChild>
-                    <Link href={`/admin/messages?userId=${user?.id}`}>
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      View All Messages
-                    </Link>
-                  </Button>
+                  {/* Messages feature not yet implemented for admins */}
                   
                   {user?.ClientProfile && !user?.ClientProfile.verified && (
                     <Button
@@ -686,13 +681,13 @@ export default function UserDetailClient({ user }: UserDetailProps) {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {user?.applications.slice(0, 5).map((app: any) => (
+                    {user?.Application?.slice(0, 5).map((app: any) => (
                       <TableRow key={app.id}>
                         <TableCell>
                           <Badge variant="outline">Application</Badge>
                         </TableCell>
                         <TableCell>
-                          {app.opportunity?.title}
+                          {app.Opportunity?.title}
                         </TableCell>
                         <TableCell>
                           {format(new Date(app.appliedAt), 'MMM d, yyyy')}
@@ -992,13 +987,13 @@ export default function UserDetailClient({ user }: UserDetailProps) {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {user?.applications.map((app: any) => (
+                    {user?.Application?.map((app: any) => (
                       <TableRow key={app.id}>
                         <TableCell className="font-medium">
-                          {app.opportunity?.title}
+                          {app.Opportunity?.title}
                         </TableCell>
                         <TableCell>
-                          {app.opportunity?.clientProfile?.organization}
+                          {app.Opportunity?.ClientProfile?.organization}
                         </TableCell>
                         <TableCell>
                           {format(new Date(app.appliedAt), 'MMM d, yyyy')}

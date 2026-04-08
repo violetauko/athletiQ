@@ -31,15 +31,15 @@ export default async function UserDetailPage({
       updatedAt: true,
       AthleteProfile: true,
       ClientProfile: true,
-      accounts: true,
-      sessions: true,
-      applications: {
+      Account: true,
+      Session: true,
+      Application: {
         include: {
-          opportunity: {
+          Opportunity: {
             select: {
               id: true,
               title: true,
-              clientProfile: {
+              ClientProfile: {
                 select: {
                   organization: true,
                 },
@@ -61,7 +61,7 @@ export default async function UserDetailPage({
       },
       _count: {
         select: {
-          applications: true,
+          Application: true,
           donations: true,
           contactSubmissions: true,
         },
