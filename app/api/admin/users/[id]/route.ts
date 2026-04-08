@@ -22,14 +22,11 @@ export async function GET(
         email: true,
         image: true,
         role: true,
+        suspended: true,
         emailVerified: true,
         createdAt: true,
         updatedAt: true,
-        AthleteProfile: {
-          select: {
-            achievements: true,
-          }
-        },
+        AthleteProfile: true,
         ClientProfile: true,
         Application: {
           include: {

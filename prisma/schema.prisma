@@ -117,6 +117,7 @@ model ClientProfile {
   title        String
   phone        String?
   bio          String?
+  verified     Boolean       @default(false)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   User         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -138,12 +139,13 @@ model Message {
 
 model ContactSubmission {
   id        String   @id @default(cuid())
-  firstName String
-  lastName  String
-  email     String
+  firstName String?
+  lastName  String?
+  email     String?
   phone     String?
   subject   String
   message   String
+  response  String?
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
@@ -202,6 +204,7 @@ model User {
   image                            String?
   password                         String?
   role                             UserRole        @default(ATHLETE)
+  suspended                        Boolean         @default(false)
   hasPaidFee                       Boolean         @default(false)
   createdAt                        DateTime        @default(now())
   updatedAt                        DateTime        @updatedAt

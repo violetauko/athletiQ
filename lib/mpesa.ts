@@ -45,13 +45,35 @@ export function generateTimestamp() {
 
 // Ensure phone number starts with 254
 export function formatPhoneNumber(phone: string): string {
-  let cleaned = phone.replace(/\D/g, "");
-  if (cleaned.startsWith("0")) {
-    cleaned = "254" + cleaned.slice(1);
-  } else if (cleaned.startsWith("+")) {
-    cleaned = cleaned.slice(1);
-  } else if (!cleaned.startsWith("254") && cleaned.length === 9) {
-    cleaned = "254" + cleaned;
+  if (!phone) return '';
+
+  let cleaned = phone.replace(/\D/g, '');
+
+  // Handle different formats
+  if (cleaned.startsWith('254') && cleaned.length === 12) {
+    return cleaned; // Already in correct format
+  } else if (cleaned.startsWith('0') && cleaned.length === 10) {
+    return '254' + cleaned.slice(1); // Remove leading 0 and add 254
+  } else if (cleaned.startsWith('+254') && cleaned.length === 13) {
+    return cleaned.slice(1); // Remove + and keep 254
+  } else if (cleaned.length === 9) {
+    return '254' + cleaned; // Add 254 prefix
+  } else if (cleaned.length === 12 && !cleaned.startsWith('254')) {
+    // Invalid format, but try to fix
+    console.warn(`Unexpected phone format: ${phone}, using as-is: ${cleaned}`);
+    return cleaned;
   }
+
+  console.warn(`Unable to format phone number: ${phone}, result: ${cleaned}`);
   return cleaned;
+}
+
+// Test M-Pesa connection
+export async function testMpesaConnection(): Promise<{ success: boolean; message: string }> {
+  try {
+    const token = await getMpesaToken();
+    return { success: true, message: "M-Pesa connection successful" };
+  } catch (error) {
+    return { success: false, message: `M-Pesa connection failed: ${error instanceof Error ? error.message : 'Unknown error'}` };
+  }
 }
