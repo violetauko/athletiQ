@@ -55,7 +55,7 @@ const DonateHeader = () => (
       Fuel the next champion
     </h1>
     <p className="text-sm md:text-lg max-w-md leading-relaxed text-white/80">
-      Your donation gives undiscovered athletes the platform, coaching, and opportunity
+      Your input gives undiscovered athletes the platform, coaching, and opportunity
       they deserve.
     </p>
   </div>
