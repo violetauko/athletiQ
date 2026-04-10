@@ -32,18 +32,9 @@ export async function POST(req: NextRequest) {
 
     // For sandbox, use a small test amount to avoid issues
     const isSandbox = (process.env.MPESA_BASE_URL || "https://sandbox.safaricom.co.ke").includes('sandbox');
-    const finalAmount = isSandbox ? Math.min(amount, 10) : amount; // Max 10 KES for sandbox
-
-    console.log("M-Pesa STK Push Details:", {
-      phone: phone,
-      formattedPhone: formattedPhone,
-      originalAmount: amount,
-      finalAmount: finalAmount,
-      isSandbox: isSandbox,
-      shortcode: process.env.MPESA_SHORTCODE,
-      callbackUrl: process.env.MPESA_CALLBACK_URL,
-      baseUrl: process.env.MPESA_BASE_URL || "https://sandbox.safaricom.co.ke"
-    });
+    const finalAmount = isSandbox ? Math.min(amount, 11) : amount; // Max 10 KES for sandbox
+    const childTillNumber = process.env.MPESA_CHILD_TILL_NUMBER || "5384902"; // Default sandbox till
+    
 
     const passkey = process.env.MPESA_PASSKEY!;
     const shortcode = process.env.MPESA_SHORTCODE!;
@@ -68,17 +59,17 @@ export async function POST(req: NextRequest) {
       BusinessShortCode: shortcode,
       Password: password,
       Timestamp: timestamp,
-      TransactionType: "CustomerPayBillOnline",
+      TransactionType: "CustomerBuyGoodsOnline",
       Amount: finalAmount,
       PartyA: formattedPhone,
-      PartyB: shortcode,
+      PartyB: childTillNumber,
       PhoneNumber: formattedPhone,
       CallBackURL: callbackUrl,
       AccountReference: "Athlete Entry Fee",
-      TransactionDesc: `Payment for Athlete dashboard access - ${finalAmount} KES`,
+      TransactionDesc: `Athlete access Fee`,
     };
 
-    console.log("STK Payload:", JSON.stringify(stkPayload, null, 2));
+    // console.log("STK Payload:", JSON.stringify(stkPayload, null, 2));
 
     const response = await fetch(
       `${process.env.MPESA_BASE_URL || "https://sandbox.safaricom.co.ke"}/mpesa/stkpush/v1/processrequest`,
@@ -93,7 +84,7 @@ export async function POST(req: NextRequest) {
     );
 
     const mpesaResponse = await response.json();
-    console.log("M-Pesa STK Push Response:", JSON.stringify(mpesaResponse, null, 2));
+    // console.log("M-Pesa STK Push Response:", JSON.stringify(mpesaResponse, null, 2));
 
     // Check for various response codes
     if (mpesaResponse.ResponseCode !== "0") {
