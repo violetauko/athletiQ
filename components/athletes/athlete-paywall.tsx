@@ -58,7 +58,7 @@ export function AthletePaywall() {
             } catch (err) {
                 console.error("Polling error", err);
             }
-        }, 4000); // Check every 4 seconds
+        }, 10000); // Check every 10 seconds
 
         // Stop polling after 2 minutes (Mpesa timeout)
         const timeout = setTimeout(() => {
@@ -67,7 +67,7 @@ export function AthletePaywall() {
                 setStkStatus("failed");
                 toast.error("Payment timed out. Please try again.");
             }
-        }, 5 * 1000);
+        }, 5 * 10000);
 
         return () => {
             clearInterval(interval);
