@@ -7,7 +7,7 @@
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type UploadType = 'image' | 'resume';
+export type UploadType = 'image' | 'resume' | 'product';
 
 export interface UploadResult {
   url: string;
@@ -36,6 +36,12 @@ export const UPLOAD_CONFIG = {
     ],
     allowedExtensions: ['pdf', 'doc', 'docx'],
     folder: 'resumes',
+  },
+  product: {
+    maxSizeBytes: 5 * 1024 * 1024, // 5 MB
+    allowedTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+    allowedExtensions: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+    folder: 'products',
   },
 } as const;
 
