@@ -184,6 +184,7 @@ export default function MarketplacePage() {
                                         price: product.price,
                                         image: product.imageUrl,
                                         hoverImage: product.imageUrl,
+                                        description: product.description
                                     }
                                     return <ProductCard key={product.id} {...cardProps} />
                                 })}

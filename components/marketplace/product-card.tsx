@@ -19,7 +19,8 @@ interface ProductCardProps {
     image: string
     hoverImage: string
     badge?: string
-    colors?: string[]
+    colors?: string[],
+    description?: string
 }
 
 export function ProductCard({
@@ -31,7 +32,8 @@ export function ProductCard({
     image,
     hoverImage,
     badge,
-    colors
+    colors,
+    description
 }: ProductCardProps) {
     const { addToCart } = useCart()
     const { toggleWishlist, isInWishlist } = useWishlist()
@@ -54,7 +56,7 @@ export function ProductCard({
     }
 
     return (
-        <div 
+        <div
             className="group relative flex flex-col"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -97,15 +99,15 @@ export function ProductCard({
                 <div className={cn(
                     "absolute right-3 top-3 flex flex-col gap-2 transition-all duration-300 translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
                 )}>
-                    <QuickActionButton 
-                        icon={<Heart className={cn("w-4 h-4", isSaved && "fill-teal-500 text-teal-500")} />} 
-                        label={isSaved ? "Saved" : "Wishlist"} 
+                    <QuickActionButton
+                        icon={<Heart className={cn("w-4 h-4", isSaved && "fill-teal-500 text-teal-500")} />}
+                        label={isSaved ? "Saved" : "Wishlist"}
                         onClick={() => toggleWishlist({ id, name, price, image, category })}
                     />
                     <QuickActionButton icon={<BarChart2 className="w-4 h-4" />} label="Compare" />
-                    <QuickActionButton 
-                        icon={<Search className="w-4 h-4" />} 
-                        label="Quick View" 
+                    <QuickActionButton
+                        icon={<Search className="w-4 h-4" />}
+                        label="Quick View"
                         onClick={() => setIsQuickViewOpen(true)}
                     />
                 </div>
@@ -114,7 +116,7 @@ export function ProductCard({
                 <div className={cn(
                     "absolute bottom-0 left-0 right-0 p-3 transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100",
                 )}>
-                    <Button 
+                    <Button
                         onClick={handleAddToCart}
                         className="w-full bg-white text-black hover:bg-black hover:text-white rounded-none h-10 font-bold uppercase text-[10px] tracking-widest shadow-lg"
                     >
@@ -141,7 +143,7 @@ export function ProductCard({
                 {colors && colors.length > 0 && (
                     <div className="flex gap-1.5 mt-2">
                         {colors.map((color, idx) => (
-                            <div 
+                            <div
                                 key={idx}
                                 className="w-3.5 h-3.5 rounded-full border border-stone-200 cursor-pointer hover:scale-110 transition-transform shadow-inner"
                                 style={{ backgroundColor: color }}
@@ -151,11 +153,11 @@ export function ProductCard({
                 )}
             </div>
 
-            <QuickViewModal 
+            <QuickViewModal
                 isOpen={isQuickViewOpen}
                 onOpenChange={setIsQuickViewOpen}
                 product={{
-                    id, name, category, price, originalPrice, image, hoverImage, badge, colors
+                    id, name, category, price, originalPrice, image, hoverImage, badge, colors, description
                 }}
             />
         </div>
@@ -164,7 +166,7 @@ export function ProductCard({
 
 function QuickActionButton({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick?: () => void }) {
     return (
-        <button 
+        <button
             onClick={onClick}
             className="w-10 h-10 bg-white hover:bg-black hover:text-white flex items-center justify-center rounded-sm shadow-sm transition-colors group/btn relative"
             title={label}
