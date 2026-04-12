@@ -43,22 +43,57 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Update the DB in a transaction
-      await prisma.$transaction([
-        prisma.payment.update({
-          where: { id: payment.id },
-          data: {
-            status: PaymentStatus.COMPLETED,
-            receiptNumber: mpesaReceiptNumber,
-          },
-        }),
-        prisma.user.update({
-          where: { id: payment.userId },
-          data: { hasPaidFee: true },
-        }),
-      ]);
+      // If it's an order (marketplace purchase)
+      if (payment.merchantReference) {
+        await prisma.$transaction(async (tx) => {
+          // 1. Update Payment
+          await tx.payment.update({
+            where: { id: payment.id },
+            data: {
+              status: PaymentStatus.COMPLETED,
+              receiptNumber: mpesaReceiptNumber,
+            },
+          });
 
-      console.log(`M-Pesa payment ${checkoutRequestID} successfully processed for user ${payment.userId}`);
+          // 2. Update Order Status
+          const order = await tx.order.update({
+            where: { id: payment.merchantReference! },
+            data: { status: "PROCESSING" },
+            include: { OrderItem: true }
+          });
+
+          // 3. Decrement Stock
+          for (const item of order.OrderItem) {
+            await tx.product.update({
+              where: { id: item.productId },
+              data: {
+                stock: {
+                  decrement: item.quantity
+                }
+              }
+            });
+          }
+        });
+
+        console.log(`M-Pesa Order Payment ${checkoutRequestID} processed for Order ${payment.merchantReference}`);
+      } else {
+        // It's an entry fee payment
+        await prisma.$transaction([
+          prisma.payment.update({
+            where: { id: payment.id },
+            data: {
+              status: PaymentStatus.COMPLETED,
+              receiptNumber: mpesaReceiptNumber,
+            },
+          }),
+          prisma.user.update({
+            where: { id: payment.userId },
+            data: { hasPaidFee: true },
+          }),
+        ]);
+
+        console.log(`M-Pesa Entry Fee payment ${checkoutRequestID} successfully processed for user ${payment.userId}`);
+      }
     } else {
       // Payment Failed (user cancelled, insufficient funds, etc.)
       console.log(`M-Pesa payment ${checkoutRequestID} failed with ResultCode ${resultCode}: ${resultDesc}`);

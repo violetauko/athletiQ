@@ -1,7 +1,7 @@
 'use client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Briefcase, FileText, Settings, TrendingUp, User } from 'lucide-react'
+import { Briefcase, FileText, Settings, TrendingUp, User, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { redirect, usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -10,6 +10,7 @@ import { prisma } from '@/lib/prisma'
 
 const NAV_ITEMS = [
     { href: '/dashboard/athlete', label: 'Dashboard', icon: TrendingUp, default: true },
+    { href: '/marketplace', label: 'Marketplace', icon: ShoppingBag, default: false },
     { href: '/dashboard/athlete/applications', label: 'Applications', icon: Briefcase, default: false },
     { href: '/dashboard/athlete/saved', label: 'Saved Opportunities', icon: FileText, default: false },
     { href: '/dashboard/athlete/opportunities', label: 'Opportunities', icon: User, default: false },

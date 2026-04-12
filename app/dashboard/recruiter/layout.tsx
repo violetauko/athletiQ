@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Briefcase, FileText, TrendingUp, User, Settings, MessageSquare } from 'lucide-react'
+import { Briefcase, FileText, TrendingUp, User, Settings, MessageSquare, ShoppingBag } from 'lucide-react'
 import React from 'react'
 import Link from 'next/link'
 import { redirect, usePathname } from 'next/navigation'
@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react'
 
 const NAV_ITEMS = [
     { href: '/dashboard/recruiter', label: 'Dashboard', icon: TrendingUp },
+    { href: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
     { href: '/dashboard/recruiter/applications', label: 'Applications', icon: Briefcase },
     { href: '/dashboard/recruiter/opportunities', label: 'My Opportunities', icon: FileText },
     { href: '/dashboard/recruiter/messages', label: 'Messages', icon: MessageSquare },

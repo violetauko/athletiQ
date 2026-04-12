@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { FileText, TrendingUp, User, MessageSquare, ShieldCheck, Users, DollarSign } from 'lucide-react'
+import { FileText, TrendingUp, User, MessageSquare, ShieldCheck, Users, DollarSign, ShoppingBag } from 'lucide-react'
 import React from 'react'
 import Link from 'next/link'
 import { redirect, usePathname } from 'next/navigation'
@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react'
 
 const NAV_ITEMS = [
     { href: '/dashboard/admin', label: 'Dashboard', icon: TrendingUp },
+    { href: '/dashboard/admin/marketplace', label: 'Marketplace', icon: ShoppingBag },
     { href: '/dashboard/admin/users', label: 'Users', icon: Users },
     // { href: '/dashboard/admin/applications', label: 'All Applications', icon: Briefcase },
     { href: '/dashboard/admin/opportunities', label: 'Opportunities', icon: FileText },
