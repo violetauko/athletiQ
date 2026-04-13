@@ -396,7 +396,8 @@
 
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -463,7 +464,7 @@ interface Opportunity {
   organization: string
   sport: string
   type: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP'
-  status: 'PENDING' | 'REJECTED' | 'ACTIVE' | 'CLOSED' | 'DRAFT' | 'EXPIRED'
+  status: 'PENDING_APPROVAL' | 'REJECTED' | 'ACTIVE' | 'CLOSED' | 'DRAFT' | 'EXPIRED'
   location: string
   createdAt: string
     ClientProfile?: {
@@ -502,6 +503,7 @@ interface PaginatedResponse {
 
 export default function AdminOpportunitiesPage() {
   const queryClient = useQueryClient()
+  const searchParams = useSearchParams()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [sport, setSport] = useState('all')
@@ -518,6 +520,14 @@ export default function AdminOpportunitiesPage() {
   const [activeTab, setActiveTab] = useState('all')
   
   const debouncedSearch = useDebounce(search, 300)
+
+  useEffect(() => {
+    const s = searchParams.get('status')
+    if (s && s !== 'all') {
+      setStatus(s)
+      setPage(1)
+    }
+  }, [searchParams])
 
   // Build query string
   const queryString = useMemo(() => {
@@ -655,15 +665,14 @@ export default function AdminOpportunitiesPage() {
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      PENDING: { className: 'bg-amber-100 text-amber-700 border-amber-200', icon: Clock },
-      // APPROVED: { className: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle },
+      PENDING_APPROVAL: { className: 'bg-amber-100 text-amber-700 border-amber-200', icon: Clock },
       REJECTED: { className: 'bg-red-100 text-red-700 border-red-200', icon: XCircle },
       ACTIVE: { className: 'bg-blue-100 text-blue-700 border-blue-200', icon: CheckCircle },
       CLOSED: { className: 'bg-stone-100 text-stone-700 border-stone-200', icon: XCircle },
       DRAFT: { className: 'bg-stone-100 text-stone-700 border-stone-200', icon: FileText },
       EXPIRED: { className: 'bg-stone-100 text-stone-700 border-stone-200', icon: AlertCircle },
     }
-    const variant = variants[status as keyof typeof variants] || variants.PENDING
+    const variant = variants[status as keyof typeof variants] || variants.PENDING_APPROVAL
     const Icon = variant.icon
     
     return (
@@ -675,7 +684,7 @@ export default function AdminOpportunitiesPage() {
   }
 
   // Count pending opportunities
-  const pendingCount = data?.data.filter(o => o.status === 'PENDING').length || 0
+  const pendingCount = data?.data.filter(o => o.status === 'PENDING_APPROVAL').length || 0
 
   if (error) {
     return (
@@ -956,7 +965,7 @@ export default function AdminOpportunitiesPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          {opportunity.status === 'PENDING' && (
+                          {opportunity.status === 'PENDING_APPROVAL' && (
                             <>
                               <Button
                                 variant="ghost"
@@ -1029,7 +1038,7 @@ export default function AdminOpportunitiesPage() {
                                   Reject
                                 </DropdownMenuItem>
                               )}
-                              {opportunity.status !== 'PENDING' && (
+                              {opportunity.status !== 'PENDING_APPROVAL' && (
                                 <DropdownMenuItem 
                                   onClick={() => {
                                     setSelectedOpportunities([opportunity.id])

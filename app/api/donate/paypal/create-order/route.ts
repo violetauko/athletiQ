@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateAccessToken, PAYPAL_API_BASE } from '@/lib/paypal'
 import { z } from 'zod'
+import { usdToKes } from '@/lib/donations/exchange'
 
 const createOrderSchema = z.object({
-  amount: z.number().int().min(100).max(1000000), // in cents
+  /** Donation in USD (same as UI); charged in KES after conversion */
+  amountUsd: z.number().positive().min(1).max(100_000),
 })
 
 export async function POST(req: NextRequest) {
@@ -15,8 +17,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid data', details: parsed.error.format() }, { status: 400 })
     }
 
-    const { amount } = parsed.data
-    const dollars = (amount / 100).toFixed(2)
+    const { amountUsd } = parsed.data
+    const kesMajor = usdToKes(amountUsd).toFixed(2)
 
     const accessToken = await generateAccessToken()
 
@@ -26,8 +28,8 @@ export async function POST(req: NextRequest) {
       purchase_units: [
         {
           amount: {
-            currency_code: 'USD',
-            value: dollars,
+            currency_code: 'KES',
+            value: kesMajor,
           },
           description: 'AthletiQ Donation'
         },

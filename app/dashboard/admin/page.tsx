@@ -19,6 +19,7 @@ import {
 import Link from 'next/link'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { formatCurrency } from '@/lib/utils'
 
 interface DashboardData {
     stats: {
@@ -84,6 +85,12 @@ interface DashboardData {
         types: string[];
         statuses: string[];
     };
+    businessStats?: {
+        monthlyRevenue: number;
+        totalOrders: number;
+        totalCommission: number;
+        revenueGrowth: number;
+    };
 }
 
 export default function AdminDashboard() {
@@ -102,47 +109,56 @@ export default function AdminDashboard() {
             if (!oppRes.ok) throw new Error('Failed to fetch opportunities')
             const oppData = await oppRes.json()
 
-            // Fetch all opportunities for stats
-            const allOppRes = await fetch('/api/admin/opportunities?limit=1')
-            if (!allOppRes.ok) throw new Error('Failed to fetch opportunity stats')
-            const allOppData = await allOppRes.json()
+            const statsRes = await fetch('/api/admin/opportunities/stats')
+            if (!statsRes.ok) throw new Error('Failed to fetch opportunity stats')
+            const oppStats = await statsRes.json()
 
-            // Calculate stats
             const totalUsers = usersData.pagination.total
             const pendingOpps = oppData.pagination.total
-            const totalOpps = allOppData.pagination.total
-            
-            // Count active opportunities (you might need to fetch more pages for accurate count)
-            const activeOpps = allOppData.data.filter((o: any) => o.status === 'ACTIVE').length
-            const closedOpps = allOppData.data.filter((o: any) => o.status === 'CLOSED').length
-
-            // Calculate total applications across all opportunities
-            const totalApplications = allOppData.data.reduce((acc: number, opp: any) => 
-                acc + (opp._count?.Application || 0), 0
-            )
 
             return {
                 stats: {
                     totalUsers,
                     opportunities: {
-                        total: totalOpps,
+                        total: oppStats.total,
                         pending: pendingOpps,
-                        active: activeOpps,
-                        closed: closedOpps
+                        active: oppStats.active,
+                        closed: oppStats.closed
                     },
                     applications: {
-                        total: totalApplications
+                        total: oppStats.totalApplications
                     },
                     recentActivity: {
                         newUsers: usersData.data.length,
                         newOpportunities: oppData.data.length,
-                        newApplications: 0 // This would need a separate API call
+                        newApplications: oppStats.pendingApplications ?? 0
                     }
                 },
                 recentUsers: usersData.data,
                 pendingOpportunities: oppData.data,
                 userStats: usersData.stats,
-                opportunityFilters: oppData.filters
+                opportunityFilters: oppData.filters,
+                businessStats: await (async () => {
+                    try {
+                        const [financeRes, marketplaceRes] = await Promise.all([
+                            fetch('/api/admin/finance/analytics?period=month'),
+                            fetch('/api/admin/marketplace/stats')
+                        ]);
+                        
+                        const finance = financeRes.ok ? await financeRes.json() : null;
+                        const marketplace = marketplaceRes.ok ? await marketplaceRes.json() : null;
+                        
+                        return {
+                            monthlyRevenue: finance?.totalRevenue || 0,
+                            totalOrders: marketplace?.totalOrders || 0,
+                            totalCommission: finance?.totalCommission || 0,
+                            revenueGrowth: finance?.growth?.revenue || 0
+                        };
+                    } catch (err) {
+                        console.error('Failed to fetch business stats:', err);
+                        return undefined;
+                    }
+                })()
             }
         },
         staleTime: 30 * 1000, // 30 seconds
@@ -191,6 +207,7 @@ export default function AdminDashboard() {
 
     const getStatusBadge = (status: string) => {
         const variants = {
+            PENDING_APPROVAL: 'bg-amber-100 text-amber-700 border-amber-200',
             PENDING: 'bg-amber-100 text-amber-700 border-amber-200',
             REJECTED: 'bg-red-100 text-red-700 border-red-200',
             ACTIVE: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -225,6 +242,66 @@ export default function AdminDashboard() {
                             </Button>
                         </div>
                     )}
+
+                    {/* Business Overview */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Card className="bg-stone-900 text-white border-0">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="p-2 bg-green-500/20 rounded-lg">
+                                        <TrendingUp className="w-6 h-6 text-green-400" />
+                                    </div>
+                                    <Badge className="bg-white/10 text-white border-0">This Month</Badge>
+                                </div>
+                                <div className="text-sm text-stone-400">Total Revenue</div>
+                                <div className="flex items-baseline gap-2">
+                                    <div className="text-3xl font-bold mt-1">
+                                        {formatCurrency(data?.businessStats?.monthlyRevenue || 0, 'KES', false)}
+                                    </div>
+                                    {data?.businessStats?.revenueGrowth !== undefined && (
+                                        <div className={`text-xs font-medium ${data.businessStats.revenueGrowth >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                            {data.businessStats.revenueGrowth >= 0 ? '+' : ''}{data.businessStats.revenueGrowth.toFixed(1)}%
+                                        </div>
+                                    )}
+                                </div>
+                                <Button variant="link" size="sm" className="p-0 h-auto mt-4 text-stone-400 hover:text-white" asChild>
+                                    <Link href="/dashboard/admin/finances">View Financials →</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                        <Activity className="w-6 h-6 text-blue-600" />
+                                    </div>
+                                </div>
+                                <div className="text-sm text-stone-600">Total Marketplace Orders</div>
+                                <div className="text-3xl font-bold mt-1">{data?.businessStats?.totalOrders || 0}</div>
+                                <Button variant="link" size="sm" className="p-0 h-auto mt-4 text-blue-600" asChild>
+                                    <Link href="/dashboard/admin/marketplace/orders">Manage Orders →</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="p-2 bg-purple-100 rounded-lg">
+                                        <Shield className="w-6 h-6 text-purple-600" />
+                                    </div>
+                                </div>
+                                <div className="text-sm text-stone-600">Platform Commission (This Month)</div>
+                                <div className="text-3xl font-bold mt-1 text-green-600">
+                                    {formatCurrency(data?.businessStats?.totalCommission || 0, 'KES', false)}
+                                </div>
+                                <p className="text-[10px] text-stone-400 mt-4 italic">
+                                    Target: 20% platform cut on all marketplace sales
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
 
                     {/* Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -285,7 +362,7 @@ export default function AdminDashboard() {
                                     className="px-0 mt-2 h-auto text-purple-600"
                                     asChild
                                 >
-                                    <Link href="/dashboard/admin/opportunities?status=PENDING">Review Now →</Link>
+                                    <Link href="/dashboard/admin/opportunities?status=PENDING_APPROVAL">Review Now →</Link>
                                 </Button>
                             </CardContent>
                         </Card>
@@ -377,7 +454,7 @@ export default function AdminDashboard() {
                                     {pendingCount > 5 && (
                                         <div className="text-center pt-2">
                                             <Button variant="link" asChild>
-                                                <Link href="/dashboard/admin/opportunities?status=PENDING">
+                                                <Link href="/dashboard/admin/opportunities?status=PENDING_APPROVAL">
                                                     View all {pendingCount} pending opportunities →
                                                 </Link>
                                             </Button>
@@ -511,7 +588,7 @@ export default function AdminDashboard() {
                                     <h3 className="font-medium text-sm mb-3">Quick Actions</h3>
                                     <div className="grid grid-cols-2 gap-2">
                                         <Button variant="outline" size="sm" asChild className="justify-start">
-                                            <Link href="/dashboard/admin/opportunities?status=PENDING">
+                                            <Link href="/dashboard/admin/opportunities?status=PENDING_APPROVAL">
                                                 <FileText className="w-4 h-4 mr-2" />
                                                 Review Pending
                                             </Link>

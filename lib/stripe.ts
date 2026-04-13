@@ -32,32 +32,33 @@ export const stripe = new Proxy({} as Stripe, {
   },
 })
 
+/** Tier amounts are USD (whole dollars); KES is derived via usdToKes on the server */
 export const DONATION_TIERS = [
   {
     id: 'champion',
     label: 'Champion',
-    amount: 1000,
+    amount: 10,
     description: 'Help one athlete with training gear',
     emoji: '🥉',
   },
   {
     id: 'supporter',
     label: 'Supporter',
-    amount: 2500,
+    amount: 25,
     description: 'Fund a month of coaching sessions',
     emoji: '🥈',
   },
   {
     id: 'mvp',
     label: 'MVP',
-    amount: 5000,
+    amount: 50,
     description: "Sponsor an athlete's tournament entry",
     emoji: '🥇',
   },
   {
     id: 'legend',
     label: 'Legend',
-    amount: 10000,
+    amount: 100,
     description: 'Full scholarship contribution',
     emoji: '🏆',
   },

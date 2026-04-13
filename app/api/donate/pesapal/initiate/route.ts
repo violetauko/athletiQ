@@ -3,16 +3,30 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getPesapalToken, registerIPN, submitOrder } from "@/lib/pesapal";
 import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
+import { usdToKes } from "@/lib/donations/exchange";
+
+const bodySchema = z.object({
+  /** Donation in USD (same as UI); order and DB use converted KES */
+  amountUsd: z.number().positive().min(1),
+  tierId: z.string().optional(),
+  isCustom: z.boolean().optional(),
+  donorName: z.string().optional(),
+  message: z.string().optional(),
+});
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { amount, tierId, isCustom, donorName, message } = body;
-
+    const raw = await req.json();
+    const parsed = bodySchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid data", details: parsed.error.flatten() }, { status: 400 });
+    }
+    const { amountUsd, tierId, isCustom, donorName, message } = parsed.data;
 
     const session = await auth();
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const amountKes = Math.round(amount / 100); // amount comes in cents
+    const amountKes = usdToKes(amountUsd);
 
     // 1. Get Pesapal token
     const token = await getPesapalToken();
@@ -53,7 +67,7 @@ export async function POST(req: NextRequest) {
     await prisma.donation.create({
       data: {
         pesapalOrderId: orderResponse.order_tracking_id,
-        amount,
+        amount: amountKes,
         currency: "kes",
         tierId: tierId ?? "custom",
         isCustom: isCustom ?? true,

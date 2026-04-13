@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
-import { PaymentProvider, PaymentStatus } from "@prisma/client";
+import { PaymentProvider, PaymentPurpose, PaymentStatus } from "@prisma/client";
 
 export async function POST() {
   try {
@@ -49,10 +49,11 @@ export async function POST() {
     await prisma.payment.create({
       data: {
         userId: session.user.id,
-        amount: amountKes * 100,
+        amount: amountKes,
         currency: "KES",
         provider: PaymentProvider.STRIPE,
         status: PaymentStatus.PENDING,
+        purpose: PaymentPurpose.REGISTRATION_FEE,
         referenceId: checkoutSession.id,
       },
     });

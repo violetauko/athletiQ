@@ -4,7 +4,8 @@ import { z } from 'zod'
 import { auth } from '@/auth'
 
 const donationSchema = z.object({
-  amount: z.number().int().min(100).max(1000000), // $1 - $10,000
+  /** Whole or decimal USD (e.g. 25.5); Stripe uses cents internally */
+  amountUsd: z.number().positive().min(1).max(100_000),
   tierId: z.string().optional(),
   isCustom: z.boolean().optional(),
   donorName: z.string().min(1).max(100).optional(),
@@ -23,7 +24,8 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { amount, tierId, donorName, message } = parsed.data
+    const { amountUsd, tierId, donorName, message } = parsed.data
+    const amountCents = Math.round(amountUsd * 100)
     const session = await auth()
 
     // Build tier label for display
@@ -45,7 +47,7 @@ export async function POST(req: NextRequest) {
               description: tier?.description ?? 'Supporting the next generation of athletes',
               images: [`${baseUrl}/og-donate.png`], // add your OG image
             },
-            unit_amount: amount,
+            unit_amount: amountCents,
           },
           quantity: 1,
         },
@@ -56,6 +58,7 @@ export async function POST(req: NextRequest) {
         message: message ?? '',
         userId: session?.user?.id ?? 'anonymous',
         userEmail: session?.user?.email ?? '',
+        amountUsd: String(amountUsd),
       },
       customer_email: session?.user?.email ?? undefined,
       allow_promotion_codes: true,

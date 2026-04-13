@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { formatCurrency } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,17 +25,8 @@ export async function GET() {
       },
     });
 
-    const raisedCents = donationsThisYear._sum.amount || 0;
-    const raisedDollars = raisedCents / 100;
-    
-    // Format appropriately
-    let raisedFormatted = `$${raisedDollars}`;
-    if (raisedDollars >= 1000) {
-      raisedFormatted = `$${(raisedDollars / 1000).toFixed(1).replace(/\.0$/, '')}K`;
-    } else if (raisedDollars === 0) {
-      // If 0, keep default for visual sake if requested, but let's be real
-      // raisedFormatted = '$48K'; 
-    }
+    const raisedKes = donationsThisYear._sum.amount ?? 0
+    const raisedFormatted = formatCurrency(raisedKes, 'KES', false)
 
     // 3. Scholarships Funded (Using Applications with ACCEPTED status)
     const scholarshipsFunded = await prisma.application.count({
@@ -53,17 +45,17 @@ export async function GET() {
 
     return NextResponse.json({
       athletesSupported: athletesSupported > 0 ? athletesSupported.toString() : '0',
-      raisedThisYear: raisedDollars > 0 ? raisedFormatted : '$0',
+      raisedThisYear: raisedKes > 0 ? raisedFormatted : formatCurrency(0, 'KES', false),
       scholarshipsFunded: scholarshipsFunded > 0 ? scholarshipsFunded.toString() : '0',
       placedInPrograms: totalApplications > 0 ? placedPercentage : '0%',
     });
   } catch (error) {
     console.error('Error fetching donation stats:', error);
     return NextResponse.json({
-      athletesSupported: '247',
-      raisedThisYear: '$48K',
-      scholarshipsFunded: '31',
-      placedInPrograms: '94%',
+      athletesSupported: '0',
+      raisedThisYear: formatCurrency(0, 'KES', false),
+      scholarshipsFunded: '0',
+      placedInPrograms: '0%',
     });
   }
 }

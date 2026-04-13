@@ -2,12 +2,12 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
-import { DonationStatus, PaymentStatus } from '@prisma/client'
+import { DonationStatus, PaymentPurpose, PaymentStatus } from '@prisma/client'
 
 export async function GET(request: Request) {
   try {
     const session = await auth()
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session?.user || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
@@ -53,18 +53,18 @@ export async function GET(request: Request) {
       }),
       prisma.payment.aggregate({
         where: {
-          createdAt: { gte: startDate },
+          updatedAt: { gte: startDate },
           status: PaymentStatus.COMPLETED,
-          merchantReference: { not: null }
+          purpose: PaymentPurpose.MARKETPLACE_PURCHASE,
         },
         _sum: { amount: true },
         _count: true
       }),
       prisma.payment.aggregate({
         where: {
-          createdAt: { gte: startDate },
+          updatedAt: { gte: startDate },
           status: PaymentStatus.COMPLETED,
-          merchantReference: null
+          purpose: PaymentPurpose.REGISTRATION_FEE,
         },
         _sum: { amount: true },
         _count: true
@@ -94,63 +94,82 @@ export async function GET(request: Request) {
       }),
       prisma.payment.aggregate({
         where: {
-          createdAt: {
+          updatedAt: {
             gte: previousStartDate,
             lt: startDate
           },
           status: PaymentStatus.COMPLETED,
-          merchantReference: { not: null }
+          purpose: PaymentPurpose.MARKETPLACE_PURCHASE,
         },
         _sum: { amount: true }
       }),
       prisma.payment.aggregate({
         where: {
-          createdAt: {
+          updatedAt: {
             gte: previousStartDate,
             lt: startDate
           },
           status: PaymentStatus.COMPLETED,
-          merchantReference: null
+          purpose: PaymentPurpose.REGISTRATION_FEE,
         },
         _sum: { amount: true }
       })
     ])
-    const currentDonationSum = currentDonations._sum.amount ? currentDonations._sum.amount / 100 : 0
-    const currentOrderRevenue = (currentOrderPayments._sum.amount || 0) * 0.20
-    const currentFeeRevenue = (currentFeePayments._sum.amount || 0)
-    const currentTotal = currentDonationSum + currentOrderRevenue + currentFeeRevenue
+    const currentDonationSum = currentDonations._sum.amount ? currentDonations._sum.amount : 0
+    const currentPurchasesTotal = (currentOrderPayments._sum.amount || 0)
+    const purchaseCommission = currentPurchasesTotal * 0.2
+    const donationCommission = currentDonationSum * 0.2
+    const currentCommissionRevenue = purchaseCommission + donationCommission
+    const currentEntryPaymentsRevenue = (currentFeePayments._sum.amount || 0)
+    // Total Revenue is what the platform keeps: Commission + 100% of Entry Payments
+    const currentTotalRevenue = currentCommissionRevenue + currentEntryPaymentsRevenue
 
-    const previousDonationSum = previousDonations._sum.amount ? previousDonations._sum.amount / 100 : 0
-    const previousOrderRevenue = (previousOrderPayments._sum.amount || 0) * 0.20
-    const previousFeeRevenue = (previousFeePayments._sum.amount || 0)
-    const previousTotal = previousDonationSum + previousOrderRevenue + previousFeeRevenue
+    const previousDonationSum = previousDonations._sum.amount ? previousDonations._sum.amount : 0
+    const previousPurchasesTotal = (previousOrderPayments._sum.amount || 0)
+    const previousCommissionRevenue = (previousPurchasesTotal * 0.20) + (previousDonationSum * 0.20)
+    const previousEntryPaymentsRevenue = (previousFeePayments._sum.amount || 0)
+    const previousTotalRevenue = previousCommissionRevenue + previousEntryPaymentsRevenue
 
     // Calculate growth percentages
-    const revenueGrowth = previousTotal > 0 
-      ? ((currentTotal - previousTotal) / previousTotal) * 100 
+    const revenueGrowth = previousTotalRevenue > 0 
+      ? ((currentTotalRevenue - previousTotalRevenue) / previousTotalRevenue) * 100 
       : 0
 
-    const currentTotalDonations = currentDonationSum
-    const previousTotalDonations = previousDonationSum
-    const donationsGrowth = previousTotalDonations > 0
-      ? ((currentTotalDonations - previousTotalDonations) / previousTotalDonations) * 100
+    const donationsGrowth = previousDonationSum > 0
+      ? ((currentDonationSum - previousDonationSum) / previousDonationSum) * 100
       : 0
 
-    const currentTotalPaymentsRevenue = currentOrderRevenue + currentFeeRevenue
-    const previousTotalPaymentsRevenue = previousOrderRevenue + previousFeeRevenue
-    const paymentsGrowth = previousTotalPaymentsRevenue > 0
-      ? ((currentTotalPaymentsRevenue - previousTotalPaymentsRevenue) / previousTotalPaymentsRevenue) * 100
+    const purchasesGrowth = previousPurchasesTotal > 0
+      ? ((currentPurchasesTotal - previousPurchasesTotal) / previousPurchasesTotal) * 100
+      : 0
+
+    const commissionGrowth = previousCommissionRevenue > 0
+      ? ((currentCommissionRevenue - previousCommissionRevenue) / previousCommissionRevenue) * 100
+      : 0
+
+    const entryPaymentsGrowth = previousEntryPaymentsRevenue > 0
+      ? ((currentEntryPaymentsRevenue - previousEntryPaymentsRevenue) / previousEntryPaymentsRevenue) * 100
       : 0
 
     return NextResponse.json({
-      totalRevenue: currentTotal,
+      totalRevenue: currentTotalRevenue,
       totalDonations: currentDonationSum,
-      totalPayments: currentTotalPaymentsRevenue,
+      /** Marketplace order checkout only (merchantReference set); COMPLETED settlement amounts. */
+      totalPurchases: currentPurchasesTotal,
+      successfulPurchaseCount: currentOrderPayments._count,
+      /** Registration / entry fee payments (no order); COMPLETED settlement amounts. */
+      totalEntryPayments: currentEntryPaymentsRevenue,
+      successfulRegistrationPaymentCount: currentFeePayments._count,
+      totalCommission: currentCommissionRevenue,
+      purchaseCommission,
+      donationCommission,
       uniqueDonors: uniqueDonors.length,
       growth: {
-        revenue: Math.round(revenueGrowth * 100) / 100,
+        revenue: Math.round(revenueGrowth),
         donations: Math.round(donationsGrowth * 100) / 100,
-        payments: Math.round(paymentsGrowth * 100) / 100,
+        purchases: Math.round(purchasesGrowth * 100) / 100,
+        commission: Math.round(commissionGrowth * 100) / 100,
+        entryPayments: Math.round(entryPaymentsGrowth * 100) / 100,
       },
       donations: {
         byStatus: await getDonationStatusBreakdown(startDate),
@@ -158,12 +177,7 @@ export async function GET(request: Request) {
         byCurrency: await getDonationCurrencyBreakdown(startDate),
         dailyStats: await getDailyDonationStats(startDate),
       },
-      payments: {
-        byStatus: await getPaymentStatusBreakdown(startDate),
-        byProvider: await getPaymentProviderBreakdown(startDate),
-        byCurrency: await getPaymentCurrencyBreakdown(startDate),
-        dailyStats: await getDailyPaymentStats(startDate),
-      }
+      payments: await buildPaymentsAnalytics(startDate),
     })
 
   } catch (error) {
@@ -264,7 +278,7 @@ async function getDailyDonationStats(startDate: Date) {
     }
     const current = statsMap.get(date)
     current.count += stat._count
-    current.total += stat._sum.amount ? stat._sum.amount/100 : 0
+    current.total += stat._sum.amount ? stat._sum.amount : 0
   })
 
   return last30Days.map(date => ({
@@ -274,79 +288,160 @@ async function getDailyDonationStats(startDate: Date) {
   }))
 }
 
-async function getPaymentStatusBreakdown(startDate: Date) {
+/** Marketplace purchases vs registration fees — use Payment.purpose, not merchantReference. */
+type PaymentAnalyticsScope = 'marketplaceCheckout' | 'registration'
+
+function paymentScopeWhere(scope: PaymentAnalyticsScope) {
+  return scope === 'marketplaceCheckout'
+    ? { purpose: PaymentPurpose.MARKETPLACE_PURCHASE }
+    : { purpose: PaymentPurpose.REGISTRATION_FEE }
+}
+
+async function buildPaymentsAnalytics(startDate: Date) {
+  const [
+    mcStatus,
+    mcProv,
+    mcCur,
+    mcDaily,
+    regStatus,
+    regProv,
+    regCur,
+    regDaily,
+  ] = await Promise.all([
+    getPaymentStatusBreakdown(startDate, 'marketplaceCheckout'),
+    getPaymentProviderCompletion(startDate, 'marketplaceCheckout'),
+    getPaymentCurrencyBreakdown(startDate, 'marketplaceCheckout'),
+    getDailyPaymentStats(startDate, 'marketplaceCheckout'),
+    getPaymentStatusBreakdown(startDate, 'registration'),
+    getPaymentProviderCompletion(startDate, 'registration'),
+    getPaymentCurrencyBreakdown(startDate, 'registration'),
+    getDailyPaymentStats(startDate, 'registration'),
+  ])
+
+  return {
+    marketplaceCheckout: {
+      byStatus: mcStatus,
+      byProvider: mcProv,
+      byCurrency: mcCur,
+      dailyStats: mcDaily,
+    },
+    registration: {
+      byStatus: regStatus,
+      byProvider: regProv,
+      byCurrency: regCur,
+      dailyStats: regDaily,
+    },
+  }
+}
+
+async function getPaymentStatusBreakdown(startDate: Date, scope: PaymentAnalyticsScope) {
   const breakdown = await prisma.payment.groupBy({
     by: ['status'],
     where: {
-      createdAt: { gte: startDate }
+      createdAt: { gte: startDate },
+      ...paymentScopeWhere(scope),
     },
     _count: true,
     _sum: {
-      amount: true
-    }
+      amount: true,
+    },
   })
 
-  return breakdown.reduce((acc, curr) => ({
-    ...acc,
-    [curr.status]: {
-      count: curr._count,
-      total: curr._sum.amount || 0
-    }
-  }), {})
+  return breakdown.reduce(
+    (acc, curr) => ({
+      ...acc,
+      [curr.status]: {
+        count: curr._count,
+        total: curr._sum.amount || 0,
+      },
+    }),
+    {}
+  )
 }
 
-async function getPaymentProviderBreakdown(startDate: Date) {
+function groupByCountVal(row: { _count: number | { _all: number } }): number {
+  const c = row._count
+  return typeof c === 'number' ? c : c._all
+}
+
+/** Per provider: all volume vs completed only (for bar charts). */
+async function getPaymentProviderCompletion(startDate: Date, scope: PaymentAnalyticsScope) {
   const breakdown = await prisma.payment.groupBy({
-    by: ['provider'],
+    by: ['provider', 'status'],
     where: {
-      createdAt: { gte: startDate }
+      createdAt: { gte: startDate },
+      ...paymentScopeWhere(scope),
     },
     _count: true,
     _sum: {
-      amount: true
-    }
+      amount: true,
+    },
   })
 
-  return breakdown.reduce((acc, curr) => ({
-    ...acc,
-    [curr.provider]: {
-      count: curr._count,
-      total: curr._sum.amount || 0
+  const acc: Record<
+    string,
+    {
+      total: number
+      completed: number
+      totalCount: number
+      completedCount: number
     }
-  }), {})
+  > = {}
+
+  for (const row of breakdown) {
+    const key = row.provider
+    if (!acc[key]) {
+      acc[key] = { total: 0, completed: 0, totalCount: 0, completedCount: 0 }
+    }
+    const amount = row._sum.amount || 0
+    const n = groupByCountVal(row)
+    acc[key].total += amount
+    acc[key].totalCount += n
+    if (row.status === PaymentStatus.COMPLETED) {
+      acc[key].completed += amount
+      acc[key].completedCount += n
+    }
+  }
+
+  return acc
 }
 
-async function getPaymentCurrencyBreakdown(startDate: Date) {
+async function getPaymentCurrencyBreakdown(startDate: Date, scope: PaymentAnalyticsScope) {
   const breakdown = await prisma.payment.groupBy({
     by: ['currency'],
     where: {
-      createdAt: { gte: startDate }
+      createdAt: { gte: startDate },
+      ...paymentScopeWhere(scope),
     },
     _count: true,
     _sum: {
-      amount: true
-    }
+      amount: true,
+    },
   })
 
-  return breakdown.reduce((acc, curr) => ({
-    ...acc,
-    [curr.currency]: {
-      count: curr._count,
-      total: curr._sum.amount || 0
-    }
-  }), {})
+  return breakdown.reduce(
+    (acc, curr) => ({
+      ...acc,
+      [curr.currency]: {
+        count: curr._count,
+        total: curr._sum.amount || 0,
+      },
+    }),
+    {}
+  )
 }
 
-async function getDailyPaymentStats(startDate: Date) {
+async function getDailyPaymentStats(startDate: Date, scope: PaymentAnalyticsScope) {
   const stats = await prisma.payment.groupBy({
     by: ['createdAt'],
     where: {
-      createdAt: { gte: startDate }
+      createdAt: { gte: startDate },
+      ...paymentScopeWhere(scope),
     },
     _count: true,
     _sum: {
-      amount: true
-    }
+      amount: true,
+    },
   })
 
   const last30Days = Array.from({ length: 30 }, (_, i) => {
@@ -361,20 +456,14 @@ async function getDailyPaymentStats(startDate: Date) {
     if (!statsMap.has(date)) {
       statsMap.set(date, { count: 0, total: 0 })
     }
-    const current = statsMap.get(date)
+    const current = statsMap.get(date)!
     current.count += stat._count
-    
-    // Use the same 20% logic for the daily charts to be consistent with totalRevenue
-    // Since we don't have merchantReference in groupBy, we have to fetch more details or adjust logic.
-    // For simplicity in daily stats, we'll keep it as 100% OR we need to fetch individual records.
-    // Let's stick with 100% for the "Payment Analytics" chart specifically if it's meant to show volume,
-    // but the Overview analytics stats above use the 20% cut.
     current.total += stat._sum.amount || 0
   })
 
-  return last30Days.map(date => ({
+  return last30Days.map((date) => ({
     date,
     count: statsMap.get(date)?.count || 0,
-    total: statsMap.get(date)?.total || 0
+    total: statsMap.get(date)?.total || 0,
   }))
 }

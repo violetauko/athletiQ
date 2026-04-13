@@ -16,14 +16,20 @@ export function DonationDetailsModal({ donation, isOpen, onClose }: DonationDeta
     if (!donation) return null
 
     const getStatusBadge = (status: string) => {
-        const styles = {
+        const styles: Record<string, string> = {
+            PAID: 'bg-green-100 text-green-800',
             COMPLETED: 'bg-green-100 text-green-800',
             PENDING: 'bg-yellow-100 text-yellow-800',
             FAILED: 'bg-red-100 text-red-800',
             REFUNDED: 'bg-purple-100 text-purple-800',
         }
-        return styles[status as keyof typeof styles] || 'bg-gray-100 text-gray-800'
+        return styles[status] || 'bg-gray-100 text-gray-800'
     }
+
+    const statusLabel = (status: string) =>
+        ({ PAID: 'Paid', COMPLETED: 'Paid', PENDING: 'Pending', FAILED: 'Failed', REFUNDED: 'Refunded' } as Record<string, string>)[status] ?? status
+
+    const settled = donation.status === 'PAID' || donation.status === 'COMPLETED'
 
     const formatDate = (date: string) => {
         return new Date(date).toLocaleString('en-US', {
@@ -45,14 +51,30 @@ export function DonationDetailsModal({ donation, isOpen, onClose }: DonationDeta
                         <div>
                             <p className="text-sm text-muted-foreground">Status</p>
                             <Badge className={getStatusBadge(donation.status)}>
-                                {donation.status}
+                                {statusLabel(donation.status)}
                             </Badge>
                         </div>
                         <div className="text-right">
-                            <p className="text-sm text-muted-foreground">Amount</p>
+                            <p className="text-sm text-muted-foreground">
+                                {settled ? 'Gross Amount (collected)' : 'Stated amount (not collected)'}
+                            </p>
                             <p className="text-3xl font-bold">
                                 {formatCurrency(donation.amount, donation.currency, false)}
                             </p>
+                            {settled ? (
+                                <div className="mt-2 text-xs font-medium space-y-1">
+                                    <p className="text-blue-600">
+                                        Athlete Share (80%): {formatCurrency(donation.amount * 0.8, donation.currency, false)}
+                                    </p>
+                                    <p className="text-purple-600">
+                                        Platform Commission (20%): {formatCurrency(donation.amount * 0.2, donation.currency, false)}
+                                    </p>
+                                </div>
+                            ) : (
+                                <p className="mt-2 text-xs text-muted-foreground">
+                                    Splits apply only after payment succeeds. Failed or pending donations do not move funds.
+                                </p>
+                            )}
                         </div>
                     </div>
 
@@ -185,7 +207,7 @@ export function DonationDetailsModal({ donation, isOpen, onClose }: DonationDeta
 
                     {/* Actions */}
                     <div className="flex justify-end gap-2">
-                        {donation.status === 'COMPLETED' && (
+                        {settled && (
                             <Button variant="outline">
                                 <Download className="w-4 h-4 mr-2" />
                                 Download Receipt
