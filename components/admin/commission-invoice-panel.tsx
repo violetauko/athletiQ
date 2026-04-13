@@ -19,9 +19,18 @@ interface InvoicePayload {
   invoiceNumber: string
   platformName: string
   periodLabel: string
-  commissionRate: number
+  commissionRates: {
+    marketplace: number
+    donation: number
+    registration: number
+  }
   totals: {
     purchaseVolumeKes: number
+    donationVolume: number
+    registrationVolumeKes: number
+    marketplaceCommissionKes: number
+    donationCommissionKes: number
+    registrationCommissionKes: number
     platformCommissionDueKes: number
     transactionCount: number
   }
@@ -54,8 +63,10 @@ export function CommissionInvoicePanel() {
           Monthly commission invoice
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Statement of marketplace platform fee (20% of each settled purchase) for payout. Period uses UTC
-          month boundaries; payments are included when marked completed in that month.
+          Total platform commission for the UTC calendar month: marketplace (20%) and donations (20%) on gross
+          volume, plus registration fees (10%). Matches finance analytics methodology; donations use{' '}
+          <code className="text-xs">createdAt</code>, payments when marked completed (
+          <code className="text-xs">updatedAt</code>).
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -128,17 +139,33 @@ export function CommissionInvoicePanel() {
             <p className="text-sm text-muted-foreground">
               {data.invoiceNumber} · {data.periodLabel}
             </p>
-            <div className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+            <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
               <div>
-                <span className="text-muted-foreground">Purchase volume</span>
-                <p className="text-lg font-semibold">
-                  {formatCurrency(data.totals.purchaseVolumeKes, 'KES', false)}
+                <span className="text-muted-foreground">Marketplace gross (KES)</span>
+                <p className="font-semibold">{formatCurrency(data.totals.purchaseVolumeKes, 'KES', false)}</p>
+                <p className="text-xs text-muted-foreground">
+                  Commission ({(data.commissionRates.marketplace * 100).toFixed(0)}%):{' '}
+                  {formatCurrency(data.totals.marketplaceCommissionKes, 'KES', false)}
                 </p>
               </div>
               <div>
-                <span className="text-muted-foreground">
-                  Commission due ({(data.commissionRate * 100).toFixed(0)}%)
-                </span>
+                <span className="text-muted-foreground">Donation gross (numeric sum)</span>
+                <p className="font-semibold">{data.totals.donationVolume.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">
+                  Commission ({(data.commissionRates.donation * 100).toFixed(0)}%):{' '}
+                  {formatCurrency(data.totals.donationCommissionKes, 'KES', false)}
+                </p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Registration gross (KES)</span>
+                <p className="font-semibold">{formatCurrency(data.totals.registrationVolumeKes, 'KES', false)}</p>
+                <p className="text-xs text-muted-foreground">
+                  Commission ({(data.commissionRates.registration * 100).toFixed(0)}%):{' '}
+                  {formatCurrency(data.totals.registrationCommissionKes, 'KES', false)}
+                </p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Total platform commission due</span>
                 <p className="text-lg font-semibold text-emerald-800">
                   {formatCurrency(data.totals.platformCommissionDueKes, 'KES', false)}
                 </p>

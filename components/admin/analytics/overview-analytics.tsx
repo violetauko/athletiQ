@@ -3,6 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatCurrency } from '@/lib/utils'
+import {
+  MARKETPLACE_PLATFORM_COMMISSION_RATE,
+  REGISTRATION_FEE_COMMISSION_RATE,
+} from '@/lib/marketplace/commission'
 import { DollarSign, TrendingUp, Users, ArrowUpRight, ArrowDownRight, ShoppingBag, Percent, Ticket } from 'lucide-react'
 
 interface OverviewAnalyticsProps {
@@ -16,6 +20,8 @@ interface OverviewAnalyticsProps {
     totalCommission: number
     purchaseCommission?: number
     donationCommission?: number
+    /** 10% of completed registration-fee volume in period. */
+    registrationCommission?: number
     totalEntryPayments: number
     uniqueDonors: number
     growth: {
@@ -63,19 +69,27 @@ export function OverviewAnalytics({ data, isLoading, period, onPeriodChange }: O
           : 'Marketplace order checkouts only (payment purpose); excludes registration fees',
     },
     {
-      title: 'Commission (20%)',
+      title: 'Platform commission',
       value: formatCurrency(data?.totalCommission || 0, 'KES', false),
       change: data?.growth?.commission ?? 0,
       icon: Percent,
       color: 'bg-indigo-100 text-indigo-600',
       subline:
-        data?.purchaseCommission != null && data?.donationCommission != null
-          ? `${formatCurrency(data.purchaseCommission, 'KES', false)} marketplace · ${formatCurrency(
+        data?.purchaseCommission != null &&
+        data?.donationCommission != null &&
+        data?.registrationCommission != null
+          ? `${formatCurrency(data.purchaseCommission, 'KES', false)} marketplace (${(MARKETPLACE_PLATFORM_COMMISSION_RATE * 100).toFixed(0)}%) · ${formatCurrency(
               data.donationCommission,
               'KES',
               false
-            )} donations`
-          : undefined,
+            )} donations (${(MARKETPLACE_PLATFORM_COMMISSION_RATE * 100).toFixed(0)}%) · ${formatCurrency(data.registrationCommission, 'KES', false)} registration (${(REGISTRATION_FEE_COMMISSION_RATE * 100).toFixed(0)}%)`
+          : data?.purchaseCommission != null && data?.donationCommission != null
+            ? `${formatCurrency(data.purchaseCommission, 'KES', false)} marketplace · ${formatCurrency(
+                data.donationCommission,
+                'KES',
+                false
+              )} donations`
+            : undefined,
     },
     {
       title: 'Registration payments',
