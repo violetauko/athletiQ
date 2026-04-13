@@ -3,6 +3,10 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { DonationStatus, PaymentPurpose, PaymentStatus } from '@prisma/client'
+import {
+  marketplaceCommissionFromGross,
+  registrationFeeCommissionFromGross,
+} from '@/lib/marketplace/commission'
 
 export async function GET(request: Request) {
   try {
@@ -117,18 +121,28 @@ export async function GET(request: Request) {
     ])
     const currentDonationSum = currentDonations._sum.amount ? currentDonations._sum.amount : 0
     const currentPurchasesTotal = (currentOrderPayments._sum.amount || 0)
-    const purchaseCommission = currentPurchasesTotal * 0.2
-    const donationCommission = currentDonationSum * 0.2
-    const currentCommissionRevenue = purchaseCommission + donationCommission
+    const purchaseCommission = marketplaceCommissionFromGross(currentPurchasesTotal)
+    const donationCommission = marketplaceCommissionFromGross(currentDonationSum)
     const currentEntryPaymentsRevenue = (currentFeePayments._sum.amount || 0)
-    // Total Revenue is what the platform keeps: Commission + 100% of Entry Payments
-    const currentTotalRevenue = currentCommissionRevenue + currentEntryPaymentsRevenue
+    const registrationCommission = registrationFeeCommissionFromGross(currentEntryPaymentsRevenue)
+    const currentCommissionRevenue =
+      purchaseCommission + donationCommission + registrationCommission
+    // Total revenue: marketplace/donation commission components + full registration fees collected (10% of fees also reflected in commission total)
+    const currentTotalRevenue =
+      purchaseCommission + donationCommission + currentEntryPaymentsRevenue
 
     const previousDonationSum = previousDonations._sum.amount ? previousDonations._sum.amount : 0
     const previousPurchasesTotal = (previousOrderPayments._sum.amount || 0)
-    const previousCommissionRevenue = (previousPurchasesTotal * 0.20) + (previousDonationSum * 0.20)
     const previousEntryPaymentsRevenue = (previousFeePayments._sum.amount || 0)
-    const previousTotalRevenue = previousCommissionRevenue + previousEntryPaymentsRevenue
+    const previousRegistrationCommission = registrationFeeCommissionFromGross(previousEntryPaymentsRevenue)
+    const previousCommissionRevenue =
+      marketplaceCommissionFromGross(previousPurchasesTotal) +
+      marketplaceCommissionFromGross(previousDonationSum) +
+      previousRegistrationCommission
+    const previousTotalRevenue =
+      marketplaceCommissionFromGross(previousPurchasesTotal) +
+      marketplaceCommissionFromGross(previousDonationSum) +
+      previousEntryPaymentsRevenue
 
     // Calculate growth percentages
     const revenueGrowth = previousTotalRevenue > 0 
@@ -163,6 +177,7 @@ export async function GET(request: Request) {
       totalCommission: currentCommissionRevenue,
       purchaseCommission,
       donationCommission,
+      registrationCommission,
       uniqueDonors: uniqueDonors.length,
       growth: {
         revenue: Math.round(revenueGrowth),
