@@ -45,7 +45,13 @@ export default function AdminMarketplaceDashboard() {
             Overview of your eCommerce operations and active orders.
           </p>
         </div>
-        <div className="mt-4 md:mt-0 flex gap-4">
+        <div className="mt-4 md:mt-0 flex flex-wrap gap-4">
+          <Button asChild variant="outline">
+            <Link href="/dashboard/admin/finances#marketplace-purchases">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Purchase analytics
+            </Link>
+          </Button>
           <Button asChild variant="outline">
             <Link href="/dashboard/admin/marketplace/orders">
               <ShoppingBag className="w-4 h-4 mr-2" />

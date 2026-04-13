@@ -3,15 +3,51 @@ import { generateAccessToken, PAYPAL_API_BASE } from '@/lib/paypal'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { z } from 'zod'
+import { usdToKes } from '@/lib/donations/exchange'
 
 const captureOrderSchema = z.object({
   orderID: z.string(),
-  amount: z.number().int(), // in cents
+  /** USD amount from the donor form (fallback if PayPal payload is missing) */
+  amountUsd: z.number().positive(),
   tierId: z.string().optional(),
   isCustom: z.boolean().optional(),
   donorName: z.string().optional(),
   message: z.string().optional(),
 })
+
+function parseKesFromPayPalCapture(data: {
+  purchase_units?: Array<{
+    payments?: {
+      captures?: Array<{
+        status?: string
+        amount?: { value?: string; currency_code?: string }
+        seller_receivable_breakdown?: {
+          gross_amount?: { value?: string; currency_code?: string }
+        }
+      }>
+    }
+  }>
+}): number | null {
+  const capture = data.purchase_units?.[0]?.payments?.captures?.[0]
+  if (!capture) return null
+
+  const tryPair = (value?: string, code?: string) => {
+    if (value == null || value === '') return null
+    const n = parseFloat(value)
+    if (Number.isNaN(n)) return null
+    if (code?.toUpperCase() === 'KES') return n
+    return null
+  }
+
+  let v = tryPair(capture.amount?.value, capture.amount?.currency_code)
+  if (v != null) return v
+
+  const gross = capture.seller_receivable_breakdown?.gross_amount
+  v = tryPair(gross?.value, gross?.currency_code)
+  if (v != null) return v
+
+  return null
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +58,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid data' }, { status: 400 })
     }
 
-    const { orderID, amount, tierId, isCustom, donorName, message } = parsed.data
+    const { orderID, amountUsd, tierId, isCustom, donorName, message } = parsed.data
     const session = await auth()
 
     const accessToken = await generateAccessToken()
@@ -48,7 +84,9 @@ export async function POST(req: NextRequest) {
         const status = capture?.status;
 
         if (status === 'COMPLETED') {
-            const payerEmail = data.payer?.email_address;
+            const payerEmail = data.payer?.email_address
+            const fromPayPal = parseKesFromPayPalCapture(data)
+            const amountKes = fromPayPal ?? usdToKes(amountUsd)
 
             // Avoid recording if already saved (webhook vs client capture race cond)
             const existingDonation = await prisma.donation.findUnique({
@@ -59,8 +97,8 @@ export async function POST(req: NextRequest) {
                 await prisma.donation.create({
                   data: {
                     paypalOrderId: orderID,
-                    amount: amount,
-                    currency: 'usd',
+                    amount: amountKes,
+                    currency: 'kes',
                     tierId: tierId ?? 'custom',
                     isCustom: isCustom ?? false,
                     donorName: donorName || session?.user?.name || null,

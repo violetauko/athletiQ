@@ -117,7 +117,7 @@ export default function DonationsPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="ALL">All Status</SelectItem>
-                                    <SelectItem value="COMPLETED">Completed</SelectItem>
+                                    <SelectItem value="PAID">Paid</SelectItem>
                                     <SelectItem value="PENDING">Pending</SelectItem>
                                     <SelectItem value="FAILED">Failed</SelectItem>
                                     <SelectItem value="REFUNDED">Refunded</SelectItem>
@@ -171,6 +171,7 @@ export default function DonationsPage() {
                                         <TableRow>
                                             <TableHead>Donor</TableHead>
                                             <TableHead>Amount</TableHead>
+                                            <TableHead>Commission (20%)</TableHead>
                                             <TableHead>Tier</TableHead>
                                             <TableHead>Status</TableHead>
                                             <TableHead>Date</TableHead>
@@ -205,7 +206,26 @@ export default function DonationsPage() {
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="font-medium">
-                                                        {formatCurrency(donation.amount/100, donation.currency, false)}
+                                                        {donation.status === 'PAID' ? (
+                                                            formatCurrency(donation.amount, donation.currency, false)
+                                                        ) : donation.status === 'REFUNDED' ? (
+                                                            <span>
+                                                                {formatCurrency(donation.amount, donation.currency, false)}
+                                                                <span className="block text-xs font-normal text-muted-foreground">Refunded</span>
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-muted-foreground">
+                                                                {formatCurrency(donation.amount, donation.currency, false)}
+                                                                <span className="block text-xs font-normal normal-case">Not collected</span>
+                                                            </span>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="text-muted-foreground text-sm font-medium">
+                                                        {donation.status === 'PAID' ? (
+                                                            formatCurrency(donation.amount * 0.20, donation.currency, false)
+                                                        ) : (
+                                                            <span className="text-muted-foreground">—</span>
+                                                        )}
                                                     </TableCell>
                                                     <TableCell>
                                                         {getTierBadge(donation.tierId, donation.isCustom)}
@@ -236,7 +256,7 @@ export default function DonationsPage() {
                                                                     <Eye className="mr-2 h-4 w-4" />
                                                                     View Details
                                                                 </DropdownMenuItem>
-                                                                {donation.status === 'COMPLETED' && (
+                                                                {donation.status === 'PAID' && (
                                                                     <DropdownMenuItem>
                                                                         <Download className="mr-2 h-4 w-4" />
                                                                         Download Receipt
@@ -249,7 +269,7 @@ export default function DonationsPage() {
                                                                         Mark as Failed
                                                                     </DropdownMenuItem>
                                                                 )}
-                                                                {donation.status === 'COMPLETED' && (
+                                                                {donation.status === 'PAID' && (
                                                                     <DropdownMenuItem className="text-purple-600">
                                                                         <RefreshCw className="mr-2 h-4 w-4" />
                                                                         Process Refund

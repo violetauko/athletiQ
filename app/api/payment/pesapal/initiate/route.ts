@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getPesapalToken, registerIPN, submitOrder } from "@/lib/pesapal";
-import { PaymentProvider, PaymentStatus } from "@prisma/client";
+import { PaymentProvider, PaymentPurpose, PaymentStatus } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST() {
@@ -62,6 +62,7 @@ export async function POST() {
         currency: "KES",
         provider: PaymentProvider.PESAPAL,
         status: PaymentStatus.PENDING,
+        purpose: PaymentPurpose.REGISTRATION_FEE,
         referenceId: orderResponse.order_tracking_id, // Store Pesapal's tracking ID
         merchantReference: merchantReference, // Store our internal reference
       },

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { PaymentProvider, PaymentStatus } from "@prisma/client";
+import { PaymentProvider, PaymentPurpose, PaymentStatus } from "@prisma/client";
 import { formatPhoneNumber } from "@/lib/mpesa"; // Reuse phone formatting
 import { getStanbicToken, generateStanbicReferenceId } from "@/lib/stanbic";
 
@@ -79,6 +79,7 @@ export async function POST(req: NextRequest) {
         currency: "KES",
         provider: PaymentProvider.STANBIC_MPESA,
         status: PaymentStatus.PENDING,
+        purpose: PaymentPurpose.REGISTRATION_FEE,
         referenceId: data.dbsReferenceId || referenceId,
       },
     });

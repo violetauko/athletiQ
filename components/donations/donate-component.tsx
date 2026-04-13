@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Heart, ArrowRight, AlertCircle, Sparkles, Trophy, Users, Target, Shield } from 'lucide-react'
 import { DONATION_TIERS } from '@/lib/stripe'
-import { cn } from '@/lib/utils'
+import { usdToKes } from '@/lib/donations/exchange'
+import { cn, formatCurrency } from '@/lib/utils'
 import { PayPalButtons } from '@paypal/react-paypal-js'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -16,7 +17,7 @@ import { Label } from '@/components/ui/label'
 // Impact stats configuration structure
 const DEFAULT_IMPACT_STATS = [
   { id: 'athletesSupported', value: '0', label: 'Athletes Supported', icon: Trophy, color: 'text-blue-600' },
-  { id: 'raisedThisYear', value: '$0', label: 'Raised This Year', icon: Sparkles, color: 'text-green-600' },
+  { id: 'raisedThisYear', value: 'KSh 0.00', label: 'Raised This Year', icon: Sparkles, color: 'text-green-600' },
   { id: 'scholarshipsFunded', value: '0', label: 'Scholarships Funded', icon: Users, color: 'text-amber-600' },
   { id: 'placedInPrograms', value: '0%', label: 'Placed in Programs', icon: Target, color: 'text-purple-600' },
 ] as const
@@ -123,7 +124,7 @@ const TierCard = ({ tier, isSelected, isPopular, onSelect }: TierCardProps) => (
       'font-black text-xl tabular-nums transition-colors shrink-0',
       isSelected ? 'text-stone-900' : 'text-stone-500 group-hover:text-stone-700'
     )}>
-      ${tier.amount}
+      {formatCurrency(tier.amount, 'USD', false)}
     </div>
 
     {isSelected && (
@@ -167,8 +168,8 @@ const CustomAmount = ({ isSelected, amount, onSelect, onAmountChange }: CustomAm
             <Input
               type="number"
               min="1"
-              max="10000"
-              step="1"
+              max="100000"
+              step="0.01"
               placeholder="Enter amount"
               value={amount}
               onChange={(e) => onAmountChange(e.target.value)}
@@ -223,8 +224,13 @@ const DonationSummary = ({
       <div>
         <p className="text-xs uppercase tracking-widest text-stone-500 mb-1">Your Impact</p>
         <div className="font-black text-2xl md:text-4xl text-stone-900 tabular-nums">
-          {displayAmount > 0 ? `$${displayAmount.toFixed(2)}` : '—'}
+          {displayAmount > 0 ? formatCurrency(displayAmount, 'USD', false) : '—'}
         </div>
+        {displayAmount > 0 && (
+          <p className="text-xs text-stone-500 mt-1">
+            ≈ {formatCurrency(usdToKes(displayAmount), 'KES', false)} recorded
+          </p>
+        )}
         {selectedTier && !isCustom && (
           <p className="text-xs text-stone-500 mt-1">{selectedTier.description}</p>
         )}
@@ -407,9 +413,7 @@ export function DonatePage() {
   async function handleDonate() {
     setError(null)
 
-    const amountCents = Math.round(displayAmount * 100)
-
-    if (amountCents < 100) {
+    if (displayAmount < 1) {
       setError('Minimum donation is $1.00')
       return
     }
@@ -420,7 +424,7 @@ export function DonatePage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            amount: amountCents,
+            amountUsd: displayAmount,
             tierId: isCustom ? undefined : selectedTierId,
             isCustom,
             donorName: donorName.trim() || undefined,
@@ -447,10 +451,8 @@ export function DonatePage() {
   async function handlePesapalDonate() {
     setError(null)
 
-    const amountCents = Math.round(displayAmount * 100)
-
-    if (amountCents < 100) {
-      setError('Minimum donation is KES 1')
+    if (displayAmount < 1) {
+      setError('Minimum donation is $1.00')
       return
     }
 
@@ -460,7 +462,7 @@ export function DonatePage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            amount: amountCents,
+            amountUsd: displayAmount,
             tierId: isCustom ? undefined : selectedTierId,
             isCustom,
             donorName: donorName.trim() || undefined,
@@ -541,7 +543,7 @@ export function DonatePage() {
                 const res = await fetch('/api/donate/paypal/create-order', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ amount: Math.round(displayAmount * 100) }),
+                  body: JSON.stringify({ amountUsd: displayAmount }),
                 })
                 const order = await res.json()
                 if (!res.ok) throw new Error(order.error || 'Failed to create PayPal order')
@@ -553,7 +555,7 @@ export function DonatePage() {
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     orderID: data.orderID,
-                    amount: Math.round(displayAmount * 100),
+                    amountUsd: displayAmount,
                     tierId: isCustom ? undefined : selectedTier?.id,
                     isCustom,
                     donorName: donorName.trim() || undefined,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { PaymentStatus } from "@prisma/client";
+import { OrderStatus, PaymentPurpose, PaymentStatus } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,8 +43,11 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // If it's an order (marketplace purchase)
-      if (payment.merchantReference) {
+      // Marketplace: order id is in merchantReference; purpose must match (do not rely on merchantReference alone)
+      if (
+        payment.purpose === PaymentPurpose.MARKETPLACE_PURCHASE &&
+        payment.merchantReference
+      ) {
         await prisma.$transaction(async (tx) => {
           // 1. Update Payment
           await tx.payment.update({
@@ -97,12 +100,27 @@ export async function POST(req: NextRequest) {
     } else {
       // Payment Failed (user cancelled, insufficient funds, etc.)
       console.log(`M-Pesa payment ${checkoutRequestID} failed with ResultCode ${resultCode}: ${resultDesc}`);
-      
-      await prisma.payment.update({
-        where: { id: payment.id },
-        data: {
-          status: PaymentStatus.FAILED,
-        },
+
+      await prisma.$transaction(async (tx) => {
+        await tx.payment.update({
+          where: { id: payment.id },
+          data: {
+            status: PaymentStatus.FAILED,
+          },
+        });
+
+        if (
+          payment.purpose === PaymentPurpose.MARKETPLACE_PURCHASE &&
+          payment.merchantReference
+        ) {
+          await tx.order.updateMany({
+            where: {
+              id: payment.merchantReference,
+              status: OrderStatus.PENDING,
+            },
+            data: { status: OrderStatus.CANCELLED },
+          });
+        }
       });
     }
 

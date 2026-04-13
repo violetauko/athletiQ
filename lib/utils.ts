@@ -45,16 +45,15 @@ export function timeAgo(date: Date | string): string {
   return 'just now'
 }
 /**
- * Format a currency amount with proper locale and currency symbol
- * @param amount - The amount to format (in dollars/cents depending on input)
- * @param currency - The currency code (USD, KES, EUR, etc.)
- * @param fromCents - Whether the amount is in cents (default: true)
- * @returns Formatted currency string
+ * Format a currency amount with proper locale and currency symbol.
+ * @param amount - Major units by default (e.g. KES shillings, USD dollars). Use `fromCents: true` only for Stripe-style minor units (e.g. USD cents).
+ * @param currency - ISO currency code (USD, KES, EUR, etc.)
+ * @param fromCents - If true, divides amount by 100 (Stripe cents → dollars). Default false — no division.
  */
 export function formatCurrency(
   amount: number | string,
   currency: string = 'USD',
-  fromCents: boolean = true
+  fromCents: boolean = false
 ): string {
   // Convert to number if string
   const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount
@@ -119,7 +118,7 @@ export function formatCurrency(
 export function formatCompactCurrency(
   amount: number | string,
   currency: string = 'USD',
-  fromCents: boolean = true
+  fromCents: boolean = false
 ): string {
   const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount
   const convertedAmount = fromCents ? numAmount / 100 : numAmount
@@ -219,18 +218,14 @@ export function formatCurrencyAdvanced(
   }
 }
 
-// Example usage:
-// formatCurrency(2500) -> "$25.00"
-// formatCurrency(2500, 'KES') -> "KSh 25.00"
-// formatCurrency(2500, 'EUR') -> "25.00 €"
-// formatCurrency("2500", 'GBP') -> "£25.00"
-// formatCompactCurrency(250000, 'USD') -> "$2.5K"
-// fromCents(2500) -> 25
-// toCents(25.99) -> 2599
+// Examples (default fromCents = false, major units):
+// formatCurrency(2500, 'KES', false) -> "KSh 2,500.00"
+// formatCurrency(99, 'USD', true) -> "$0.99"  // 9900 cents would be passed for $99.00
 
 export const getStatusBadge = (status: string) => {
     const styles = {
       COMPLETED: 'bg-green-100 text-green-800 border-green-200',
+      PAID: 'bg-green-100 text-green-800 border-green-200',
       PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
       FAILED: 'bg-red-100 text-red-800 border-red-200',
       REFUNDED: 'bg-purple-100 text-purple-800 border-purple-200',

@@ -1,4 +1,4 @@
-export type DonationStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED'
+export type DonationStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED'
 export type PaymentProvider = 'STRIPE' | 'MPESA' | 'STANBIC_MPESA' | 'PAYPAL' | 'PESAPAL'
 export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED'
 export interface Donation {
@@ -30,6 +30,11 @@ export interface Donation {
   updatedAt: string
 }
 
+/** Ledger line: marketplace order, platform fee, or donation (Donation model). */
+export type PaymentKind = 'purchase' | 'fee' | 'donation'
+
+export type PaymentPurposeKind = 'MARKETPLACE_PURCHASE' | 'REGISTRATION_FEE'
+
 export interface Payment {
   id: string
   userId: string
@@ -37,9 +42,14 @@ export interface Payment {
   currency: string
   provider: PaymentProvider
   status: PaymentStatus
+  /** Authoritative: marketplace order checkout vs registration/entry fee (not merchantReference). */
+  purpose?: PaymentPurposeKind
   referenceId?: string
   receiptNumber?: string
   merchantReference?: string
+  /** Set on API rows: purchase / fee for Payment; use AdminLedgerItem for donations. */
+  paymentType?: 'purchase' | 'fee'
+  source?: 'payment'
   createdAt: string
   updatedAt: string
   user?: {
@@ -51,6 +61,36 @@ export interface Payment {
       lastName?: string
     }
   }
+}
+
+/** Admin payments table row — Payment row or Donation row (unified list). */
+export type AdminLedgerItem =
+  | (Payment & { source: 'payment'; paymentType: 'purchase' | 'fee' })
+  | DonationLedgerItem
+
+export interface DonationLedgerItem {
+  source: 'donation'
+  paymentType: 'donation'
+  id: string
+  amount: number
+  currency: string
+  provider: PaymentProvider
+  status: DonationStatus
+  referenceId?: string
+  userId?: string | null
+  createdAt: string | Date
+  updatedAt: string | Date
+  tierId: string
+  isCustom: boolean
+  donorName?: string | null
+  donorEmail?: string | null
+  message?: string | null
+  stripeSessionId?: string | null
+  stripePaymentId?: string | null
+  paypalOrderId?: string | null
+  pesapalOrderId?: string | null
+  paidAt?: Date | string | null
+  user?: Payment['user']
 }
 
 export interface PaginatedResponse<T> {

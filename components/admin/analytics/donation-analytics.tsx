@@ -17,16 +17,21 @@ interface DonationsAnalyticsProps {
 
 const COLORS = ['#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
 
+function statusHasSettledFunds(status: string) {
+  return status === 'PAID' || status === 'REFUNDED'
+}
+
 export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps) {
-  console.log("Data: ",data)
   if (isLoading) {
     return <DonationsAnalyticsSkeleton />
   }
 
   const statusData = Object.entries(data?.byStatus || {}).map(([status, value]) => ({
     name: status,
-    value: value.total,
     count: value.count,
+    total: value.total,
+    /** Pie uses counts so failed/pending rows do not skew the chart with placeholder amounts */
+    pieValue: value.count,
   }))
 
   const tierData = Object.entries(data?.byTier || {}).map(([tier, value]) => ({
@@ -48,7 +53,7 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
             <div className="bg-stone-50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">Total Donations</p>
               <p className="text-2xl font-bold">
-                {formatCurrency(data?.byStatus?.PAID?.total || 0, 'KES',true)}
+                {formatCurrency(data?.byStatus?.PAID?.total || 0, 'KES', false)}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 {data?.byStatus?.PAID?.count || 0} completed donations
@@ -58,8 +63,9 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
               <p className="text-sm text-muted-foreground">Average Donation</p>
               <p className="text-2xl font-bold">
                 {formatCurrency(
-                  (data?.byStatus?.PAID?.total ?data?.byStatus.PAID.total/100 : 0) / (data?.byStatus?.PAID?.count || 1),
-                  'KES'
+                  (data?.byStatus?.PAID?.total || 0) / (data?.byStatus?.PAID?.count || 1),
+                  'KES',
+                  false
                 )}
               </p>
             </div>
@@ -68,7 +74,7 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Status Distribution */}
             <div>
-              <h3 className="text-sm font-medium mb-4">By Status</h3>
+              <h3 className="text-sm font-medium mb-4">By status (count)</h3>
               <div className="h-50">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -79,26 +85,58 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
                       innerRadius={60}
                       outerRadius={80}
                       paddingAngle={5}
-                      dataKey="value"
+                      dataKey="pieValue"
+                      nameKey="name"
                     >
                       {statusData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip
-                      formatter={(value?: number) => formatCurrency(value?value/100 : 0, 'KES', false)}
+                      content={({ active, payload }) => {
+                        if (!active || !payload?.length) return null
+                        const row = payload[0].payload as (typeof statusData)[0]
+                        const money =
+                          statusHasSettledFunds(row.name) && row.total > 0
+                            ? formatCurrency(row.total, 'KES', false)
+                            : null
+                        return (
+                          <div className="rounded-md border bg-background px-3 py-2 text-xs shadow-md">
+                            <p className="font-semibold">{row.name}</p>
+                            <p className="text-muted-foreground">
+                              {row.count} {row.count === 1 ? 'donation' : 'donations'}
+                            </p>
+                            {money ? (
+                              <p className="mt-1">{money} recorded total</p>
+                            ) : (
+                              <p className="mt-1 text-muted-foreground">No settled funds total</p>
+                            )}
+                          </div>
+                        )
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
               <div className="mt-4 space-y-2">
                 {statusData.map((item, index) => (
-                  <div key={item.name} className="flex justify-between items-center text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                      <span>{item.name}</span>
+                  <div key={item.name} className="flex justify-between items-center gap-4 text-sm">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-3 h-3 shrink-0 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                      <div className="min-w-0">
+                        <span className="font-medium">{item.name}</span>
+                        <p className="text-xs text-muted-foreground">
+                          {item.count} {item.count === 1 ? 'record' : 'records'}
+                        </p>
+                      </div>
                     </div>
-                    <div className="font-medium">{formatCurrency(item.value, 'KES')}</div>
+                    <div className="shrink-0 text-right">
+                      {statusHasSettledFunds(item.name) ? (
+                        <span className="font-medium">{formatCurrency(item.total, 'KES', false)}</span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -138,12 +176,12 @@ export function DonationsAnalytics({ data, isLoading }: DonationsAnalyticsProps)
                       <div
                         className="h-full bg-green-500 rounded-full"
                         style={{
-                          width: `${(tier.value / (data?.byStatus?.PAID?.total?data?.byStatus.PAID.total/100 : 1)) * 100}%`
+                          width: `${(tier.value / (data?.byStatus?.PAID?.total || 1)) * 100}%`
                         }}
                       />
                     </div>
                     <span className="text-sm font-medium w-24 text-right">
-                      {formatCurrency(tier.value, 'KES')}
+                      {formatCurrency(tier.value, 'KES', false)}
                     </span>
                   </div>
                 </div>

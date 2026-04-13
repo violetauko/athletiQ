@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
 import { prisma } from '@/lib/prisma'
 import { sendEmail } from '@/lib/email/email-service'
+import { usdToKes } from '@/lib/donations/exchange'
 
 /**
  * Stripe Webhook Handler
@@ -93,9 +94,11 @@ async function handleDonationSuccess(session: Stripe.Checkout.Session) {
   } = session.metadata ?? {}
 
   const amountCents = session.amount_total ?? 0
-  const amountDollars = (amountCents / 100).toFixed(2)
+  const amountUsd = (amountCents / 100)
+  const amountDollars = amountUsd.toFixed(2)
+  const amountKes = usdToKes(amountUsd)
 
-  console.log(`[DONATION] ✅ $${amountDollars} from ${donorName || userEmail || 'Anonymous'}`)
+  console.log(`[DONATION] ✅ $${amountDollars} (≈ KSh ${amountKes}) from ${donorName || userEmail || 'Anonymous'}`)
 
   /**
    * ─── TODO: Persist to your database ──────────────────────────────────────
@@ -104,12 +107,18 @@ async function handleDonationSuccess(session: Stripe.Checkout.Session) {
    */
    await prisma.donation.upsert({
       where: { stripeSessionId: session.id },
-      update: { status: 'PAID', paidAt: new Date(), stripePaymentId: session.payment_intent as string },
+      update: {
+        status: 'PAID',
+        paidAt: new Date(),
+        stripePaymentId: session.payment_intent as string,
+        amount: amountKes,
+        currency: 'kes',
+      },
       create: {
         stripeSessionId: session.id,
         stripePaymentId: session.payment_intent as string ?? null,
-        amount: session.amount_total ?? 0,
-        currency: session.currency ?? 'usd',
+        amount: amountKes,
+        currency: 'kes',
         tierId: session.metadata?.tierId ?? 'custom',
         isCustom: session.metadata?.tierId === 'custom',
         donorName: session.metadata?.donorName || null,

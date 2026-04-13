@@ -250,7 +250,7 @@ model Donation {
   pesapalOrderId  String?       @unique
 
   // Amount
-  amount          Int           // stored in cents (e.g. 2500 = $25.00)
+  amount          Float         // stored in literal units (e.g. 25.50)
   currency        String        @default("usd")
 
   // Tier
@@ -334,6 +334,12 @@ enum UserRole {
   ADMIN
 }
 
+/// What this Payment row is for — do not infer from merchantReference (providers use it for internal refs too).
+enum PaymentPurpose {
+  MARKETPLACE_PURCHASE
+  REGISTRATION_FEE
+}
+
 model Payment {
   id              String          @id @default(cuid())
   userId          String
@@ -341,19 +347,21 @@ model Payment {
   currency        String          @default("KES")
   provider        PaymentProvider
   status          PaymentStatus   @default(PENDING)
-  
+  purpose         PaymentPurpose  @default(REGISTRATION_FEE)
+
   // External references
   referenceId     String?         // Stripe Session ID or M-Pesa CheckoutRequestID
   receiptNumber   String?         // Stripe Payment Intent or M-Pesa Receipt Number
-  merchantReference String?         // Our internal reference
-  
+  merchantReference String?       // Order id (marketplace) or provider-specific internal ref (e.g. PesaPal order id)
+
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
-  
+
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([status])
+  @@index([purpose])
 }
 
 enum PaymentProvider {

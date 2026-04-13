@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { formatCurrency } from '@/lib/utils'
+import { PaymentPurpose } from '@prisma/client'
 import { Calendar, User, CreditCard, Download, RefreshCw } from 'lucide-react'
 
 interface PaymentDetailsModalProps {
@@ -14,6 +15,9 @@ interface PaymentDetailsModalProps {
 
 export function PaymentDetailsModal({ payment, isOpen, onClose }: PaymentDetailsModalProps) {
     if (!payment) return null
+
+    const payType =
+        payment.purpose === PaymentPurpose.MARKETPLACE_PURCHASE ? 'purchase' : 'fee'
 
     const getStatusBadge = (status: string) => {
         const styles = {
@@ -98,6 +102,24 @@ export function PaymentDetailsModal({ payment, isOpen, onClose }: PaymentDetails
                         </h3>
                         <div className="bg-stone-50 p-4 rounded-lg space-y-3">
                             <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Payment type</p>
+                                    <Badge
+                                        className={
+                                            payType === 'purchase'
+                                                ? 'bg-violet-100 text-violet-900 border-violet-200'
+                                                : 'bg-amber-100 text-amber-900 border-amber-200'
+                                        }
+                                        variant="outline"
+                                    >
+                                        {payType === 'purchase' ? 'Purchase (order)' : 'Fee (registration)'}
+                                    </Badge>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        {payType === 'purchase'
+                                            ? 'Marketplace checkout — merchant reference is the order id.'
+                                            : 'No order — platform registration or entry fee.'}
+                                    </p>
+                                </div>
                                 <div>
                                     <p className="text-sm text-muted-foreground">Payment ID</p>
                                     <p className="font-mono text-sm">{payment.id}</p>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { MARKETPLACE_PLATFORM_COMMISSION_RATE } from "@/lib/marketplace/commission";
 
 export async function GET(req: Request) {
   try {
@@ -24,7 +25,7 @@ export async function GET(req: Request) {
     });
 
     const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
-    const platformRevenue = totalRevenue * 0.20;
+    const platformRevenue = totalRevenue * MARKETPLACE_PLATFORM_COMMISSION_RATE;
 
     return NextResponse.json({
       totalProducts,

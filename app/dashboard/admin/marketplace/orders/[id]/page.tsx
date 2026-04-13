@@ -158,15 +158,25 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
             <div className="mt-6 flex justify-end">
               <div className="w-1/2 md:w-1/3 space-y-3">
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Subtotal</span>
+                  <span>Gross Total</span>
                   <span>KES {order.totalAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Shipping</span>
                   <span>KES 0.00</span>
                 </div>
-                <div className="flex justify-between font-bold text-lg border-t pt-2">
-                  <span>Total</span>
+                <div className="pt-2 border-t mt-2">
+                  <div className="flex justify-between text-xs font-medium text-blue-600">
+                    <span>Merchant Share (80%)</span>
+                    <span>KES {(order.totalAmount * 0.8).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs font-medium text-purple-600 mt-1">
+                    <span>Platform Commission (20%)</span>
+                    <span>KES {(order.totalAmount * 0.2).toFixed(2)}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">
+                  <span>Total Amount</span>
                   <span>KES {order.totalAmount.toFixed(2)}</span>
                 </div>
               </div>

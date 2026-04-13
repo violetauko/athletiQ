@@ -2,13 +2,14 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '@/components/ui/table'
-import { PaginatedResponse, Payment } from '@/lib/types/types'
+import { PaginatedResponse, type AdminLedgerItem, type DonationLedgerItem } from '@/lib/types/types'
 import { formatCurrency, formatDate, getInitials, getStatusBadge } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 import { Search, Filter, CreditCard, Calendar, MoreHorizontal, Eye, Download, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { PaymentDetailsModal } from '@/components/payments/payment-details-modal'
+import { DonationDetailsModal } from '@/components/donations/donation-details-modal'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -20,22 +21,33 @@ export default function PaymentsPage(){
   const [paymentSearch, setPaymentSearch] = useState('')
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('ALL')
   const [paymentProviderFilter, setPaymentProviderFilter] = useState<string>('ALL')
+  const [paymentTypeFilter, setPaymentTypeFilter] = useState<string>('ALL')
   const [paymentDateRange, setPaymentDateRange] = useState<'today' | 'week' | 'month' | 'all'>('all')
   const [paymentPage, setPaymentPage] = useState(1)
 
-  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
+  const [selectedLedger, setSelectedLedger] = useState<AdminLedgerItem | null>(null)
 
+  function formatDateShort(date: Date | string): string {
+    const d = new Date(date)
+    return d.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'numeric', 
+      day: 'numeric'
+      
+    })
+  }
+  
  // Fetch payments with pagination
   const {
     data: paymentsData,
     isLoading: paymentsLoading,
-  } = useQuery<PaginatedResponse<Payment>>({
-    queryKey: ['admin-payments', paymentStatusFilter, paymentProviderFilter, paymentDateRange, paymentPage],
+  } = useQuery<PaginatedResponse<AdminLedgerItem>>({
+    queryKey: ['admin-payments', paymentSearch, paymentStatusFilter, paymentProviderFilter, paymentTypeFilter, paymentDateRange, paymentPage],
     queryFn: async () => {
       const params = new URLSearchParams()
       if (paymentStatusFilter !== 'ALL') params.append('status', paymentStatusFilter)
       if (paymentProviderFilter !== 'ALL') params.append('provider', paymentProviderFilter)
+      if (paymentTypeFilter !== 'ALL') params.append('paymentType', paymentTypeFilter)
       if (paymentDateRange !== 'all') params.append('dateRange', paymentDateRange)
       params.append('page', paymentPage.toString())
       params.append('limit', '10')
@@ -58,7 +70,7 @@ export default function PaymentsPage(){
               <CardHeader>
                 <CardTitle>Payments Management</CardTitle>
                 <CardDescription>
-                  View and manage all payment transactions
+                  Payments, registration fees, and donations — type shows purchase (order), fee (registration), or donation.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -111,6 +123,22 @@ export default function PaymentsPage(){
                       </SelectContent>
                     </Select>
 
+                    <Select value={paymentTypeFilter} onValueChange={(value) => {
+                      setPaymentTypeFilter(value)
+                      setPaymentPage(1)
+                    }}>
+                      <SelectTrigger className="w-[9.5rem]">
+                        <Filter className="w-4 h-4 mr-2" />
+                        <SelectValue placeholder="Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">All types</SelectItem>
+                        <SelectItem value="purchase">Purchase</SelectItem>
+                        <SelectItem value="fee">Fee</SelectItem>
+                        <SelectItem value="donation">Donation</SelectItem>
+                      </SelectContent>
+                    </Select>
+
                     <Select value={paymentDateRange} onValueChange={(value: typeof paymentDateRange) => {
                       setPaymentDateRange(value)
                       setPaymentPage(1)
@@ -139,6 +167,7 @@ export default function PaymentsPage(){
                         <TableHeader>
                           <TableRow>
                             <TableHead>User</TableHead>
+                            <TableHead>Type</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Provider</TableHead>
                             <TableHead>Reference</TableHead>
@@ -150,54 +179,83 @@ export default function PaymentsPage(){
                         <TableBody>
                           {payments.length === 0 ? (
                             <TableRow>
-                              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                                 No payments found
                               </TableCell>
                             </TableRow>
                           ) : (
-                            payments.map((payment) => (
-                              <TableRow key={payment.id}>
+                            payments.map((row) => {
+                              const isDonation = row.source === 'donation'
+                              const payKind = isDonation
+                                ? 'donation'
+                                : row.paymentType === 'purchase'
+                                  ? 'purchase'
+                                  : 'fee'
+                              return (
+                              <TableRow key={`${row.source}-${row.id}`}>
                                 <TableCell>
-                                  <div className="flex items-center gap-3">
+                                  <div className="flex items-center gap-3 w-48 overflow-x-clip">
                                     <Avatar className="h-8 w-8">
                                       <AvatarFallback className="text-xs bg-stone-200">
-                                        {getInitials(payment.user?.name, payment.user?.email)}
+                                        {getInitials(row.user?.name, row.user?.email)}
                                       </AvatarFallback>
                                     </Avatar>
                                     <div>
                                       <div className="font-medium">
-                                        {payment.user?.name || 'Unknown User'}
+                                        {row.user?.name || (isDonation ? (row as DonationLedgerItem).donorName : null) || 'Unknown User'}
                                       </div>
                                       <div className="text-xs text-muted-foreground">
-                                        {payment.user?.email}
+                                        {row.user?.email || (isDonation ? (row as DonationLedgerItem).donorEmail : null) || '—'}
                                       </div>
                                     </div>
                                   </div>
                                 </TableCell>
-                                <TableCell className="font-medium">
-                                  {formatCurrency(payment.amount, payment.currency, false)}
+                                <TableCell>
+                                  <Badge
+                                    variant="outline"
+                                    className={
+                                      payKind === 'purchase'
+                                        ? 'border-violet-300 bg-violet-50 text-violet-900'
+                                        : payKind === 'donation'
+                                          ? 'border-rose-300 bg-rose-50 text-rose-900'
+                                          : 'border-amber-300 bg-amber-50 text-amber-900'
+                                    }
+                                  >
+                                    {payKind === 'purchase' ? 'Purchase' : payKind === 'donation' ? 'Donation' : 'Fee'}
+                                  </Badge>
+                                  <p className="mt-1 max-w-28 text-[10px] leading-tight text-muted-foreground">
+                                    {payKind === 'purchase'
+                                      ? 'Order checkout'
+                                      : payKind === 'donation'
+                                        ? 'Donation (not a shop order)'
+                                        : 'Registration / entry'}
+                                  </p>
+                                </TableCell>
+                                <TableCell className="font-medium text-[10px] w-24 overflow-x-clip">
+                                  {formatCurrency(row.amount, row.currency, false)}
                                 </TableCell>
                                 <TableCell>
                                   <div className="flex items-center gap-1">
-                                    {/* {getProviderIcon(payment.provider)} */}
-                                    <span className="text-sm capitalize">
-                                      {payment.provider.toLowerCase().replace('_', ' ')}
+                                    <span className="text-[10px] capitalize">
+                                      {row.provider.toLowerCase().replace('_', ' ')}
                                     </span>
                                   </div>
                                 </TableCell>
                                 <TableCell>
-                                  <div className="text-sm max-w-50 overflow-x-clip">
-                                    {payment.receiptNumber || payment.referenceId || 'N/A'}
+                                  <div className="text-[10px] w-24 overflow-x-clip">
+                                    {isDonation
+                                      ? (row as DonationLedgerItem).referenceId || `Tier: ${(row as DonationLedgerItem).tierId}`
+                                      : row.receiptNumber || row.referenceId || 'N/A'}
                                   </div>
                                 </TableCell>
-                                <TableCell>
-                                  <Badge className={getStatusBadge(payment.status)}>
-                                    {payment.status}
+                                <TableCell className="text-[10px] w-24 overflow-x-clip">
+                                  <Badge className={getStatusBadge(row.status)}>
+                                    {row.status}
                                   </Badge>
                                 </TableCell>
                                 <TableCell>
-                                  <div className="text-sm">
-                                    {formatDate(payment.createdAt)}
+                                  <div className="text-[10px] w-12 overflow-x-clip">
+                                    {formatDateShort(row.createdAt as string)}
                                   </div>
                                 </TableCell>
                                 <TableCell className="text-right">
@@ -209,21 +267,18 @@ export default function PaymentsPage(){
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                      <DropdownMenuItem onClick={() => {
-                                        setSelectedPayment(payment)
-                                        setIsPaymentModalOpen(true)
-                                      }}>
+                                      <DropdownMenuItem onClick={() => setSelectedLedger(row)}>
                                         <Eye className="mr-2 h-4 w-4" />
                                         View Details
                                       </DropdownMenuItem>
-                                      {payment.status === 'COMPLETED' && (
+                                      {!isDonation && row.status === 'COMPLETED' && (
                                         <DropdownMenuItem>
                                           <Download className="mr-2 h-4 w-4" />
                                           Download Receipt
                                         </DropdownMenuItem>
                                       )}
                                       <DropdownMenuSeparator />
-                                      {payment.provider === 'MPESA' && payment.status === 'PENDING' && (
+                                      {!isDonation && row.provider === 'MPESA' && row.status === 'PENDING' && (
                                         <DropdownMenuItem>
                                           <RefreshCw className="mr-2 h-4 w-4" />
                                           Check Status
@@ -233,7 +288,8 @@ export default function PaymentsPage(){
                                   </DropdownMenu>
                                 </TableCell>
                               </TableRow>
-                            ))
+                              );
+                            })
                           )}
                         </TableBody>
                       </Table>
@@ -272,12 +328,14 @@ export default function PaymentsPage(){
               </CardContent>
             </Card>
             <PaymentDetailsModal
-                payment={selectedPayment}
-                isOpen={isPaymentModalOpen}
-                onClose={() => {
-                setIsPaymentModalOpen(false)
-                setSelectedPayment(null)
-                }}
+              payment={selectedLedger?.source === 'payment' ? selectedLedger : null}
+              isOpen={selectedLedger?.source === 'payment'}
+              onClose={() => setSelectedLedger(null)}
+            />
+            <DonationDetailsModal
+              donation={selectedLedger?.source === 'donation' ? selectedLedger : null}
+              isOpen={selectedLedger?.source === 'donation'}
+              onClose={() => setSelectedLedger(null)}
             />
           </div>
   )
@@ -290,6 +348,7 @@ function PaymentsTableSkeleton() {
         <TableHeader>
           <TableRow>
             <TableHead>User</TableHead>
+            <TableHead>Type</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead>Provider</TableHead>
             <TableHead>Reference</TableHead>
@@ -310,6 +369,7 @@ function PaymentsTableSkeleton() {
                   </div>
                 </div>
               </TableCell>
+              <TableCell><Skeleton className="h-6 w-16" /></TableCell>
               <TableCell><Skeleton className="h-4 w-20" /></TableCell>
               <TableCell><Skeleton className="h-4 w-24" /></TableCell>
               <TableCell><Skeleton className="h-4 w-24" /></TableCell>
