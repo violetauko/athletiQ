@@ -14,14 +14,16 @@ export async function POST(req: NextRequest) {
     }
 
     const checkoutRequestID = stkCallback.CheckoutRequestID;
-    const resultCode = stkCallback.ResultCode; // 0 means success
+    const resultCode = stkCallback.ResultCode; // 0 means success (number or string)
     const resultDesc = stkCallback.ResultDesc;
+    const normalizedResultCode =
+      typeof resultCode === "number" ? resultCode : Number(resultCode);
 
     // We must find the active payment for this request
     const payment = await prisma.payment.findFirst({
       where: {
         referenceId: checkoutRequestID,
-        status: PaymentStatus.PENDING,
+        NOT: { status: PaymentStatus.COMPLETED },
       },
     });
 
@@ -31,7 +33,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ResultCode: 0, ResultDesc: "Success" });
     }
 
-    if (resultCode === 0) {
+    if (normalizedResultCode === 0) {
       // Payment Successful
       const callbackMetadata = stkCallback.CallbackMetadata?.Item;
       let mpesaReceiptNumber = "";
@@ -99,7 +101,9 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // Payment Failed (user cancelled, insufficient funds, etc.)
-      console.log(`M-Pesa payment ${checkoutRequestID} failed with ResultCode ${resultCode}: ${resultDesc}`);
+      console.log(
+        `M-Pesa payment ${checkoutRequestID} failed with ResultCode ${resultCode}: ${resultDesc}`
+      );
 
       await prisma.$transaction(async (tx) => {
         await tx.payment.update({

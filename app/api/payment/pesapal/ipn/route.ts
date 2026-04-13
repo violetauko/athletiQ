@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPesapalToken, getTransactionStatus } from "@/lib/pesapal";
-import { PaymentStatus } from "@prisma/client";
+import { OrderStatus, PaymentPurpose, PaymentStatus } from "@prisma/client";
 
 export async function POST(req: Request) {
   try {
@@ -48,14 +48,32 @@ export async function POST(req: Request) {
 
     if (payment.status !== newStatus) {
       await prisma.$transaction(async (tx) => {
-        // Update payment record
+        // Always persist latest payment status first.
         await tx.payment.update({
           where: { id: payment.id },
           data: { status: newStatus },
         });
 
-        // Update user if payment was successful
-        if (hasPaidFee) {
+        const isMarketplacePurchase =
+          payment.purpose === PaymentPurpose.MARKETPLACE_PURCHASE &&
+          Boolean(payment.merchantReference);
+
+        if (isMarketplacePurchase) {
+          const nextOrderStatus =
+            newStatus === PaymentStatus.COMPLETED
+              ? OrderStatus.PROCESSING
+              : newStatus === PaymentStatus.FAILED
+                ? OrderStatus.CANCELLED
+                : null;
+
+          if (nextOrderStatus) {
+            await tx.order.updateMany({
+              where: { id: payment.merchantReference! },
+              data: { status: nextOrderStatus },
+            });
+          }
+        } else if (hasPaidFee) {
+          // Registration fee flow.
           await tx.user.update({
             where: { id: payment.userId },
             data: { hasPaidFee: true },
