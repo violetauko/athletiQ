@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const payment = await prisma.payment.findFirst({
       where: {
         referenceId: checkoutRequestID,
-        NOT: { status: PaymentStatus.COMPLETED },
+        NOT: { status: "COMPLETED" },
       },
     });
 
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
           prisma.payment.update({
             where: { id: payment.id },
             data: {
-              status: PaymentStatus.COMPLETED,
+              status: "COMPLETED",
               receiptNumber: mpesaReceiptNumber,
             },
           }),
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
         await tx.payment.update({
           where: { id: payment.id },
           data: {
-            status: PaymentStatus.FAILED,
+            status: "FAILED",
           },
         });
 
@@ -120,9 +120,9 @@ export async function POST(req: NextRequest) {
           await tx.order.updateMany({
             where: {
               id: payment.merchantReference,
-              status: OrderStatus.PENDING,
+              status: "PENDING",
             },
-            data: { status: OrderStatus.CANCELLED },
+            data: { status: "CANCELLED" },
           });
         }
       });
