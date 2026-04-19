@@ -20,3 +20,9 @@ export function getUsdToKesRate(): number {
 export function usdToKes(usd: number): number {
   return Math.round(usd * getUsdToKesRate() * 100) / 100
 }
+
+/** KES major units → USD major units (2 dp). Used when PayPal charges in USD. */
+export function kesToUsd(kes: number): number {
+  const rate = getUsdToKesRate()
+  return Math.round((kes / rate) * 100) / 100
+}

@@ -3,6 +3,7 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { getMpesaToken, generateTimestamp, generateMpesaPassword, formatPhoneNumber } from '@/lib/mpesa'
 import { PaymentProvider, PaymentPurpose, PaymentStatus } from '@prisma/client'
+import { createMarketplaceOrderFromCart } from '@/lib/marketplace/create-marketplace-order'
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,16 +16,8 @@ export async function POST(req: NextRequest) {
 
     const { items, phone, shippingAddress } = await req.json()
 
-    if (!items || items.length === 0) {
-      return NextResponse.json({ error: 'Cart is empty' }, { status: 400 })
-    }
-
     if (!phone) {
       return NextResponse.json({ error: 'M-Pesa phone number is required' }, { status: 400 })
-    }
-
-    if (!shippingAddress) {
-      return NextResponse.json({ error: 'Shipping address is required' }, { status: 400 })
     }
 
     const formattedPhone = formatPhoneNumber(phone)
@@ -32,48 +25,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid M-Pesa phone number format' }, { status: 400 })
     }
 
-    // 1. Validate prices with database
-    const productIds = items.map((i: any) => i.id)
-    const dbProducts = await prisma.product.findMany({
-      where: { id: { in: productIds } }
-    })
+    let order
+    let totalAmount: number
 
-    if (dbProducts.length !== productIds.length) {
-      return NextResponse.json({ error: 'One or more products are invalid' }, { status: 400 })
-    }
-
-    let totalAmount = 0
-    const orderItemsData = []
-
-    for (const item of items) {
-      const dbProduct = dbProducts.find(p => p.id === item.id)
-      if (!dbProduct) continue
-      
-      // Prevent ordering unavailable stock
-      if (dbProduct.stock < item.quantity) {
-         return NextResponse.json({ error: `Not enough stock for ${dbProduct.name}` }, { status: 400 })
-      }
-
-      totalAmount += dbProduct.price * item.quantity
-      orderItemsData.push({
-        productId: item.id,
-        quantity: item.quantity,
-        price: dbProduct.price
-      })
-    }
-
-    // 2. Create the Order
-    const order = await prisma.order.create({
-      data: {
+    try {
+      const created = await createMarketplaceOrderFromCart({
         userId: session.user.id,
-        totalAmount,
+        items,
         shippingAddress,
         paymentMethod: 'MPESA',
-        OrderItem: {
-          create: orderItemsData
-        }
-      }
-    })
+      })
+      order = created.order
+      totalAmount = created.totalAmount
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Checkout failed'
+      return NextResponse.json({ error: msg }, { status: 400 })
+    }
 
     // 3. Initiate STK Push
     const isSandbox = (process.env.MPESA_BASE_URL || "https://sandbox.safaricom.co.ke").includes('sandbox')
