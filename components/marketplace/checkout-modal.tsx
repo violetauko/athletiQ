@@ -21,7 +21,7 @@ export function CheckoutModal({ open, onOpenChange }: { open: boolean; onOpenCha
   const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null)
   const [preparingPaypal, setPreparingPaypal] = useState(false)
 
-  const paypalClientId = process.env.PAYPAL_CLIENT_ID ?? ''
+  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ?? ''
 
   const paypalTotal = cartTotal + PAYPAL_MARKETPLACE_SURCHARGE_KES
 
