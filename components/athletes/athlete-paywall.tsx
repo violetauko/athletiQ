@@ -28,7 +28,7 @@ export function AthletePaywall() {
     const [feePayPalOrderId, setFeePayPalOrderId] = useState<string | null>(null);
     const [preparingPayPalFee, setPreparingPayPalFee] = useState(false);
 
-    const paypalClientId = process.env.PAYPAL_CLIENT_ID ?? "";
+    const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ?? "";
     const defaultEntryFeeKes = Number(process.env.NEXT_PUBLIC_ENTRY_FEE_AMOUNT ?? 1000);
 
     // Check for successful Stripe redirect 
