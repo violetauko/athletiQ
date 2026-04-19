@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/footer'
 import { ReactQueryProvider } from '@/lib/react-query-provider'
 import { AuthProvider } from '@/components/layout/auth-provider'
 import { Toaster } from '@/components/ui/sonner'
+import { PayPalScriptRoot } from '@/components/layout/paypal-script-root'
 
 
 export const metadata: Metadata = {
@@ -32,19 +33,21 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <ReactQueryProvider>
-            <div className="min-h-screen">
-              <Header />
-              <main className="container mx-auto px-2 sm:px-0 lg:px-0 min-h-screen">
-                {children}
-                <Toaster 
-                  position="top-right"
-                  richColors
-                  closeButton
-                  theme="light"
-                />
-              </main>
-              <Footer />
-            </div>
+            <PayPalScriptRoot>
+              <div className="min-h-screen">
+                <Header />
+                <main className="container mx-auto px-2 sm:px-0 lg:px-0 min-h-screen">
+                  {children}
+                  <Toaster 
+                    position="top-right"
+                    richColors
+                    closeButton
+                    theme="light"
+                  />
+                </main>
+                <Footer />
+              </div>
+            </PayPalScriptRoot>
           </ReactQueryProvider>
         </AuthProvider>
       </body>

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateAccessToken, PAYPAL_API_BASE } from '@/lib/paypal'
 import { z } from 'zod'
-import { usdToKes } from '@/lib/donations/exchange'
 
 const createOrderSchema = z.object({
   /** Donation in USD (same as UI); charged in KES after conversion */
@@ -18,7 +17,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { amountUsd } = parsed.data
-    const kesMajor = usdToKes(amountUsd).toFixed(2)
+    const valueUsd = amountUsd.toFixed(2)
 
     const accessToken = await generateAccessToken()
 
@@ -28,8 +27,8 @@ export async function POST(req: NextRequest) {
       purchase_units: [
         {
           amount: {
-            currency_code: 'KES',
-            value: kesMajor,
+            currency_code: 'USD',
+            value: valueUsd,
           },
           description: 'AthletiQ Donation'
         },

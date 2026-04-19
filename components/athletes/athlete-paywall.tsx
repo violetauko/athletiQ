@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession } from "next-auth/react";
+import { PayPalButtons } from "@paypal/react-paypal-js";
+import { PAYPAL_REGISTRATION_FEE_KES } from "@/lib/paypal-pricing";
 
 export function AthletePaywall() {
     const router = useRouter();
@@ -22,6 +24,12 @@ export function AthletePaywall() {
     const [stkStatus, setStkStatus] = useState<"idle" | "polling" | "success" | "failed">({
         payment: searchParams.get("payment") === "success" ? "success" : "idle"
     }.payment as any);
+
+    const [feePayPalOrderId, setFeePayPalOrderId] = useState<string | null>(null);
+    const [preparingPayPalFee, setPreparingPayPalFee] = useState(false);
+
+    const paypalClientId = process.env.PAYPAL_CLIENT_ID ?? "";
+    const defaultEntryFeeKes = Number(process.env.NEXT_PUBLIC_ENTRY_FEE_AMOUNT ?? 1000);
 
     // Check for successful Stripe redirect 
     useEffect(() => {
@@ -179,34 +187,43 @@ export function AthletePaywall() {
         );
     }
 
+    const prepareFeePayPal = async () => {
+        try {
+            setPreparingPayPalFee(true);
+            const res = await fetch("/api/payment/paypal/create-order", { method: "POST" });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to start PayPal");
+            setFeePayPalOrderId(data.id);
+            toast.success("PayPal order ready — complete payment below.");
+        } catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : "PayPal failed");
+        } finally {
+            setPreparingPayPalFee(false);
+        }
+    };
+
     return (
         <div className="flex items-center justify-center min-h-[60vh] py-12 px-4">
             <Card className="w-full max-w-md shadow-lg border-primary/10">
                 <CardHeader className="text-center space-y-2">
                     <CardTitle className="text-2xl">Complete Registration</CardTitle>
                     <CardDescription>
-                        A one-time entry fee of <strong>KES 1,000</strong> is required to access the athlete dashboard and apply to opportunities.
+                        A one-time entry fee is required to access the athlete dashboard and apply to opportunities.
+                        Most methods: <strong>KES {defaultEntryFeeKes.toLocaleString()}</strong>. PayPal:{" "}
+                        <strong>KES {PAYPAL_REGISTRATION_FEE_KES.toLocaleString()}</strong>.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Tabs defaultValue="mpesa" className="w-full">
-                        <TabsList className="grid w-full mb-6">
-                            {/* <TabsTrigger value="pesapal" disabled={stkStatus === "polling"}>
-                                <CreditCard className="w-4 h-4 mr-2 hidden sm:block" />
-                                Pesapal
-                            </TabsTrigger> */}
-                            {<TabsTrigger value="mpesa" disabled={stkStatus === "polling"}>
+                        <TabsList className="grid w-full grid-cols-2 mb-6">
+                            <TabsTrigger value="mpesa" disabled={stkStatus === "polling"}>
                                 <Smartphone className="w-4 h-4 mr-2 hidden sm:block" />
-                                M-Pesa (Daraja)
+                                M-Pesa
                             </TabsTrigger>
-                            /* <TabsTrigger value="stanbic" disabled={stkStatus === "polling"}>
-                                <Smartphone className="w-4 h-4 mr-2 hidden sm:block" />
-                                Stanbic
-                            </TabsTrigger>
-                            <TabsTrigger value="card" disabled={stkStatus === "polling"}>
+                            <TabsTrigger value="paypal" disabled={stkStatus === "polling"}>
                                 <CreditCard className="w-4 h-4 mr-2 hidden sm:block" />
-                                Card
-                            </TabsTrigger> */}
+                                PayPal
+                            </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="pesapal" className="space-y-4">
@@ -302,19 +319,56 @@ export function AthletePaywall() {
                             )}
                         </TabsContent>
 
-                        <TabsContent value="card" className="space-y-4">
-                            <div className="py-6 text-center space-y-4">
-                                <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center">
-                                    <CreditCard className="w-8 h-8 text-primary" />
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                    Pay securely using any major credit or debit card via Stripe.
+                        <TabsContent value="paypal" className="space-y-4">
+                            {!paypalClientId ? (
+                                <p className="text-sm text-muted-foreground text-center py-4">
+                                    PayPal is not configured.
                                 </p>
-                                <Button onClick={handleStripeCheckout} className="w-full" disabled={isLoading || stkStatus === "polling"}>
-                                    {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                                    Pay KES 1,000 by Card
-                                </Button>
-                            </div>
+                            ) : (
+                                <>
+                                    <p className="text-sm text-muted-foreground text-center">
+                                        Pay with PayPal or card via PayPal. Prepare the order once, then complete payment.
+                                    </p>
+                                    {!feePayPalOrderId ? (
+                                        <Button
+                                            type="button"
+                                            className="w-full"
+                                            disabled={preparingPayPalFee || stkStatus === "polling"}
+                                            onClick={prepareFeePayPal}
+                                        >
+                                            {preparingPayPalFee ? (
+                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                            ) : null}
+                                            Prepare PayPal checkout
+                                        </Button>
+                                    ) : (
+                                        <div className="min-h-[140px]">
+                                            <PayPalButtons
+                                                style={{ layout: "vertical", shape: "rect" }}
+                                                createOrder={() => Promise.resolve(feePayPalOrderId)}
+                                                onApprove={async (data) => {
+                                                    const res = await fetch("/api/payment/paypal/capture", {
+                                                        method: "POST",
+                                                        headers: { "Content-Type": "application/json" },
+                                                        body: JSON.stringify({ orderID: data.orderID }),
+                                                    });
+                                                    const json = await res.json();
+                                                    if (!res.ok) {
+                                                        throw new Error(json.error || "Payment failed");
+                                                    }
+                                                    toast.success("Payment successful! Welcome to your dashboard.");
+                                                    setFeePayPalOrderId(null);
+                                                    await refreshSessionAndReload();
+                                                }}
+                                                onError={(err) => {
+                                                    console.error(err);
+                                                    toast.error("PayPal error — try again or use M-Pesa.");
+                                                }}
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         </TabsContent>
                     </Tabs>
                 </CardContent>

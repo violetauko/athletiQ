@@ -129,7 +129,7 @@ export async function GET(request: Request) {
       purchaseCommission + donationCommission + registrationCommission
     // Total revenue: marketplace/donation commission components + full registration fees collected (10% of fees also reflected in commission total)
     const currentTotalRevenue =
-      purchaseCommission + donationCommission + currentEntryPaymentsRevenue
+      currentPurchasesTotal + currentDonationSum + currentEntryPaymentsRevenue
 
     const previousDonationSum = previousDonations._sum.amount ? previousDonations._sum.amount : 0
     const previousPurchasesTotal = (previousOrderPayments._sum.amount || 0)
