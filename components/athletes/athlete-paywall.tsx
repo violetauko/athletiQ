@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, CreditCard, Smartphone, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, CreditCard, Smartphone, CheckCircle2, AlertCircle, Landmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useSession } from "next-auth/react";
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { PAYPAL_REGISTRATION_FEE_KES } from "@/lib/paypal-pricing";
+import { WiseBankInstructions, type WiseBankPayload } from "@/components/payments/wise-bank-instructions";
 
 export function AthletePaywall() {
     const router = useRouter();
@@ -27,6 +28,13 @@ export function AthletePaywall() {
 
     const [feePayPalOrderId, setFeePayPalOrderId] = useState<string | null>(null);
     const [preparingPayPalFee, setPreparingPayPalFee] = useState(false);
+    const [feeWiseData, setFeeWiseData] = useState<{
+        bank: WiseBankPayload;
+        reference: string;
+        amount: number;
+        currency: string;
+    } | null>(null);
+    const [preparingWiseFee, setPreparingWiseFee] = useState(false);
 
     const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ?? "";
     const defaultEntryFeeKes = Number(process.env.NEXT_PUBLIC_ENTRY_FEE_AMOUNT ?? 1000);
@@ -187,6 +195,26 @@ export function AthletePaywall() {
         );
     }
 
+    const prepareFeeWise = async () => {
+        try {
+            setPreparingWiseFee(true);
+            const res = await fetch("/api/payment/wise/registration", { method: "POST" });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Wise is not available");
+            setFeeWiseData({
+                bank: data.bank,
+                reference: data.reference,
+                amount: data.amount,
+                currency: data.currency,
+            });
+            toast.success("Transfer details ready — pay in Wise with the reference shown.");
+        } catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : "Wise failed");
+        } finally {
+            setPreparingWiseFee(false);
+        }
+    };
+
     const prepareFeePayPal = async () => {
         try {
             setPreparingPayPalFee(true);
@@ -210,19 +238,24 @@ export function AthletePaywall() {
                     <CardDescription>
                         A one-time entry fee is required to access the athlete dashboard and apply to opportunities.
                         Most methods: <strong>KES {defaultEntryFeeKes.toLocaleString()}</strong>. PayPal:{" "}
-                        <strong>KES {PAYPAL_REGISTRATION_FEE_KES.toLocaleString()}</strong>.
+                        <strong>KES {PAYPAL_REGISTRATION_FEE_KES.toLocaleString()}</strong>. Wise: bank transfer for{" "}
+                        <strong>KES {defaultEntryFeeKes.toLocaleString()}</strong> (confirmed manually after arrival).
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Tabs defaultValue="mpesa" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 mb-6">
-                            <TabsTrigger value="mpesa" disabled={stkStatus === "polling"}>
-                                <Smartphone className="w-4 h-4 mr-2 hidden sm:block" />
+                        <TabsList className="grid w-full grid-cols-3 mb-6 gap-1">
+                            <TabsTrigger value="mpesa" disabled={stkStatus === "polling"} className="text-xs sm:text-sm px-1">
+                                <Smartphone className="w-4 h-4 mr-1 hidden sm:inline" />
                                 M-Pesa
                             </TabsTrigger>
-                            <TabsTrigger value="paypal" disabled={stkStatus === "polling"}>
-                                <CreditCard className="w-4 h-4 mr-2 hidden sm:block" />
+                            <TabsTrigger value="paypal" disabled={stkStatus === "polling"} className="text-xs sm:text-sm px-1">
+                                <CreditCard className="w-4 h-4 mr-1 hidden sm:inline" />
                                 PayPal
+                            </TabsTrigger>
+                            <TabsTrigger value="wise" disabled={stkStatus === "polling"} className="text-xs sm:text-sm px-1">
+                                <Landmark className="w-4 h-4 mr-1 hidden sm:inline" />
+                                Wise
                             </TabsTrigger>
                         </TabsList>
 
@@ -316,6 +349,30 @@ export function AthletePaywall() {
                                         Pay KES 1,000 via Stanbic
                                     </Button>
                                 </form>
+                            )}
+                        </TabsContent>
+
+                        <TabsContent value="wise" className="space-y-4">
+                            <p className="text-sm text-muted-foreground text-center">
+                                Pay the entry fee from Wise or your bank using the details below. Access is enabled after an admin confirms your transfer.
+                            </p>
+                            {!feeWiseData ? (
+                                <Button
+                                    type="button"
+                                    className="w-full"
+                                    disabled={preparingWiseFee || stkStatus === "polling"}
+                                    onClick={prepareFeeWise}
+                                >
+                                    {preparingWiseFee ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                                    Get Wise transfer details
+                                </Button>
+                            ) : (
+                                <WiseBankInstructions
+                                    bank={feeWiseData.bank}
+                                    reference={feeWiseData.reference}
+                                    amount={feeWiseData.amount}
+                                    currency={feeWiseData.currency}
+                                />
                             )}
                         </TabsContent>
 

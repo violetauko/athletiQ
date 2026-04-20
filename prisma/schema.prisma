@@ -353,6 +353,8 @@ model Payment {
   referenceId     String?         // Stripe Session ID or M-Pesa CheckoutRequestID
   receiptNumber   String?         // Stripe Payment Intent or M-Pesa Receipt Number
   merchantReference String?       // Order id (marketplace) or provider-specific internal ref (e.g. PesaPal order id)
+  /// Partnerize / affiliate click ref (e.g. camref) captured from landing URL cookie when payment was created.
+  affiliateClickRef String?
 
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
@@ -370,6 +372,7 @@ enum PaymentProvider {
   STANBIC_MPESA
   PAYPAL
   PESAPAL
+  WISE
 }
 
 enum PaymentStatus {
