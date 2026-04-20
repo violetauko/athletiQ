@@ -6,6 +6,7 @@ import type { Donation, Payment, User } from '@prisma/client'
 import { PaymentPurpose } from '@prisma/client'
 import { inferDonationProvider, mapAdminStatusToDonationStatus } from '@/lib/admin/admin-ledger'
 import type { Prisma } from '@prisma/client'
+import { PaymentProvider } from '@/lib/types/types'
 
 type DonationWithUser = Donation & { user: User | null }
 
@@ -295,6 +296,8 @@ function buildDonationWhere(args: {
       parts.push({ paypalOrderId: { not: null } })
     } else if (p === 'PESAPAL') {
       parts.push({ pesapalOrderId: { not: null } })
+    } else if (p === 'WISE' as PaymentProvider) {
+      parts.push({ id: { in: [] } })
     } else {
       parts.push({ id: { in: [] } })
     }

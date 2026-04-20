@@ -35,6 +35,7 @@ export function PaymentDetailsModal({ payment, isOpen, onClose }: PaymentDetails
             case 'STANBIC_MPESA': return '📱'
             case 'PAYPAL': return '🅿️'
             case 'PESAPAL': return '💵'
+            case 'WISE': return '🏦'
             default: return '💰'
         }
     }

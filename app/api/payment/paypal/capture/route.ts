@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { generateAccessToken, PAYPAL_API_BASE, parseKesFromPayPalCapture } from '@/lib/paypal'
-import { OrderStatus, PaymentPurpose, PaymentProvider, PaymentStatus } from '@prisma/client'
+import { PaymentPurpose, PaymentProvider, PaymentStatus } from '@prisma/client'
+import { finalizeSuccessfulPayment } from '@/lib/payment/finalize-successful-payment'
 import { z } from 'zod'
 
 const captureSchema = z.object({
@@ -80,9 +81,9 @@ export async function POST(req: NextRequest) {
         await prisma.order.updateMany({
           where: {
             id: payment.merchantReference,
-            status: OrderStatus.PENDING,
+            status: 'PENDING',
           },
-          data: { status: OrderStatus.CANCELLED },
+          data: { status: 'CANCELLED' },
         })
       }
       return NextResponse.json({ error: 'Failed to capture payment' }, { status: 500 })
@@ -101,41 +102,19 @@ export async function POST(req: NextRequest) {
     const amountFromPayPal = parseKesFromPayPalCapture(data)
 
     await prisma.$transaction(async (tx) => {
-      await tx.payment.update({
-        where: { id: payment.id },
-        data: {
-          status: PaymentStatus.COMPLETED,
-          receiptNumber: receiptNumber ?? undefined,
-          ...(amountFromPayPal != null
-            ? { amount: Math.round(amountFromPayPal) }
-            : {}),
+      await finalizeSuccessfulPayment(
+        tx,
+        {
+          id: payment.id,
+          userId: payment.userId,
+          purpose: payment.purpose,
+          merchantReference: payment.merchantReference,
         },
-      })
-
-      if (payment.purpose === PaymentPurpose.REGISTRATION_FEE) {
-        await tx.user.update({
-          where: { id: payment.userId },
-          data: { hasPaidFee: true },
-        })
-      } else if (
-        payment.purpose === PaymentPurpose.MARKETPLACE_PURCHASE &&
-        payment.merchantReference
-      ) {
-        const order = await tx.order.update({
-          where: { id: payment.merchantReference },
-          data: { status: OrderStatus.PROCESSING },
-          include: { OrderItem: true },
-        })
-
-        for (const item of order.OrderItem) {
-          await tx.product.update({
-            where: { id: item.productId },
-            data: {
-              stock: { decrement: item.quantity },
-            },
-          })
+        {
+          receiptNumber: receiptNumber ?? undefined,
+          ...(amountFromPayPal != null ? { amount: Math.round(amountFromPayPal) } : {}),
         }
-      }
+      )
     })
 
     return NextResponse.json({ success: true, orderID })

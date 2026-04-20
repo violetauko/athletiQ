@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input'
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '@/components/ui/table'
 import { PaginatedResponse, type AdminLedgerItem, type DonationLedgerItem } from '@/lib/types/types'
 import { formatCurrency, formatDate, getInitials, getStatusBadge } from '@/lib/utils'
-import { useQuery } from '@tanstack/react-query'
-import { Search, Filter, CreditCard, Calendar, MoreHorizontal, Eye, Download, RefreshCw } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { Search, Filter, CreditCard, Calendar, MoreHorizontal, Eye, Download, RefreshCw, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { PaymentDetailsModal } from '@/components/payments/payment-details-modal'
@@ -17,6 +18,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Badge } from '@/components/ui/badge'
 
 export default function PaymentsPage(){
+  const queryClient = useQueryClient()
   // Payments state
   const [paymentSearch, setPaymentSearch] = useState('')
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('ALL')
@@ -120,6 +122,7 @@ export default function PaymentsPage(){
                         <SelectItem value="STANBIC_MPESA">Stanbic M-Pesa</SelectItem>
                         <SelectItem value="PAYPAL">PayPal</SelectItem>
                         <SelectItem value="PESAPAL">PesaPal</SelectItem>
+                        <SelectItem value="WISE">Wise</SelectItem>
                       </SelectContent>
                     </Select>
 
@@ -282,6 +285,28 @@ export default function PaymentsPage(){
                                         <DropdownMenuItem>
                                           <RefreshCw className="mr-2 h-4 w-4" />
                                           Check Status
+                                        </DropdownMenuItem>
+                                      )}
+                                      {!isDonation && row.provider === 'WISE' && row.status === 'PENDING' && (
+                                        <DropdownMenuItem
+                                          onClick={async () => {
+                                            try {
+                                              const res = await fetch(`/api/admin/payments/${row.id}/confirm-wise`, {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({}),
+                                              })
+                                              const data = await res.json()
+                                              if (!res.ok) throw new Error(data.error || 'Confirm failed')
+                                              toast.success('Wise payment marked completed.')
+                                              await queryClient.invalidateQueries({ queryKey: ['admin-payments'] })
+                                            } catch (e: unknown) {
+                                              toast.error(e instanceof Error ? e.message : 'Confirm failed')
+                                            }
+                                          }}
+                                        >
+                                          <CheckCircle className="mr-2 h-4 w-4" />
+                                          Confirm Wise received
                                         </DropdownMenuItem>
                                       )}
                                     </DropdownMenuContent>

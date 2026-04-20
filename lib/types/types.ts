@@ -1,5 +1,5 @@
 export type DonationStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED'
-export type PaymentProvider = 'STRIPE' | 'MPESA' | 'STANBIC_MPESA' | 'PAYPAL' | 'PESAPAL'
+export type PaymentProvider = 'STRIPE' | 'MPESA' | 'STANBIC_MPESA' | 'PAYPAL' | 'PESAPAL' | 'WISE'
 export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED'
 export interface Donation {
   id: string
