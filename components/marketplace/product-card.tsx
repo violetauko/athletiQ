@@ -55,6 +55,14 @@ export function ProductCard({
         })
     }
 
+    const handleWishlist = () => {
+        toggleWishlist({ id, name, price, image, category })
+    }
+
+    const openQuickView = () => {
+        setIsQuickViewOpen(true)
+    }
+
     return (
         <div
             className="group relative flex flex-col"
@@ -65,7 +73,7 @@ export function ProductCard({
             <div className="relative aspect-[3/4] overflow-hidden bg-stone-100 rounded-sm mb-4">
                 {/* Badge */}
                 {badge && (
-                    <Badge className="absolute top-3 left-3 z-10 bg-teal-500 hover:bg-teal-600 font-medium rounded-sm px-2.5 py-0.5">
+                    <Badge className="absolute top-3 left-3 z-10 bg-amber-500 hover:bg-amber-600 font-medium rounded-sm px-2.5 py-0.5">
                         {badge}
                     </Badge>
                 )}
@@ -80,6 +88,8 @@ export function ProductCard({
                     src={image}
                     alt={name}
                     fill
+                    loading='eager'
+                    sizes='(width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
                     className={cn(
                         "object-cover transition-opacity duration-700 ease-in-out",
                         isHovered ? "opacity-0" : "opacity-100"
@@ -88,51 +98,98 @@ export function ProductCard({
                 <Image
                     src={hoverImage}
                     alt={`${name} hover`}
+                    loading='eager'
                     fill
+                    sizes='(width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
                     className={cn(
                         "object-cover transition-opacity duration-700 ease-in-out",
                         isHovered ? "opacity-100" : "opacity-0"
                     )}
                 />
 
-                {/* Quick Actions (Sidebar on hover) */}
-                <div className={cn(
-                    "absolute right-3 top-3 flex flex-col gap-2 transition-all duration-300 translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
-                )}>
+                {/* Small screens: one horizontal bar — icons + Add share the bottom row */}
+                <div
+                    className={cn(
+                        "absolute inset-x-0 bottom-0 z-20 flex items-stretch gap-0.5 border-t border-stone-200/80 bg-white/95 p-1 shadow-[0_-4px_14px_rgba(0,0,0,0.06)] backdrop-blur-sm sm:gap-1 sm:p-1.5",
+                        "lg:hidden",
+                    )}
+                >
                     <QuickActionButton
-                        icon={<Heart className={cn("w-4 h-4", isSaved && "fill-teal-500 text-teal-500")} />}
+                        icon={<Heart className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4", isSaved && "fill-amber-500 text-amber-500")} />}
                         label={isSaved ? "Saved" : "Wishlist"}
-                        onClick={() => toggleWishlist({ id, name, price, image, category })}
+                        onClick={handleWishlist}
+                        compact
                     />
-                    <QuickActionButton icon={<BarChart2 className="w-4 h-4" />} label="Compare" />
                     <QuickActionButton
-                        icon={<Search className="w-4 h-4" />}
+                        icon={<BarChart2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+                        label="Compare"
+                        compact
+                    />
+                    <QuickActionButton
+                        icon={<Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
                         label="Quick View"
-                        onClick={() => setIsQuickViewOpen(true)}
+                        onClick={openQuickView}
+                        compact
+                    />
+                    <Button
+                        type="button"
+                        onClick={handleAddToCart}
+                        className="h-9 min-h-9 min-w-0 flex-1 shrink rounded-none bg-amber-600 px-1.5 text-[9px] font-bold md:tracking-wide text-white uppercase shadow-none hover:bg-amber-700 sm:h-10 sm:min-h-10 sm:px-2 sm:text-[10px]"
+                    >
+                        <ShoppingBag className="mr-0 h-3 w-3 shrink-0 sm:mr-1 sm:h-3.5 sm:w-3.5" />
+                        <span className="hidden truncate sm:inline">Add to cart</span>
+                    </Button>
+                </div>
+
+                {/* Desktop: vertical quick actions (hover) */}
+                <div
+                    className={cn(
+                        "absolute top-3 right-3 z-20 hidden flex-col gap-2 transition-all duration-300 lg:flex",
+                        "translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100",
+                    )}
+                >
+                    <QuickActionButton
+                        icon={<Heart className={cn("h-4 w-4", isSaved && "fill-amber-500 text-amber-500")} />}
+                        label={isSaved ? "Saved" : "Wishlist"}
+                        onClick={handleWishlist}
+                    />
+                    <QuickActionButton icon={<BarChart2 className="h-4 w-4" />} label="Compare" />
+                    <QuickActionButton
+                        icon={<Search className="h-4 w-4" />}
+                        label="Quick View"
+                        onClick={openQuickView}
                     />
                 </div>
 
-                {/* Quick Add Button (Bottom on hover) */}
-                <div className={cn(
-                    "absolute bottom-0 left-0 right-0 p-3 transition-all duration-300 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100",
-                )}>
+                {/* Desktop: full-width add on hover */}
+                <div
+                    className={cn(
+                        "absolute right-0 bottom-0 left-0 z-20 hidden p-3 transition-all duration-300 lg:block",
+                        "translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100",
+                    )}
+                >
                     <Button
+                        type="button"
                         onClick={handleAddToCart}
-                        className="w-full bg-white text-black hover:bg-black hover:text-white rounded-none h-10 font-bold uppercase text-[10px] tracking-widest shadow-lg"
+                        className="h-10 w-full rounded-none bg-white text-[10px] font-bold tracking-widest text-black uppercase shadow-lg hover:bg-black hover:text-white"
                     >
-                        <ShoppingBag className="w-3.5 h-3.5 mr-2" />
-                        Quick Add
+                        <ShoppingBag className="mr-2 h-3.5 w-3.5" />
+                        Add to cart
                     </Button>
                 </div>
             </div>
 
             {/* Product Info */}
-            <div className="flex flex-col gap-1.5">
-                <p className="text-[10px] uppercase tracking-widest text-stone-500 font-semibold">{category}</p>
-                <h3 className="text-sm font-medium hover:text-teal-600 transition-colors cursor-pointer leading-tight">
+            <div className="flex flex-col gap-1 md:gap-1.5">
+                <p className="text-[10px] uppercase md:tracking-widest text-stone-500 font-semibold">{category}</p>
+                <button
+                    type="button"
+                    onClick={openQuickView}
+                    className="text-left text-sm font-medium leading-tight text-foreground underline-offset-4 hover:text-amber-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 overflow-hidden text-ellipsis whitespace-nowrap"
+                >
                     {name}
-                </h3>
-                <div className="flex items-center gap-2 mt-1">
+                </button>
+                <div className="flex items-center gap-1 md:gap-2 mt-1">
                     <span className="text-sm font-bold">KES {price.toFixed(2)}</span>
                     {originalPrice && (
                         <span className="text-xs text-stone-400 line-through">KES {originalPrice.toFixed(2)}</span>
@@ -164,17 +221,40 @@ export function ProductCard({
     )
 }
 
-function QuickActionButton({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick?: () => void }) {
+function QuickActionButton({
+    icon,
+    label,
+    onClick,
+    compact,
+}: {
+    icon: React.ReactNode
+    label: string
+    onClick?: () => void
+    compact?: boolean
+}) {
     return (
         <button
-            onClick={onClick}
-            className="w-10 h-10 bg-white hover:bg-black hover:text-white flex items-center justify-center rounded-sm shadow-sm transition-colors group/btn relative"
+            type="button"
+            onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                onClick?.()
+            }}
+            className={cn(
+                "group/btn relative flex touch-manipulation items-center justify-center rounded-sm bg-white shadow-sm transition-colors hover:bg-black hover:text-white",
+                compact
+                    ? "h-9 min-h-9 w-9 min-w-9 shrink-0 sm:h-10 sm:min-h-10 sm:w-10 sm:min-w-10"
+                    : "h-10 w-10",
+            )}
             title={label}
+            aria-label={label}
         >
             {icon}
-            <span className="absolute right-full mr-2 px-2 py-1 bg-black text-white text-[10px] whitespace-nowrap opacity-0 group-hover/btn:opacity-100 transition-opacity pointer-events-none rounded-sm">
-                {label}
-            </span>
+            {!compact && (
+                <span className="pointer-events-none absolute right-full mr-2 hidden rounded-sm bg-black px-2 py-1 text-[10px] whitespace-nowrap text-white opacity-0 transition-opacity group-hover/btn:opacity-100 lg:block">
+                    {label}
+                </span>
+            )}
         </button>
     )
 }
