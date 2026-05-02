@@ -7,6 +7,7 @@ import {
   marketplaceCommissionFromGross,
   registrationFeeCommissionFromGross,
 } from '@/lib/marketplace/commission'
+import { utcCalendarMonthStart } from '@/lib/admin/analytics-period'
 
 export async function GET(request: Request) {
   try {
@@ -18,31 +19,39 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const period = searchParams.get('period') || 'month'
 
-    // Calculate date range based on period
+    // Calculate date range based on period (month = UTC calendar month-to-date, same as commission invoice)
     const now = new Date()
     let startDate: Date
     let previousStartDate: Date
 
     switch (period) {
-      case 'week':
-        startDate = new Date(now.setDate(now.getDate() - 7))
-        previousStartDate = new Date(now.setDate(now.getDate() - 14))
+      case 'week': {
+        const end = new Date()
+        startDate = new Date(end)
+        startDate.setDate(startDate.getDate() - 7)
+        previousStartDate = new Date(end)
+        previousStartDate.setDate(previousStartDate.getDate() - 14)
         break
+      }
       case 'month':
-        startDate = new Date(now.setMonth(now.getMonth() - 1))
-        previousStartDate = new Date(now.setMonth(now.getMonth() - 2))
+        startDate = utcCalendarMonthStart(now, 0)
+        previousStartDate = utcCalendarMonthStart(now, -1)
         break
       case 'quarter':
-        startDate = new Date(now.setMonth(now.getMonth() - 3))
-        previousStartDate = new Date(now.setMonth(now.getMonth() - 6))
+        startDate = new Date(now)
+        startDate.setMonth(startDate.getMonth() - 3)
+        previousStartDate = new Date(now)
+        previousStartDate.setMonth(previousStartDate.getMonth() - 6)
         break
       case 'year':
-        startDate = new Date(now.setFullYear(now.getFullYear() - 1))
-        previousStartDate = new Date(now.setFullYear(now.getFullYear() - 2))
+        startDate = new Date(now)
+        startDate.setFullYear(startDate.getFullYear() - 1)
+        previousStartDate = new Date(now)
+        previousStartDate.setFullYear(previousStartDate.getFullYear() - 2)
         break
       default:
-        startDate = new Date(now.setMonth(now.getMonth() - 1))
-        previousStartDate = new Date(now.setMonth(now.getMonth() - 2))
+        startDate = utcCalendarMonthStart(now, 0)
+        previousStartDate = utcCalendarMonthStart(now, -1)
     }
 
     // Get current period data

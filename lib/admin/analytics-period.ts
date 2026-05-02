@@ -1,6 +1,19 @@
 export type AnalyticsPeriod = 'week' | 'month' | 'quarter' | 'year'
 
-/** Start of the rolling window ending now (matches finance analytics behavior). */
+/**
+ * Start of a UTC calendar month relative to `reference` (aligned with commission invoice).
+ * offset 0 = month containing reference; -1 = previous calendar month, etc.
+ */
+export function utcCalendarMonthStart(
+  reference: Date = new Date(),
+  monthOffset = 0
+): Date {
+  const y = reference.getUTCFullYear()
+  const m = reference.getUTCMonth() + monthOffset
+  return new Date(Date.UTC(y, m, 1, 0, 0, 0, 0))
+}
+
+/** Rolling week/quarter/year; month = start of current UTC calendar month (month-to-date). */
 export function getAnalyticsPeriodStart(period: AnalyticsPeriod): Date {
   const d = new Date()
   switch (period) {
@@ -10,9 +23,7 @@ export function getAnalyticsPeriodStart(period: AnalyticsPeriod): Date {
       return x
     }
     case 'month': {
-      const x = new Date(d)
-      x.setMonth(x.getMonth() - 1)
-      return x
+      return utcCalendarMonthStart(d, 0)
     }
     case 'quarter': {
       const x = new Date(d)
@@ -25,9 +36,7 @@ export function getAnalyticsPeriodStart(period: AnalyticsPeriod): Date {
       return x
     }
     default: {
-      const x = new Date(d)
-      x.setMonth(x.getMonth() - 1)
-      return x
+      return utcCalendarMonthStart(d, 0)
     }
   }
 }
