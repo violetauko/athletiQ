@@ -65,13 +65,13 @@ const categories = [
 
 // Team data - static
 const ourTeam = [
-  {
-    name: 'Cornellias Mokoro',
-    position: 'Co-Founder & CEO',
-    imageUrl: '/team/mokoro.jpeg',
-    role: 'Leadership',
-    linkedIn: 'https://linkedin.com/in/cornellias'
-  },
+  // {
+  //   name: 'Cornellias Mokoro',
+  //   position: 'Co-Founder & CEO',
+  //   imageUrl: '/team/mokoro.jpeg',
+  //   role: 'Leadership',
+  //   linkedIn: 'https://linkedin.com/in/cornellias'
+  // },
   {
     name: 'Hezbon Obutu',
     position: 'Coordinator',
